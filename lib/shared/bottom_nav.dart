@@ -3,6 +3,7 @@ import 'package:magicards/shared/custom_icons_icons.dart';
 import 'package:magicards/shared/shared.dart';
 
 class AppBottomNav extends StatelessWidget {
+  // Test changes
   
   final int selectedIndex;
   final bool isHomePage;
