@@ -6,7 +6,7 @@ Color hexToColor(String code) {
 }
 
 class MyColors {
-  static const Color mainBgColor =  Color(0xFFF3F3F3);
+  static const Color mainBgColor = Color(0xFFF3F3F3);
   static const Color mainDarkColor = Color(0xFF393560);
   static const Color mainBrightColor = Color(0xFFFA5C5C);
   static const Color greenBrightColor = Color(0xFF1AC840);
@@ -44,5 +44,10 @@ const myMainTextStyle = TextStyle(
 
 const myLabelTextStyle = TextStyle(
   fontSize: 12,
+  color: MyColors.mainDarkColor,
+);
+
+const myToolbarTextStyle = TextStyle(
+  fontWeight: FontWeight.bold,
   color: MyColors.mainDarkColor,
 );

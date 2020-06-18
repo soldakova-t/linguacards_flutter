@@ -1,39 +1,82 @@
-import 'dart:collection';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import '../screens/screens.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-class SubtopicsScreen extends StatelessWidget {
+class SubtopicsScreen extends StatefulWidget {
   final Topic topic;
+  SubtopicsScreen({Key key, this.topic}) : super(key: key);
 
-  const SubtopicsScreen({Key key, this.topic}) : super(key: key);
+  @override
+  _SubtopicsScreenState createState() => _SubtopicsScreenState();
+}
+
+const kExpandedHeight = 300.0;
+
+class _SubtopicsScreenState extends State<SubtopicsScreen> {
+  ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController = ScrollController()..addListener(() => setState(() {}));
+  }
+
+  bool get _showTitle {
+    return _scrollController.hasClients &&
+        _scrollController.offset > kExpandedHeight - kToolbarHeight;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            TopicDetails(topic: topic),
-            Container(
-              height: 15,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: <Widget>[
+          SliverAppBar(
+            pinned: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios),
+              color: hexToColor('#B2B2B2'),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => TopicsScreen(),
+                  ),
+                );
+              },
             ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
+            expandedHeight: 300.0,
+            title: _showTitle
+                ? Text(
+                    widget.topic.title,
+                    style: myToolbarTextStyle,
+                  )
+                : null,
+            flexibleSpace: _showTitle
+                ? null
+                : FlexibleSpaceBar(
+                    background: TopicDetails(topic: widget.topic),
+                  ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.only(
+              top: 15,
+              //bottom: 500,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => SubtopicContent(
+                  subtopic: widget.topic.subtopics[index],
+                  value: 0.5,
                 ),
-                child: SubtopicsList(topic: topic),
+                childCount: widget.topic.subtopics.length,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: AppBottomNav(
         selectedIndex: 0,
@@ -51,8 +94,6 @@ class TopicDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 230,
-      width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: NetworkImage(topic.img),
@@ -64,35 +105,23 @@ class TopicDetails extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(
-              left: 10,
-              top: 42,
+              left: 40,
+              top: 130,
             ),
-            child: InkWell(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => TopicsScreen(),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SvgPicture.asset("assets/icons/arrow-left.svg"),
+            child: Container(
+              width: 150,
+              child: Text(
+                topic.title,
+                style: myH1,
               ),
             ),
           ),
           Padding(
             padding: EdgeInsets.only(
               left: 40,
-              top: 7,
             ),
-            child: Text(topic.title, style: myH1),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: 40,
-            ),
-            child: Text(topic.titleRus, style: mySubtitle14Style),
+            child: Text(topic.titleRus,
+                style: mySubtitle14Style),
           ),
           Padding(
             padding: EdgeInsets.only(
@@ -107,37 +136,12 @@ class TopicDetails extends StatelessWidget {
                 color: Colors.white,
               ),
               child: Center(
-                child: Text('240 слов', style: myLabelTextStyle),
+                child:
+                    Text('240 слов', style: myLabelTextStyle),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class SubtopicsList extends StatelessWidget {
-  final Topic topic;
-
-  const SubtopicsList({
-    Key key,
-    this.topic,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView(
-        padding: const EdgeInsets.all(0),
-        children: topic.subtopics
-            .map(
-              (subtopic) => SubtopicContent(
-                subtopic: subtopic,
-                value: 0.5,
-              ),
-            )
-            .toList(),
       ),
     );
   }
@@ -153,10 +157,8 @@ class SubtopicContent extends StatelessWidget {
     this.value,
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
-
     int percentValue = (value * 100).toInt();
 
     return InkWell(
