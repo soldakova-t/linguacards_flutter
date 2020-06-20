@@ -11,9 +11,8 @@ class SubtopicsScreen extends StatefulWidget {
   _SubtopicsScreenState createState() => _SubtopicsScreenState();
 }
 
-const kExpandedHeight = 300.0;
-
 class _SubtopicsScreenState extends State<SubtopicsScreen> {
+  static const kExpandedHeight = 300.0;
   ScrollController _scrollController;
 
   @override
@@ -41,14 +40,10 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
               icon: Icon(Icons.arrow_back_ios),
               color: hexToColor('#B2B2B2'),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => TopicsScreen(),
-                  ),
-                );
+                Navigator.of(context).pop();
               },
             ),
-            expandedHeight: 300.0,
+            expandedHeight: 155.0 + kToolbarHeight,
             title: _showTitle
                 ? Text(
                     widget.topic.title,
@@ -64,13 +59,12 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
           SliverPadding(
             padding: const EdgeInsets.only(
               top: 15,
-              //bottom: 500,
             ),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) => SubtopicContent(
                   subtopic: widget.topic.subtopics[index],
-                  value: 0.5,
+                  progress: 0.5,
                 ),
                 childCount: widget.topic.subtopics.length,
               ),
@@ -106,7 +100,7 @@ class TopicDetails extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(
               left: 40,
-              top: 130,
+              top: 56 + kToolbarHeight,
             ),
             child: Container(
               width: 150,
@@ -120,8 +114,7 @@ class TopicDetails extends StatelessWidget {
             padding: EdgeInsets.only(
               left: 40,
             ),
-            child: Text(topic.titleRus,
-                style: mySubtitle14Style),
+            child: Text(topic.titleRus, style: mySubtitle14Style),
           ),
           Padding(
             padding: EdgeInsets.only(
@@ -136,8 +129,7 @@ class TopicDetails extends StatelessWidget {
                 color: Colors.white,
               ),
               child: Center(
-                child:
-                    Text('240 слов', style: myLabelTextStyle),
+                child: Text('240 слов', style: myLabelTextStyle),
               ),
             ),
           ),
@@ -149,23 +141,23 @@ class TopicDetails extends StatelessWidget {
 
 class SubtopicContent extends StatelessWidget {
   final Subtopic subtopic;
-  final double value;
+  final double progress;
 
   const SubtopicContent({
     Key key,
     this.subtopic,
-    this.value,
+    this.progress,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int percentValue = (value * 100).toInt();
+    int percentValue = (progress * 100).toInt();
 
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (BuildContext context) => CardsPage(
+            builder: (BuildContext context) => CardsScreen(
               subtopic: subtopic,
             ),
           ),
@@ -198,7 +190,7 @@ class SubtopicContent extends StatelessWidget {
                     width: 85,
                     child: AnimatedProgressBar(
                       height: 3,
-                      value: value,
+                      value: progress,
                     ),
                   ),
                   Text(
