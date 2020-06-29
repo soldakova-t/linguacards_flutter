@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         StreamProvider<FirebaseUser>.value(value: AuthService().user),
+        ChangeNotifierProvider<TrainingFlashcardsState>(
+          create: (_) => TrainingFlashcardsState(),
+        )
       ],
       child: MaterialApp(
         // Firebase Analytics

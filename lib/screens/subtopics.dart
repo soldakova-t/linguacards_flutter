@@ -12,7 +12,7 @@ class SubtopicsScreen extends StatefulWidget {
 }
 
 class _SubtopicsScreenState extends State<SubtopicsScreen> {
-  static const kExpandedHeight = 300.0;
+  static const kExpandedHeight = 155.0;
   ScrollController _scrollController;
 
   @override
@@ -43,7 +43,7 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
                 Navigator.of(context).pop();
               },
             ),
-            expandedHeight: 155.0 + kToolbarHeight,
+            expandedHeight: kExpandedHeight + kToolbarHeight,
             title: _showTitle
                 ? Text(
                     widget.topic.title,
@@ -188,7 +188,7 @@ class SubtopicContent extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.only(right: 15),
                     width: 85,
-                    child: AnimatedProgressBar(
+                    child: AnimatedProgressWithDelay(
                       height: 3,
                       value: progress,
                     ),

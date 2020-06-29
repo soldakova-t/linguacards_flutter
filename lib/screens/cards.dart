@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import '../screens/screens.dart';
+import 'package:provider/provider.dart';
 
 class CardsScreen extends StatefulWidget {
   final Subtopic subtopic;
@@ -13,7 +15,7 @@ class CardsScreen extends StatefulWidget {
 }
 
 class _CardsScreenState extends State<CardsScreen> {
-  static const kExpandedHeight = 300.0;
+  static const kExpandedHeight = 155.0;
   ScrollController _scrollController;
   List<Magicard> listOfCards = List<Magicard>();
 
@@ -32,13 +34,34 @@ class _CardsScreenState extends State<CardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: _buildBody(context),
-      bottomNavigationBar: AppBottomNav(
-        selectedIndex: 0,
-        isHomePage: false,
-      ),
-    );
+        backgroundColor: Colors.white,
+        body: _buildBody(context),
+        floatingActionButton: Container(
+    height: 48,
+    width: 196,
+    child: FloatingActionButton.extended(
+      onPressed: () {
+        var state =
+            Provider.of<TrainingFlashcardsState>(context, listen: false);
+        state.progress = (1 / listOfCards.length);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) => TrainingFlashcards(
+              listOfCards: listOfCards,
+            ),
+          ),
+        );
+      },
+      label: Text('Флешкарты'),
+      backgroundColor: MyColors.mainBrightColor,
+    ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        bottomNavigationBar: AppBottomNav(
+    selectedIndex: 0,
+    isHomePage: false,
+        ),
+      );
   }
 
   Widget _buildBody(BuildContext context) {
@@ -58,6 +81,9 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    listOfCards =
+        snapshot.map((document) => Magicard.fromSnapshot(document)).toList();
+
     return CustomScrollView(
       controller: _scrollController,
       slivers: <Widget>[
@@ -70,7 +96,7 @@ class _CardsScreenState extends State<CardsScreen> {
               Navigator.of(context).pop();
             },
           ),
-          expandedHeight: 155.0 + kToolbarHeight,
+          expandedHeight: kExpandedHeight + kToolbarHeight,
           title: _showTitle
               ? Text(
                   widget.subtopic.title,
@@ -187,11 +213,10 @@ class CardContent extends StatelessWidget {
               left: 0.0,
               right: 0.0,
             ),
-            leading: Container(
+            leading: Image.network(
+              card.photo,
               height: 70,
-              child: Image.network(
-                card.photo,
-              ),
+              width: 70,
             ),
             title: Text(
               card.title,

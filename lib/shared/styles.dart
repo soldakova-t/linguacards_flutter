@@ -20,6 +20,7 @@ const myH1 = TextStyle(
   color: MyColors.mainDarkColor,
   fontWeight: FontWeight.bold,
 );
+
 const myH2 = TextStyle(
   fontSize: 20,
   color: MyColors.mainDarkColor,
@@ -50,4 +51,21 @@ const myLabelTextStyle = TextStyle(
 const myToolbarTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
   color: MyColors.mainDarkColor,
+);
+
+const myH1Card = TextStyle(
+  fontSize: 32,
+  color: Colors.black,
+  fontWeight: FontWeight.bold,
+);
+
+const myTranscriptionCard = TextStyle(
+  fontSize: 14,
+  color: Color(0xFF878787),
+  fontFamily: 'Arial',
+);
+
+const myMainTextStyleCard = TextStyle(
+  fontSize: 14,
+  color: Colors.black,
 );

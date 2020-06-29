@@ -2,27 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:magicards/shared/shared.dart';
 import 'dart:async';
 
-class AnimatedProgressBar extends StatefulWidget {
+class AnimatedProgressWithDelay extends StatefulWidget {
   final double value;
   final double height;
 
-  AnimatedProgressBar({Key key, @required this.value, this.height = 12})
+  AnimatedProgressWithDelay({Key key, this.value, this.height = 8})
       : super(key: key);
 
   @override
-  _AnimatedProgressBarState createState() => _AnimatedProgressBarState();
+  _AnimatedProgressWithDelayState createState() =>
+      _AnimatedProgressWithDelayState();
 }
 
-class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
+class _AnimatedProgressWithDelayState<T>
+    extends State<AnimatedProgressWithDelay> {
   double _currentValue = 0.0;
 
-  _AnimatedProgressBarState() {
+  _AnimatedProgressWithDelayState() {
     Future.delayed(const Duration(milliseconds: 400), () {
       setState(() {
         _currentValue = widget.value;
       });
     });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return ProgressLayoutBuilder(
+        value: _currentValue, height: widget.height);
+  }
+}
+
+class AnimatedProgress extends StatelessWidget {
+  final double value;
+  final double height;
+
+  AnimatedProgress({Key key, @required this.value, this.height = 12})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ProgressLayoutBuilder(value: value, height: height);
+  }
+}
+
+
+class ProgressLayoutBuilder extends StatelessWidget {
+  final double value;
+  final double height;
+
+  const ProgressLayoutBuilder(
+      {Key key, @required this.value, this.height = 12})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,23 +64,23 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
           child: Stack(
             children: [
               Container(
-                height: widget.height,
+                height: height,
                 decoration: BoxDecoration(
                   color: hexToColor('#E2E1E1'),
                   borderRadius: BorderRadius.all(
-                    Radius.circular(widget.height),
+                    Radius.circular(height),
                   ),
                 ),
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 400),
                 curve: Curves.easeOutCubic,
-                height: widget.height,
-                width: box.maxWidth * _floor(_currentValue),
+                height: height,
+                width: box.maxWidth * _floor(value),
                 decoration: BoxDecoration(
                   color: MyColors.greenBrightColor,
                   borderRadius: BorderRadius.all(
-                    Radius.circular(widget.height),
+                    Radius.circular(height),
                   ),
                 ),
               ),
@@ -59,9 +90,9 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
       },
     );
   }
+}
 
-  // Always round negative or NaNs to min value
-  _floor(double value, [min = 0.0]) {
-    return value.sign <= min ? min : value;
-  }
+// Always round negative or NaNs to min value
+_floor(double value, [min = 0.0]) {
+  return value.sign <= min ? min : value;
 }
