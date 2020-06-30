@@ -60,6 +60,7 @@ class Magicard {
   final String titleRus;
   final String transcription;
   final String photo;
+  final String whiteBg;
   final DocumentReference reference;
 
   Magicard.fromMap(Map<String, dynamic> map, {this.reference})
@@ -68,6 +69,7 @@ class Magicard {
         title = map['title'],
         titleRus = map['titleRus'] ?? '',
         transcription = map['transcription'] ?? '',
+        whiteBg = map['whiteBg'] ?? '1',
         photo = map['photo'];
 
   Magicard.fromSnapshot(DocumentSnapshot snapshot)

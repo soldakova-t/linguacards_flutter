@@ -37,7 +37,7 @@ class AnimatedProgress extends StatelessWidget {
   final double value;
   final double height;
 
-  AnimatedProgress({Key key, @required this.value, this.height = 12})
+  AnimatedProgress({Key key, @required this.value, this.height = 8})
       : super(key: key);
 
   @override

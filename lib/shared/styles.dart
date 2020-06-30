@@ -41,6 +41,7 @@ const mySubtitle14Style = TextStyle(
 const myMainTextStyle = TextStyle(
   fontSize: 14,
   color: MyColors.mainDarkColor,
+  // fontWeight: FontWeight.normal,
 );
 
 const myLabelTextStyle = TextStyle(
@@ -54,18 +55,18 @@ const myToolbarTextStyle = TextStyle(
 );
 
 const myH1Card = TextStyle(
-  fontSize: 32,
+  fontSize: 36,
   color: Colors.black,
   fontWeight: FontWeight.bold,
 );
 
 const myTranscriptionCard = TextStyle(
-  fontSize: 14,
+  fontSize: 13,
   color: Color(0xFF878787),
-  fontFamily: 'Arial',
+  fontFamily: 'Helvetica',
 );
 
-const myMainTextStyleCard = TextStyle(
+const myLabelTextStyleCard = TextStyle(
   fontSize: 14,
-  color: Colors.black,
+  color: Color(0xFF878787),
 );

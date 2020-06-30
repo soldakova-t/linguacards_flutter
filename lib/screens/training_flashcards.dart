@@ -38,10 +38,11 @@ class TrainingFlashcards extends StatelessWidget {
                       right: 12,
                     ),
                     width: MediaQuery.of(context).size.width - 83.0,
-                    height: 8.0,
                     child: Consumer<TrainingFlashcardsState>(
-                      builder: (context, state, child) =>
-                          AnimatedProgress(value: state.progress),
+                      builder: (context, state, child) => AnimatedProgress(
+                        value: state.progress,
+                        height: 5.0,
+                      ),
                     ),
                   ),
                   InkWell(
@@ -64,23 +65,6 @@ class TrainingFlashcards extends StatelessWidget {
                   top: 60.0 + MediaQuery.of(context).padding.top, bottom: 20.0),
               child: _buildCarousel(context),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 60.0 + MediaQuery.of(context).padding.top),
-              child: CustomGradientContainer(
-                  width: 40,
-                  colors: [Colors.grey[200], Colors.white.withOpacity(0.0)],
-                  stops: [0.0, 0.95]),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                  top: 60.0 + MediaQuery.of(context).padding.top),
-              alignment: Alignment.topRight,
-              child: CustomGradientContainer(
-                  width: 40,
-                  colors: [Colors.white.withOpacity(0.0), Colors.grey[200]],
-                  stops: [0.0, 0.95]),
-            ),
           ],
         ),
       ),
@@ -89,6 +73,7 @@ class TrainingFlashcards extends StatelessWidget {
 
   Widget _buildCarousel(BuildContext context) {
     var state = Provider.of<TrainingFlashcardsState>(context);
+    int trainingVariant = 1;
 
     return SizedBox(
       height: double.infinity,
@@ -101,25 +86,51 @@ class TrainingFlashcards extends StatelessWidget {
           state.progress = ((idx + 1) / listOfCards.length);
         },
         itemBuilder: (BuildContext context, int itemIndex) {
-          return _buildCarouselItem(context, itemIndex);
+          if (trainingVariant == 0) {
+            return CarouselItemWordOpened(
+                listOfCards: listOfCards,
+                context: context,
+                itemIndex: itemIndex);
+          } else {
+            return CarouselItemPhotoOpened(
+                listOfCards: listOfCards,
+                context: context,
+                itemIndex: itemIndex);
+          }
         },
         itemCount: listOfCards.length,
       ),
     );
   }
+}
 
-  Widget _buildCarouselItem(BuildContext context, int itemIndex) {
-    var state = Provider.of<TrainingFlashcardsState>(context);
+// Two layouts for different types of training.
+
+class CarouselItemWordOpened extends StatelessWidget {
+  const CarouselItemWordOpened({
+    Key key,
+    @required this.listOfCards,
+    @required this.context,
+    @required this.itemIndex,
+  }) : super(key: key);
+
+  final List<Magicard> listOfCards;
+  final BuildContext context;
+  final int itemIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    var trainingState = Provider.of<TrainingFlashcardsState>(context);
 
     return Padding(
       padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
       child: GestureDetector(
         onPanUpdate: (details) {
           if (details.delta.dx < 0) {
-            state.nextPage();
+            trainingState.nextPage();
           }
           if (details.delta.dx > 0) {
-            state.prevPage();
+            trainingState.prevPage();
           }
         },
         child: Container(
@@ -138,70 +149,84 @@ class TrainingFlashcards extends StatelessWidget {
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(34.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Stack(children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Text(
-                        listOfCards[itemIndex].title,
-                        style: myH1Card,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40.0, top: 30),
+                        child: Text(
+                          listOfCards[itemIndex].title,
+                          style: myH1Card,
+                        ),
                       ),
                       SizedBox(height: 10),
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            '[' + listOfCards[itemIndex].transcription + ']',
-                            style: myTranscriptionCard,
-                          ),
-                          SizedBox(width: 10),
-                          ClipOval(
-                            child: Container(
-                              height: 30,
-                              width: 30,
-                              color: Colors.grey[200],
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child:
-                                    SvgPicture.asset('assets/icons/sound.svg'),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40.0),
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              '[' + listOfCards[itemIndex].transcription + ']',
+                              style: myTranscriptionCard,
+                            ),
+                            SizedBox(width: 10),
+                            ClipOval(
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                color: Colors.grey[200],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: SvgPicture.asset(
+                                      'assets/icons/sound.svg'),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       SizedBox(height: 30),
-                      Text(
-                        listOfCards[itemIndex].titleRus,
-                        style: myMainTextStyleCard,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40.0),
+                        child: Text(
+                          listOfCards[itemIndex].titleRus,
+                          style: myLabelTextStyleCard,
+                        ),
                       ),
                       SizedBox(height: 10),
                       Expanded(
                         child: Align(
                           alignment: Alignment.center,
-                          child: Image.network(listOfCards[itemIndex].photo),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 1.0),
+                            child: Container(
+                                width: double.infinity,
+                                child: Image.network(
+                                  listOfCards[itemIndex].photo,
+                                  fit: listOfCards[itemIndex].whiteBg == '1'
+                                      ? BoxFit.contain
+                                      : BoxFit.cover,
+                                )),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 120),
+                      SizedBox(height: 110),
                     ],
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
-                      height: 48,
-                      width: 196,
-                      child: FloatingActionButton.extended(
-                        heroTag: null,
-                        onPressed: () {},
-                        label: Text('Изучено'),
-                        backgroundColor: MyColors.mainBrightColor,
-                      ),
+                    child: ButtonLearned(
+                      heroTag: listOfCards[itemIndex].title,
                     ),
                   ),
                 ]),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 150.0),
-                child: ShowMeaning(),
+                child: ContainerShowMeaning(
+                    trainingVariant: 0, notifyParent: () {}),
               ),
             ],
           ),
@@ -211,85 +236,326 @@ class TrainingFlashcards extends StatelessWidget {
   }
 }
 
-class ShowMeaning extends StatefulWidget {
-  ShowMeaning({Key key}) : super(key: key);
+class CarouselItemPhotoOpened extends StatefulWidget {
+  const CarouselItemPhotoOpened({
+    Key key,
+    @required this.listOfCards,
+    @required this.context,
+    @required this.itemIndex,
+  }) : super(key: key);
+
+  final List<Magicard> listOfCards;
+  final BuildContext context;
+  final int itemIndex;
 
   @override
-  _ShowMeaningState createState() => _ShowMeaningState();
+  _CarouselItemPhotoOpenedState createState() =>
+      _CarouselItemPhotoOpenedState();
 }
 
-class _ShowMeaningState extends State<ShowMeaning>
-    with AutomaticKeepAliveClientMixin<ShowMeaning> {
+class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
+  Color _titleRusBg = Colors.grey[100];
+
+  changeTitleRusBg() {
+    setState(() {
+      _titleRusBg = Colors.white;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var trainingState = Provider.of<TrainingFlashcardsState>(context);
+
+    return Padding(
+      padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
+      child: GestureDetector(
+        onPanUpdate: (details) {
+          if (details.delta.dx < 0) {
+            trainingState.nextPage();
+          }
+          if (details.delta.dx > 0) {
+            trainingState.prevPage();
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(35.0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 3,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Stack(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(
+                    left: 0.0,
+                    top: widget.listOfCards[widget.itemIndex].whiteBg == '1'
+                        ? 20.0
+                        : 0.0,
+                    right: 0.0,
+                    bottom: 20.0),
+                child: Stack(children: <Widget>[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Container(
+                        height:
+                            widget.listOfCards[widget.itemIndex].whiteBg == '1'
+                                ? 260
+                                : 280,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(35.0),
+                                  topRight: Radius.circular(35.0)),
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Image.network(
+                                  widget.listOfCards[widget.itemIndex].photo,
+                                  height: widget.listOfCards[widget.itemIndex]
+                                              .whiteBg ==
+                                          '1'
+                                      ? 210
+                                      : 280,
+                                  width: double.infinity,
+                                  fit: widget.listOfCards[widget.itemIndex]
+                                              .whiteBg ==
+                                          '1'
+                                      ? BoxFit.contain
+                                      : BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: _titleRusBg,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10.0),
+                                      topRight: Radius.circular(10.0)),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 50.0,
+                                      top: 6.0,
+                                      right: 50.0,
+                                      bottom: 6.0),
+                                  child: Text(
+                                    widget
+                                        .listOfCards[widget.itemIndex].titleRus,
+                                    style: myLabelTextStyleCard,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 13),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                widget.listOfCards[widget.itemIndex].title,
+                                style: myH1Card,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    '[' +
+                                        widget.listOfCards[widget.itemIndex]
+                                            .transcription +
+                                        ']',
+                                    style: myTranscriptionCard,
+                                  ),
+                                  SizedBox(width: 10),
+                                  ClipOval(
+                                    child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      color: Colors.grey[200],
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(6.0),
+                                        child: SvgPicture.asset(
+                                            'assets/icons/sound.svg'),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 65),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ButtonLearned(),
+                  ),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 280.0),
+                child: ContainerShowMeaning(
+                    trainingVariant: 1, notifyParent: changeTitleRusBg),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Elements
+
+class ButtonLearned extends StatefulWidget {
+  const ButtonLearned({
+    Key key,
+    this.heroTag,
+  }) : super(key: key);
+
+  final String heroTag;
+
+  @override
+  _ButtonLearnedState createState() => _ButtonLearnedState();
+}
+
+class _ButtonLearnedState extends State<ButtonLearned> {
+  bool _learned = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      child: _learned == false
+          ? FloatingActionButton.extended(
+              heroTag: widget.heroTag,
+              onPressed: () {
+                setState(() {
+                  _learned = true;
+                });
+              },
+              label: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Text(
+                  'Изучено',
+                  style: myMainTextStyle,
+                ),
+              ),
+              backgroundColor: Colors.grey[200],
+              elevation: 1.0,
+            )
+          : Container(
+              height: 48,
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 88,
+                height: 25,
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.check,
+                      size: 18,
+                      color: Colors.green[600],
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Изучено',
+                      style: TextStyle(
+                        color: Colors.green[600],
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+class ContainerShowMeaning extends StatefulWidget {
+  ContainerShowMeaning({
+    Key key,
+    this.trainingVariant,
+    @required this.notifyParent,
+  }) : super(key: key);
+
+  final int trainingVariant;
+  final Function() notifyParent;
+
+  @override
+  _ContainerShowMeaningState createState() => _ContainerShowMeaningState();
+}
+
+class _ContainerShowMeaningState extends State<ContainerShowMeaning>
+    with AutomaticKeepAliveClientMixin<ContainerShowMeaning> {
   bool _show = true;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        widget.notifyParent();
         setState(() {
           _show = false;
         });
       },
-      child: Container(
-        width: double.infinity,
-        child: Opacity(
-          opacity: _show == true ? 1.0 : 0.0,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(35.0),
-                  bottomRight: Radius.circular(35.0)),
-              color: Colors.grey[100],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SvgPicture.asset('assets/icons/eye.svg'),
-                Text(
-                  'Показать значение',
-                  style: TextStyle(
-                    color: hexToColor('#979797'),
-                    fontSize: 15,
-                  ),
+      child: _show == false
+          ? Container()
+          : Container(
+              width: double.infinity,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(35.0),
+                      bottomRight: Radius.circular(35.0)),
+                  color: Colors.grey[100],
                 ),
-              ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SvgPicture.asset('assets/icons/eye.svg'),
+                    Text(
+                      widget.trainingVariant == 0
+                          ? 'Показать фото'
+                          : 'Показать слово',
+                      style: TextStyle(
+                        color: hexToColor('#979797'),
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
   @override
   bool get wantKeepAlive => true;
-}
-
-class CustomGradientContainer extends StatelessWidget {
-  const CustomGradientContainer({
-    Key key,
-    @required List<Color> colors,
-    @required List<double> stops,
-    @required double width,
-  })  : _colors = colors,
-        _stops = stops,
-        _width = width,
-        super(key: key);
-
-  final List<Color> _colors;
-  final List<double> _stops;
-  final double _width;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: _width,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: _colors,
-          stops: _stops,
-        ),
-      ),
-    );
-  }
 }

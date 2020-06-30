@@ -34,34 +34,34 @@ class _CardsScreenState extends State<CardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: _buildBody(context),
-        floatingActionButton: Container(
-    height: 48,
-    width: 196,
-    child: FloatingActionButton.extended(
-      onPressed: () {
-        var state =
-            Provider.of<TrainingFlashcardsState>(context, listen: false);
-        state.progress = (1 / listOfCards.length);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => TrainingFlashcards(
-              listOfCards: listOfCards,
-            ),
-          ),
-        );
-      },
-      label: Text('Флешкарты'),
-      backgroundColor: MyColors.mainBrightColor,
-    ),
+      backgroundColor: Colors.white,
+      body: _buildBody(context),
+      floatingActionButton: Container(
+        height: 48,
+        width: 196,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            var state =
+                Provider.of<TrainingFlashcardsState>(context, listen: false);
+            state.progress = (1 / listOfCards.length);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) => TrainingFlashcards(
+                  listOfCards: listOfCards,
+                ),
+              ),
+            );
+          },
+          label: Text('Флешкарты'),
+          backgroundColor: MyColors.mainBrightColor,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        bottomNavigationBar: AppBottomNav(
-    selectedIndex: 0,
-    isHomePage: false,
-        ),
-      );
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      bottomNavigationBar: AppBottomNav(
+        selectedIndex: 0,
+        isHomePage: false,
+      ),
+    );
   }
 
   Widget _buildBody(BuildContext context) {
