@@ -5,8 +5,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class TrainingFlashcards extends StatelessWidget {
-  TrainingFlashcards({Key key, this.listOfCards}) : super(key: key);
+  TrainingFlashcards({Key key, this.listOfCards, this.trainingVariant}) : super(key: key);
+
   final List<Magicard> listOfCards;
+  final int trainingVariant;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class TrainingFlashcards extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(
                   top: 60.0 + MediaQuery.of(context).padding.top, bottom: 20.0),
-              child: _buildCarousel(context),
+              child: _buildCarousel(context, trainingVariant),
             ),
           ],
         ),
@@ -71,9 +73,8 @@ class TrainingFlashcards extends StatelessWidget {
     );
   }
 
-  Widget _buildCarousel(BuildContext context) {
+  Widget _buildCarousel(BuildContext context, int trainingVariant) {
     var state = Provider.of<TrainingFlashcardsState>(context);
-    int trainingVariant = 1;
 
     return SizedBox(
       height: double.infinity,
@@ -542,8 +543,8 @@ class _ContainerShowMeaningState extends State<ContainerShowMeaning>
                     SvgPicture.asset('assets/icons/eye.svg'),
                     Text(
                       widget.trainingVariant == 0
-                          ? 'Показать фото'
-                          : 'Показать слово',
+                          ? 'Показать изображение'
+                          : 'Показать английское слово',
                       style: TextStyle(
                         color: hexToColor('#979797'),
                         fontSize: 15,

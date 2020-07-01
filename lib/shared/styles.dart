@@ -41,7 +41,15 @@ const mySubtitle14Style = TextStyle(
 const myMainTextStyle = TextStyle(
   fontSize: 14,
   color: MyColors.mainDarkColor,
+  decoration: TextDecoration.none,
   // fontWeight: FontWeight.normal,
+);
+
+const myVariantsTextStyle = TextStyle(
+  fontSize: 16,
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  letterSpacing: 0.85,
 );
 
 const myLabelTextStyle = TextStyle(

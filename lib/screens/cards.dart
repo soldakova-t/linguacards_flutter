@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
@@ -41,14 +42,10 @@ class _CardsScreenState extends State<CardsScreen> {
         width: 196,
         child: FloatingActionButton.extended(
           onPressed: () {
-            var state =
-                Provider.of<TrainingFlashcardsState>(context, listen: false);
-            state.progress = (1 / listOfCards.length);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => TrainingFlashcards(
-                  listOfCards: listOfCards,
-                ),
+            showDialog(
+              context: context,
+              builder: (_) => ChooseVariantOverlay(
+                listOfCards: listOfCards,
               ),
             );
           },
@@ -61,6 +58,26 @@ class _CardsScreenState extends State<CardsScreen> {
         selectedIndex: 0,
         isHomePage: false,
       ),
+    );
+  }
+
+  _showPopupMenu(BuildContext context) async {
+    await showMenu(
+      context: context,
+      //position: RelativeRect.fromLTRB(40, 40, double.infinity, double.infinity),
+      position: RelativeRect.fromLTRB(double.infinity, double.infinity, 140, 0),
+      items: [
+        PopupMenuItem(
+          child: Text("View"),
+        ),
+        PopupMenuItem(
+          child: Text("Edit"),
+        ),
+        PopupMenuItem(
+          child: Text("Delete"),
+        ),
+      ],
+      elevation: 8.0,
     );
   }
 
@@ -213,10 +230,17 @@ class CardContent extends StatelessWidget {
               left: 0.0,
               right: 0.0,
             ),
-            leading: Image.network(
-              card.photo,
-              height: 70,
-              width: 70,
+            leading: Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  card.photo,
+                  height: 70,
+                  width: 70,
+                  fit: card.whiteBg == '1' ? BoxFit.contain : BoxFit.cover,
+                ),
+              ),
             ),
             title: Text(
               card.title,
@@ -251,6 +275,107 @@ class CardContent extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ChooseVariantOverlay extends StatelessWidget {
+  ChooseVariantOverlay({
+    Key key,
+    this.listOfCards,
+  }) : super(key: key);
+
+  final List<Magicard> listOfCards;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 70.0),
+        child: Container(
+            height: 123.0,
+            width: 320.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[700],
+                  blurRadius: 2.0,
+                  spreadRadius: 0.0,
+                  //offset: Offset(2.0, 2.0), // shadow direction: bottom right
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                FlatButton(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: const EdgeInsets.all(0),
+                  child: Container(
+                    width: 320,
+                    height: 60,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(width: 22),
+                        Icon(Icons.favorite),
+                        SizedBox(width: 16),
+                        Text(
+                          'Скрыть изображения',
+                          style: myVariantsTextStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => TrainingFlashcards(
+                          listOfCards: listOfCards,
+                          trainingVariant: 0,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: Colors.grey[400],
+                ),
+                FlatButton(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: const EdgeInsets.all(0),
+                  child: Container(
+                    width: 320,
+                    height: 60,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(width: 22),
+                        Icon(Icons.favorite),
+                        SizedBox(width: 16),
+                        Text(
+                          'Скрыть английские слова',
+                          style: myVariantsTextStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => TrainingFlashcards(
+                          listOfCards: listOfCards,
+                          trainingVariant: 1,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            )),
       ),
     );
   }
