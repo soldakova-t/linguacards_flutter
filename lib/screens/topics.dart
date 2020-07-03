@@ -86,13 +86,7 @@ class TopicsScreen extends StatelessWidget {
   Widget _buildTopicListItem(BuildContext context, Topic topic, int index) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => SubtopicsScreen(
-              topic: topic,
-            ),
-          ),
-        );
+        Navigator.of(context).push(_createRoute(topic));
       },
       child: Container(
         height: index.isEven ? 200 : 240,
@@ -129,4 +123,22 @@ class TopicsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Route _createRoute(Topic topic) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SubtopicsScreen(topic: topic),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

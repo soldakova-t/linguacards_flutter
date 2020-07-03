@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:magicards/screens/card_details.dart';
 import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
-import '../screens/screens.dart';
-import 'package:provider/provider.dart';
 
 class CardsScreen extends StatefulWidget {
   final Subtopic subtopic;
@@ -37,47 +35,29 @@ class _CardsScreenState extends State<CardsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: _buildBody(context),
-      floatingActionButton: Container(
-        height: 48,
-        width: 196,
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (_) => ChooseVariantOverlay(
-                listOfCards: listOfCards,
-              ),
-            );
-          },
-          label: Text('Флешкарты'),
-          backgroundColor: MyColors.mainBrightColor,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+        child: Container(
+          height: 60,
+          width: 60,
+          child: FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => ChooseVariantOverlay(
+                  listOfCards: listOfCards,
+                ),
+              );
+            },
+            backgroundColor: MyColors.mainBrightColor,
+            child: Icon(Icons.donut_small),
+          ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: AppBottomNav(
         selectedIndex: 0,
         isHomePage: false,
       ),
-    );
-  }
-
-  _showPopupMenu(BuildContext context) async {
-    await showMenu(
-      context: context,
-      //position: RelativeRect.fromLTRB(40, 40, double.infinity, double.infinity),
-      position: RelativeRect.fromLTRB(double.infinity, double.infinity, 140, 0),
-      items: [
-        PopupMenuItem(
-          child: Text("View"),
-        ),
-        PopupMenuItem(
-          child: Text("Edit"),
-        ),
-        PopupMenuItem(
-          child: Text("Delete"),
-        ),
-      ],
-      elevation: 8.0,
     );
   }
 
@@ -212,13 +192,7 @@ class CardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        /*Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => TrainingMatch(
-              listOfCards: listOfCards,
-            ),
-          ),
-        );*/
+        Navigator.of(context).push(_createRoute(card));
       },
       child: Ink(
         color: Colors.white,
@@ -291,9 +265,9 @@ class ChooseVariantOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.bottomCenter,
+      alignment: Alignment.bottomRight,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 70.0),
+        padding: const EdgeInsets.only(right: 30.0, bottom: 85.0),
         child: Container(
             height: 123.0,
             width: 320.0,
@@ -305,7 +279,6 @@ class ChooseVariantOverlay extends StatelessWidget {
                   color: Colors.grey[700],
                   blurRadius: 2.0,
                   spreadRadius: 0.0,
-                  //offset: Offset(2.0, 2.0), // shadow direction: bottom right
                 )
               ],
             ),
@@ -331,6 +304,7 @@ class ChooseVariantOverlay extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context) => TrainingFlashcards(
@@ -364,6 +338,7 @@ class ChooseVariantOverlay extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context) => TrainingFlashcards(
@@ -379,4 +354,23 @@ class ChooseVariantOverlay extends StatelessWidget {
       ),
     );
   }
+}
+
+Route _createRoute(Magicard card) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        CardDetailsScreen(card: card),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

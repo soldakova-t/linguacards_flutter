@@ -78,3 +78,15 @@ const myLabelTextStyleCard = TextStyle(
   fontSize: 14,
   color: Color(0xFF878787),
 );
+
+const myExampleCard = TextStyle(
+  fontSize: 14,
+  color: Color(0xFF878787),
+  decoration: TextDecoration.none,
+);
+
+const myExampleMainWordCard = TextStyle(
+  fontSize: 14,
+  color: Colors.black,
+  decoration: TextDecoration.none,
+);

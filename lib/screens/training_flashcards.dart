@@ -5,7 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class TrainingFlashcards extends StatelessWidget {
-  TrainingFlashcards({Key key, this.listOfCards, this.trainingVariant}) : super(key: key);
+  TrainingFlashcards({Key key, this.listOfCards, this.trainingVariant})
+      : super(key: key);
 
   final List<Magicard> listOfCards;
   final int trainingVariant;
@@ -473,9 +474,10 @@ class _ButtonLearnedState extends State<ButtonLearned> {
               height: 48,
               alignment: Alignment.center,
               child: SizedBox(
-                width: 88,
+                width: 180,
                 height: 25,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Icon(
                       Icons.check,
@@ -489,6 +491,23 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                         color: Colors.green[600],
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _learned = false;
+                        });
+                      },
+                      child: Text(
+                        'Вернуть',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF878787),
+                          decoration: TextDecoration.underline,
+                          decorationStyle: TextDecorationStyle.dotted,
+                        ),
                       ),
                     ),
                   ],
