@@ -5,3 +5,5 @@ export 'profile.dart';
 export 'about.dart';
 export 'cards.dart';
 export 'training_match.dart';
+export 'dashboard.dart';
+export 'loginpage.dart';

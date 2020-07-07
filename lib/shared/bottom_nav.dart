@@ -19,9 +19,9 @@ class AppBottomNav extends StatelessWidget {
         BottomNavigationBarItem(
             icon: Icon(CustomIcons.bottomnav_search,),
             title: Text('Поиск')),
-        BottomNavigationBarItem(
+        /*BottomNavigationBarItem(
             icon: Icon(CustomIcons.bottomnav_heart,),
-            title: Text('Мой список')),
+            title: Text('Мой список')),*/
         BottomNavigationBarItem(
             icon: Icon(CustomIcons.bottomnav_profile,),
             title: Text('Профиль')),

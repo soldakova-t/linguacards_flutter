@@ -7,10 +7,14 @@ import '../shared/shared.dart';
 import '../screens/screens.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class TopicsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -28,6 +32,7 @@ class TopicsScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8.0, top: 8.0, ),
                 child: Text('Magicards'),
               ),
+              Text( user != null ? user.uid: ''),
             ],
           ),
         ),

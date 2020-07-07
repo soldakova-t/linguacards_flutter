@@ -12,6 +12,7 @@ class MyColors {
   static const Color greenBrightColor = Color(0xFF1AC840);
   static const Color subtitleColor = Color(0x99171245);
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
+  static const Color inputBgColor = Color(0xFFF6F6F6);
 }
 
 // My Text Styles
@@ -89,4 +90,9 @@ const myExampleMainWordCard = TextStyle(
   fontSize: 14,
   color: Colors.black,
   decoration: TextDecoration.none,
+);
+
+const myAuthButtonTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 14,
 );

@@ -9,7 +9,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  AuthService auth = AuthService();
+  AuthServiceFirebase auth = AuthServiceFirebase();
 
   @override
   void initState() {

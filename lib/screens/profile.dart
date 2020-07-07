@@ -3,9 +3,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
+import '../screens/screens.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final AuthService auth = AuthService();
+  @override
+  Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    print('ProfileScreen');
+
+    if (user != null) { 
+      print('User != null');
+      return DashboardPage();
+    } else {
+      print('User == null');
+      return LoginPage();
+    }
+
+  }
+  /*final AuthServiceFirebase auth = AuthServiceFirebase();
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +68,6 @@ class ProfileScreen extends StatelessWidget {
     } else {
       return LoadingScreen();
     }
-  }
+  }*/
 
 }

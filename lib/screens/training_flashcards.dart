@@ -77,31 +77,27 @@ class TrainingFlashcards extends StatelessWidget {
   Widget _buildCarousel(BuildContext context, int trainingVariant) {
     var state = Provider.of<TrainingFlashcardsState>(context);
 
-    return SizedBox(
-      height: double.infinity,
-      width: double.infinity,
-      child: PageView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        controller: state.controller,
-        onPageChanged: (int idx) {
-          state.progress = ((idx + 1) / listOfCards.length);
-        },
-        itemBuilder: (BuildContext context, int itemIndex) {
-          if (trainingVariant == 0) {
-            return CarouselItemWordOpened(
-                listOfCards: listOfCards,
-                context: context,
-                itemIndex: itemIndex);
-          } else {
-            return CarouselItemPhotoOpened(
-                listOfCards: listOfCards,
-                context: context,
-                itemIndex: itemIndex);
-          }
-        },
-        itemCount: listOfCards.length,
-      ),
+    return PageView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      controller: state.controller,
+      onPageChanged: (int idx) {
+        state.progress = ((idx + 1) / listOfCards.length);
+      },
+      itemBuilder: (BuildContext context, int itemIndex) {
+        if (trainingVariant == 0) {
+          return CarouselItemWordOpened(
+              listOfCards: listOfCards,
+              context: context,
+              itemIndex: itemIndex);
+        } else {
+          return CarouselItemPhotoOpened(
+              listOfCards: listOfCards,
+              context: context,
+              itemIndex: itemIndex);
+        }
+      },
+      itemCount: listOfCards.length,
     );
   }
 }
