@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/shared/custom_icons_icons.dart';
 import 'package:magicards/shared/shared.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int selectedIndex;
@@ -10,6 +12,9 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       items: [
@@ -24,7 +29,7 @@ class AppBottomNav extends StatelessWidget {
             title: Text('Мой список')),*/
         BottomNavigationBarItem(
             icon: Icon(CustomIcons.bottomnav_profile,),
-            title: Text('Профиль')),
+            title: user == null ? Text('Войти') : Text('Профиль')),
       ].toList(),
       currentIndex: selectedIndex,
       selectedItemColor: MyColors.mainBrightColor,

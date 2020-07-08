@@ -21,7 +21,6 @@ class MyApp extends StatelessWidget {
       ],
       child: GestureDetector(
         onTap: () {
-          print('tap');
           FocusScope.of(context).requestFocus(new FocusNode());
         },
         child: MaterialApp(

@@ -13,6 +13,7 @@ class MyColors {
   static const Color subtitleColor = Color(0x99171245);
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
   static const Color inputBgColor = Color(0xFFF6F6F6);
+  static const Color inputErrorColor = Color(0x0DFA5C5C);
 }
 
 // My Text Styles

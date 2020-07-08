@@ -6,21 +6,8 @@ import 'package:provider/provider.dart';
 import '../screens/screens.dart';
 
 class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
-    print('ProfileScreen');
 
-    if (user != null) { 
-      print('User != null');
-      return DashboardPage();
-    } else {
-      print('User == null');
-      return LoginPage();
-    }
-
-  }
-  /*final AuthServiceFirebase auth = AuthServiceFirebase();
+  final AuthServiceFirebase auth = AuthServiceFirebase();
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +18,19 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
-        title: Text(user.displayName ?? 'Guest'),
+        title: Text('Профиль'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(user.displayName ?? ''),
+            Text(user.phoneNumber ?? ''),
             if (user.photoUrl != null)
               Container(
-                width: 100,
-                height: 100,
+                width: 50,
+                height: 50,
                 margin: EdgeInsets.only(top: 50),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -53,7 +42,7 @@ class ProfileScreen extends StatelessWidget {
             Text(user.email ?? '', style: Theme.of(context).textTheme.headline),
             Spacer(),
             FlatButton(
-                child: Text('logout'),
+                child: Text('Выйти'),
                 color: Colors.red,
                 onPressed: () async {
                   await auth.signOut();
@@ -66,8 +55,8 @@ class ProfileScreen extends StatelessWidget {
       bottomNavigationBar: AppBottomNav(selectedIndex: 2),
     );
     } else {
-      return LoadingScreen();
+      return LoginPage();
     }
-  }*/
+  }
 
 }

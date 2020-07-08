@@ -40,9 +40,6 @@ class AuthServiceFirebase {
       AuthResult firebaseResult = await _auth.signInWithCredential(credential);
       FirebaseUser user = firebaseResult.user;
 
-      // Update user data
-      updateUserData(user);
-
       return user;
     } catch (error) {
       print(error);
@@ -65,9 +62,6 @@ class AuthServiceFirebase {
       AuthResult result = await _auth.signInWithCredential(credential);
       FirebaseUser user = result.user;
 
-      // Update user data
-      updateUserData(user);
-
       return user;
     } catch (error) {
       print(error);
@@ -79,17 +73,24 @@ class AuthServiceFirebase {
   Future<FirebaseUser> anonLogin() async {
     AuthResult result = await _auth.signInAnonymously();
     FirebaseUser user = result.user;
-
-    updateUserData(user);
     return user;
   }
 
-  /// Updates the User's data in Firestore on each new login
-  Future<void> updateUserData(FirebaseUser user) {
-    DocumentReference reportRef = _db.collection('reports').document(user.uid);
+  /// Sign in with OTP (phone auth)
+  signInWithOTP(smsCode, verId) {
+    AuthCredential authCreds = PhoneAuthProvider.getCredential(
+        verificationId: verId, smsCode: smsCode);
+    signInWithCredential(authCreds);
+  }
 
-    return reportRef.setData({'uid': user.uid, 'lastActivity': DateTime.now()},
-        merge: true);
+  signInWithCredential(AuthCredential authCreds) async {
+    String errorMessage;
+    try {
+      await FirebaseAuth.instance.signInWithCredential(authCreds);
+    } catch (e) {
+      errorMessage = e.code;
+    }
+    print('errorMessage = ' + errorMessage);
   }
 
   // Sign out

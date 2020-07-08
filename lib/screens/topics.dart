@@ -32,7 +32,6 @@ class TopicsScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8.0, top: 8.0, ),
                 child: Text('Magicards'),
               ),
-              Text( user != null ? user.uid: ''),
             ],
           ),
         ),
