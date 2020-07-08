@@ -31,8 +31,9 @@ dependencies:
 
   cloud_firestore: ^0.13.5
 
-  firebase_auth: ^0.15.3+1
-  google_sign_in: ^4.0.1+1
+  firebase_auth: ^0.16.1
+  google_sign_in: ^4.5.1
+  flutter_facebook_login: ^3.0.0
   apple_sign_in: 0.1.0
 
   rxdart: 0.23.1

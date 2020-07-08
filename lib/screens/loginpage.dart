@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 4),
                     _buildSocialAuthButton(
                       'Facebook',
-                      auth.googleSignIn,
+                      auth.loginFacebook,
                     ),
                     SizedBox(height: 4),
                     FutureBuilder<Object>(

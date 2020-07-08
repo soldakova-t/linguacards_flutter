@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>968997541736-i2jr4pe6tfap4l8kr0u1aaan6c3ekk4i.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.968997541736-i2jr4pe6tfap4l8kr0u1aaan6c3ekk4i</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>968997541736-jullkcgtvrqvd0ggfif6qrev2bm7i5vd.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyALVURPFUe9vxZ0_C4prQVbHPS9KtFUoN8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>968997541736</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.magicards.mc</string>
+	<key>PROJECT_ID</key>
+	<string>magicards-388e2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>magicards-388e2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:968997541736:ios:18b81b260e5384f425a8dd</string>
+	<key>DATABASE_URL</key>
+	<string>https://magicards-388e2.firebaseio.com</string>
+</dict>
+</plist>

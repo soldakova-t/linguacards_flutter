@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 class AuthServiceFirebase {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -62,6 +64,43 @@ class AuthServiceFirebase {
       AuthResult result = await _auth.signInWithCredential(credential);
       FirebaseUser user = result.user;
 
+      return user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  /// This mehtod makes the real auth
+  Future<FirebaseUser> firebaseAuthWithFacebook(
+      {@required FacebookAccessToken token}) async {
+    AuthCredential credential =
+        FacebookAuthProvider.getCredential(accessToken: token.token);
+    FirebaseUser firebaseUser =
+        (await _auth.signInWithCredential(credential)).user;
+    return firebaseUser;
+  }
+
+  /// Sign in with Facebook
+  Future<FirebaseUser> loginFacebook() async {
+    FirebaseUser user;
+    try {
+      final facebookLogin = new FacebookLogin();
+      final result = await facebookLogin.logIn(['email']);
+
+      switch (result.status) {
+        case FacebookLoginStatus.loggedIn:
+          user = await firebaseAuthWithFacebook(token: result.accessToken);
+          print('FACEBOOK LOGGED IN');
+          break;
+        case FacebookLoginStatus.cancelledByUser:
+          print('FACEBOOK CANCELED BY USER');
+          break;
+        case FacebookLoginStatus.error:
+          print('FACEBOOK ERROR');
+          print(result.errorMessage);
+          break;
+      }
       return user;
     } catch (error) {
       print(error);
