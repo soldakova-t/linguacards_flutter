@@ -5,6 +5,7 @@ import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../services/services.dart';
 
 class AuthServiceFirebase {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -125,7 +126,14 @@ class AuthServiceFirebase {
   signInWithCredential(AuthCredential authCreds) async {
     String errorMessage;
     try {
-      await FirebaseAuth.instance.signInWithCredential(authCreds);
+      AuthResult authResult = await FirebaseAuth.instance.signInWithCredential(authCreds);
+      String phone = authResult.user.phoneNumber;
+      if (await DB.userExists(phone) == false) {
+        print('USER DOESNT EXIST');
+        DB.addUser(phone);
+      } else {
+        print('USER EXISTS');
+      }
     } catch (e) {
       errorMessage = e.code;
     }

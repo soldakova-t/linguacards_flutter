@@ -61,9 +61,8 @@ class Magicard {
   final String transcription;
   final String photo;
   final String whiteBg;
-  final DocumentReference reference;
 
-  Magicard.fromMap(Map<String, dynamic> map, {this.reference})
+  Magicard.fromMap(Map<String, dynamic> map)
       : assert(map['title'] != null),
         assert(map['photo'] != null),
         title = map['title'],
@@ -71,9 +70,6 @@ class Magicard {
         transcription = map['transcription'] ?? '',
         whiteBg = map['whiteBg'] ?? '1',
         photo = map['photo'];
-
-  Magicard.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
 
   @override
   String toString() => "Magicard<$title:$photo>";

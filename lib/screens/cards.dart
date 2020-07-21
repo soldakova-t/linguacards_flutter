@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:magicards/screens/card_details.dart';
-import 'package:magicards/screens/training_flashcards.dart';
+import 'package:magicards/screens/cards_radial_menu.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 
@@ -13,9 +13,13 @@ class CardsScreen extends StatefulWidget {
   _CardsScreenState createState() => _CardsScreenState();
 }
 
-class _CardsScreenState extends State<CardsScreen> {
+class _CardsScreenState extends State<CardsScreen>
+    with SingleTickerProviderStateMixin {
   static const kExpandedHeight = 155.0;
+
   ScrollController _scrollController;
+  AnimationController _animatedFABController;
+
   List<Magicard> listOfCards = List<Magicard>();
 
   @override
@@ -23,6 +27,18 @@ class _CardsScreenState extends State<CardsScreen> {
     super.initState();
 
     _scrollController = ScrollController()..addListener(() => setState(() {}));
+
+    _animatedFABController = AnimationController(
+      vsync: this, // the SingleTickerProviderStateMixin
+      duration: Duration(seconds: 1),
+    );
+  }
+
+  @override
+  dispose() {
+    _scrollController.dispose();
+    _animatedFABController.dispose();
+    super.dispose();
   }
 
   bool get _showTitle {
@@ -35,25 +51,6 @@ class _CardsScreenState extends State<CardsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: _buildBody(context),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
-        child: Container(
-          height: 60,
-          width: 60,
-          child: FloatingActionButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => ChooseVariantOverlay(
-                  listOfCards: listOfCards,
-                ),
-              );
-            },
-            backgroundColor: MyColors.mainBrightColor,
-            child: Icon(Icons.donut_small),
-          ),
-        ),
-      ),
       bottomNavigationBar: AppBottomNav(
         selectedIndex: 0,
         isHomePage: false,
@@ -62,63 +59,75 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('cards')
-          .where('subtopic', isEqualTo: widget.subtopic.title)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return LinearProgressIndicator();
-        } else {
-          return _buildList(context, snapshot.data.documents);
-        }
-      },
-    );
+    return Stack(children: <Widget>[
+      StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance
+            .collection('cards')
+            .where('subtopic', isEqualTo: widget.subtopic.title)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return LinearProgressIndicator();
+          } else {
+            return _buildList(context, snapshot.data.documents);
+          }
+        },
+      ),
+    ]);
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
     listOfCards =
-        snapshot.map((document) => Magicard.fromSnapshot(document)).toList();
+        snapshot.map((document) => Magicard.fromMap(document.data)).toList();
 
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            color: hexToColor('#B2B2B2'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          expandedHeight: kExpandedHeight + kToolbarHeight,
-          title: _showTitle
-              ? Text(
-                  widget.subtopic.title,
-                  style: myToolbarTextStyle,
-                )
-              : null,
-          flexibleSpace: _showTitle
-              ? null
-              : FlexibleSpaceBar(
-                  background: SubtopicDetails(subtopic: widget.subtopic),
-                ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.only(
-            top: 15,
-          ),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => CardContent(
-                card: Magicard.fromSnapshot(snapshot[index]),
-                learned: false,
+    return Stack(
+      children: <Widget>[
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                color: hexToColor('#B2B2B2'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              childCount: snapshot.length,
+              expandedHeight: kExpandedHeight + kToolbarHeight,
+              title: _showTitle
+                  ? Text(
+                      widget.subtopic.title,
+                      style: myToolbarTextStyle,
+                    )
+                  : null,
+              flexibleSpace: _showTitle
+                  ? null
+                  : FlexibleSpaceBar(
+                      background: SubtopicDetails(subtopic: widget.subtopic),
+                    ),
             ),
-          ),
+            SliverPadding(
+              padding: const EdgeInsets.only(
+                top: 15,
+              ),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => CardContent(
+                    card: Magicard.fromMap(snapshot[index].data),
+                    learned: false,
+                  ),
+                  childCount: snapshot.length,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: RadialMenu(listOfCards: listOfCards,),),
         ),
       ],
     );
@@ -249,108 +258,6 @@ class CardContent extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ChooseVariantOverlay extends StatelessWidget {
-  ChooseVariantOverlay({
-    Key key,
-    this.listOfCards,
-  }) : super(key: key);
-
-  final List<Magicard> listOfCards;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 30.0, bottom: 85.0),
-        child: Container(
-            height: 123.0,
-            width: 320.0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[700],
-                  blurRadius: 2.0,
-                  spreadRadius: 0.0,
-                )
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                FlatButton(
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: const EdgeInsets.all(0),
-                  child: Container(
-                    width: 320,
-                    height: 60,
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(width: 22),
-                        Icon(Icons.favorite),
-                        SizedBox(width: 16),
-                        Text(
-                          'Скрыть изображения',
-                          style: myVariantsTextStyle,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => TrainingFlashcards(
-                          listOfCards: listOfCards,
-                          trainingVariant: 0,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                Divider(
-                  height: 1,
-                  color: Colors.grey[400],
-                ),
-                FlatButton(
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: const EdgeInsets.all(0),
-                  child: Container(
-                    width: 320,
-                    height: 60,
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(width: 22),
-                        Icon(Icons.favorite),
-                        SizedBox(width: 16),
-                        Text(
-                          'Скрыть английские слова',
-                          style: myVariantsTextStyle,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => TrainingFlashcards(
-                          listOfCards: listOfCards,
-                          trainingVariant: 1,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            )),
       ),
     );
   }

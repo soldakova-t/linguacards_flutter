@@ -8,7 +8,7 @@ Color hexToColor(String code) {
 class MyColors {
   static const Color mainBgColor = Color(0xFFF3F3F3);
   static const Color mainDarkColor = Color(0xFF393560);
-  static const Color mainBrightColor = Color(0xFFFA5C5C);
+  static const Color mainBrightColor = Color(0xFF464EFF);
   static const Color greenBrightColor = Color(0xFF1AC840);
   static const Color subtitleColor = Color(0x99171245);
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
@@ -97,3 +97,9 @@ const myAuthButtonTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 14,
 );
+
+const labelSpeedDialStyle = TextStyle(
+  fontSize: 15,
+  backgroundColor: Colors.white,
+);
+

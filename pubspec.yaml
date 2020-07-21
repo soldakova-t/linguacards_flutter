@@ -43,6 +43,8 @@ dependencies:
   flutter_svg: ^0.17.3+1
   flutter_staggered_grid_view: ^0.3.0
 
+  flutter_speed_dial: ^1.2.5
+
 
 dev_dependencies:
   flutter_test:
@@ -56,7 +58,6 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
-    - assets/covers/
     - assets/icons/
     - assets/images/
     
