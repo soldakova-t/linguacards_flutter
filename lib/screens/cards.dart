@@ -104,7 +104,9 @@ class _CardsScreenState extends State<CardsScreen>
               flexibleSpace: _showTitle
                   ? null
                   : FlexibleSpaceBar(
-                      background: SubtopicDetails(subtopic: widget.subtopic),
+                      background: SubtopicDetails(
+                          subtopic: widget.subtopic,
+                          numberOfCards: listOfCards.length),
                     ),
             ),
             SliverPadding(
@@ -127,7 +129,10 @@ class _CardsScreenState extends State<CardsScreen>
           padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
           child: Align(
             alignment: Alignment.bottomRight,
-            child: RadialMenu(listOfCards: listOfCards,),),
+            child: RadialMenu(
+              listOfCards: listOfCards,
+            ),
+          ),
         ),
       ],
     );
@@ -136,8 +141,10 @@ class _CardsScreenState extends State<CardsScreen>
 
 class SubtopicDetails extends StatelessWidget {
   final Subtopic subtopic;
+  final int numberOfCards;
 
-  const SubtopicDetails({Key key, this.subtopic}) : super(key: key);
+  const SubtopicDetails({Key key, this.subtopic, this.numberOfCards})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -177,13 +184,25 @@ class SubtopicDetails extends StatelessWidget {
                 color: Colors.white,
               ),
               child: Center(
-                child: Text('240 слов', style: myLabelTextStyle),
+                child: Text(_textNumberOfCards(numberOfCards),
+                    style: myLabelTextStyle),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+String _textNumberOfCards(int number) {
+  if (number == 1) {
+    return '1 слово';
+  }
+  if (number >= 2 && number <= 4) {
+    return number.toString() + ' слова';
+  } else {
+    return number.toString() + ' слов';
   }
 }
 

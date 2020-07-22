@@ -65,6 +65,11 @@ class AuthServiceFirebase {
       AuthResult result = await _auth.signInWithCredential(credential);
       FirebaseUser user = result.user;
 
+      String userSocialId = 'GO' + user.uid;
+      if (await DB.userExists(socialId: userSocialId) == false) {
+        DB.addUser(socialId: userSocialId);
+      }
+
       return user;
     } catch (error) {
       print(error);
@@ -92,6 +97,12 @@ class AuthServiceFirebase {
       switch (result.status) {
         case FacebookLoginStatus.loggedIn:
           user = await firebaseAuthWithFacebook(token: result.accessToken);
+
+          String userSocialId = 'FB' + user.uid;
+          if (await DB.userExists(socialId: userSocialId) == false) {
+            DB.addUser(socialId: userSocialId);
+          }
+
           print('FACEBOOK LOGGED IN');
           break;
         case FacebookLoginStatus.cancelledByUser:
@@ -126,13 +137,12 @@ class AuthServiceFirebase {
   signInWithCredential(AuthCredential authCreds) async {
     String errorMessage;
     try {
-      AuthResult authResult = await FirebaseAuth.instance.signInWithCredential(authCreds);
+      AuthResult authResult =
+          await FirebaseAuth.instance.signInWithCredential(authCreds);
       String phone = authResult.user.phoneNumber;
-      if (await DB.userExists(phone) == false) {
-        print('USER DOESNT EXIST');
-        DB.addUser(phone);
-      } else {
-        print('USER EXISTS');
+
+      if (await DB.userExists(phone: phone) == false) {
+        DB.addUser(phone: phone);
       }
     } catch (e) {
       errorMessage = e.code;
