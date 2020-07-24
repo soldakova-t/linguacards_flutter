@@ -4,6 +4,8 @@ import 'package:magicards/screens/card_details.dart';
 import 'package:magicards/screens/cards_radial_menu.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CardsScreen extends StatefulWidget {
   final Subtopic subtopic;
@@ -21,6 +23,7 @@ class _CardsScreenState extends State<CardsScreen>
   AnimationController _animatedFABController;
 
   List<Magicard> listOfCards = List<Magicard>();
+  List<String> listOfLearnedCards = List<String>();
 
   @override
   void initState() {
@@ -63,13 +66,32 @@ class _CardsScreenState extends State<CardsScreen>
       StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
             .collection('cards')
-            .where('subtopic', isEqualTo: widget.subtopic.title)
+            .where('subtopic', isEqualTo: widget.subtopic.id)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return LinearProgressIndicator();
           } else {
-            return _buildList(context, snapshot.data.documents);
+            var documents = snapshot.data.documents;
+            FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+            if (user != null) {
+              return FutureBuilder<List<String>>(
+                future: DB.getEarlyLearnedCards(
+                    userId: user.uid, subtopicId: widget.subtopic.id),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return LinearProgressIndicator();
+                  } else {
+                    listOfLearnedCards = snapshot.data;
+                    return _buildList(context, documents);
+                  }
+                },
+              );
+            } else {
+              return _buildList(context, documents);
+            }
+
           }
         },
       ),
@@ -77,8 +99,18 @@ class _CardsScreenState extends State<CardsScreen>
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-    listOfCards =
-        snapshot.map((document) => Magicard.fromMap(document.data)).toList();
+    listOfCards = snapshot
+        .map((document) => Magicard.fromMap(document.documentID, document.data))
+        .toList();
+
+    print('listOfLearnedCards 555');
+    listOfLearnedCards.forEach((element) {
+      print('Print listOfLearnedCards ' + element);
+    });
+
+    /*listOfCards.forEach((element) {
+      print('Print listOfCards ' + element.toString());
+    });*/
 
     return Stack(
       children: <Widget>[
@@ -116,7 +148,8 @@ class _CardsScreenState extends State<CardsScreen>
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => CardContent(
-                    card: Magicard.fromMap(snapshot[index].data),
+                    card: Magicard.fromMap(
+                        snapshot[index].documentID, snapshot[index].data),
                     learned: false,
                   ),
                   childCount: snapshot.length,
@@ -131,6 +164,8 @@ class _CardsScreenState extends State<CardsScreen>
             alignment: Alignment.bottomRight,
             child: RadialMenu(
               listOfCards: listOfCards,
+              listOfLearnedCards: listOfLearnedCards,
+              subtopicId: widget.subtopic.id,
             ),
           ),
         ),

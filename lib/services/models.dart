@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:magicards/services/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Subtopic {
+  String id;
   String title;
   String titleRus;
 
   Subtopic({
+    this.id,
     this.title,
     this.titleRus,
   });
 
   factory Subtopic.fromMap(Map data) {
     return Subtopic(
+      id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
     );
@@ -56,15 +58,18 @@ class Topic {
 }
 
 class Magicard {
+  final String id;
   final String title;
   final String titleRus;
   final String transcription;
   final String photo;
   final String whiteBg;
 
-  Magicard.fromMap(Map<String, dynamic> map)
-      : assert(map['title'] != null),
+  Magicard.fromMap(String docId, Map<String, dynamic> map)
+      : assert(docId != null),
+        assert(map['title'] != null),
         assert(map['photo'] != null),
+        id = docId,
         title = map['title'],
         titleRus = map['titleRus'] ?? '',
         transcription = map['transcription'] ?? '',
@@ -72,7 +77,7 @@ class Magicard {
         photo = map['photo'];
 
   @override
-  String toString() => "Magicard<$title:$photo>";
+  String toString() => "Magicard<$title>";
 }
 
 class TrainingFlashcardsState with ChangeNotifier {

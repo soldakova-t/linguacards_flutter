@@ -8,8 +8,12 @@ import '../services/services.dart';
 import 'dart:async';
 
 class RadialMenu extends StatefulWidget {
-  RadialMenu({Key key, this.listOfCards}) : super(key: key);
+  RadialMenu(
+      {Key key, this.listOfCards, this.listOfLearnedCards, this.subtopicId})
+      : super(key: key);
   final List<Magicard> listOfCards;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
 
   createState() => _RadialMenuState();
 }
@@ -22,6 +26,7 @@ class _RadialMenuState extends State<RadialMenu>
   @override
   void initState() {
     super.initState();
+
     controller =
         AnimationController(duration: Duration(milliseconds: 300), vsync: this)
           ..addStatusListener((status) {
@@ -43,6 +48,8 @@ class _RadialMenuState extends State<RadialMenu>
       controller: controller,
       isOpen: isOpen,
       listOfCards: widget.listOfCards,
+      listOfLearnedCards: widget.listOfLearnedCards,
+      subtopicId: widget.subtopicId,
     );
   }
 
@@ -54,8 +61,14 @@ class _RadialMenuState extends State<RadialMenu>
 }
 
 class RadialAnimation extends StatelessWidget {
-  RadialAnimation({Key key, this.controller, this.isOpen, this.listOfCards})
-      : translation = Tween<double>(
+  RadialAnimation({
+    Key key,
+    this.controller,
+    this.isOpen,
+    this.listOfCards,
+    this.listOfLearnedCards,
+    this.subtopicId,
+  })  : translation = Tween<double>(
           begin: 0.0,
           end: 70.0,
         ).animate(
@@ -88,6 +101,8 @@ class RadialAnimation extends StatelessWidget {
   final Animation<double> scale;
   final bool isOpen;
   final List<Magicard> listOfCards;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +132,8 @@ class RadialAnimation extends StatelessWidget {
             controller.forward();
             Future.delayed(Duration.zero, () {
               showDialog(
-                  context: context, builder: (context) => buildDialogButtons());
+                  context: context,
+                  builder: (context) => buildDialogButtons(listOfLearnedCards));
             });
           },
         ),
@@ -125,7 +141,7 @@ class RadialAnimation extends StatelessWidget {
     );
   }
 
-  AnimatedBuilder buildDialogButtons() {
+  AnimatedBuilder buildDialogButtons(List<String> listOfLearnedCards) {
     return AnimatedBuilder(
         animation: controller,
         builder: (context, widget) {
@@ -141,11 +157,11 @@ class RadialAnimation extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.bottomRight,
                   children: <Widget>[
-                    _buildButton(context, 2, 270,
+                    _buildButton(context, 2, 270, listOfLearnedCards,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hidewords,
                         text: 'Скрыть английские слова'),
-                    _buildButton(context, 1, 270,
+                    _buildButton(context, 1, 270, listOfLearnedCards,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hideimages,
                         text: 'Скрыть изображения'),
@@ -178,6 +194,7 @@ class RadialAnimation extends StatelessWidget {
   }
 
   _buildButton(BuildContext context, int number, double angle,
+      List<String> listOfLearnedCards,
       {Color color, IconData icon, String text}) {
     final double rad = radians(angle);
     return Transform(
@@ -226,12 +243,22 @@ class RadialAnimation extends StatelessWidget {
   }
 
   _routeToTraining(BuildContext context, int trainingVariant) {
+    /*listOfLearnedCards.forEach((element) {
+      print('Print _routeToTraining ' + element);
+    });
+
+    listOfCards.forEach((element) {
+      print('Print _routeToTraining ' + element.toString());
+    });*/
+
     Navigator.of(context).pop();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => TrainingFlashcards(
           listOfCards: listOfCards,
+          listOfLearnedCards: listOfLearnedCards,
           trainingVariant: trainingVariant,
+          subtopicId: subtopicId,
         ),
       ),
     );

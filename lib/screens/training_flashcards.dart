@@ -2,17 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class TrainingFlashcards extends StatelessWidget {
-  TrainingFlashcards({Key key, this.listOfCards, this.trainingVariant})
-      : super(key: key);
+  TrainingFlashcards({
+    Key key,
+    this.listOfCards,
+    this.listOfLearnedCards,
+    this.subtopicId,
+    this.trainingVariant,
+  }) : super(key: key);
 
   final List<Magicard> listOfCards;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
   final int trainingVariant;
 
   @override
   Widget build(BuildContext context) {
+    listOfLearnedCards.forEach((element) {
+      print('Print build ' + element);
+    });
+
     return WillPopScope(
       onWillPop: () async {
         var state =
@@ -86,15 +98,26 @@ class TrainingFlashcards extends StatelessWidget {
       },
       itemBuilder: (BuildContext context, int itemIndex) {
         if (trainingVariant == 0) {
+          print('trainingVariant == 0');
+          listOfLearnedCards.forEach((element) {
+            print('Print _buildCarousel ' + element);
+          });
+
           return CarouselItemWordOpened(
-              listOfCards: listOfCards,
-              context: context,
-              itemIndex: itemIndex);
+            listOfCards: listOfCards,
+            listOfLearnedCards: listOfLearnedCards,
+            context: context,
+            itemIndex: itemIndex,
+            subtopicId: subtopicId,
+          );
         } else {
           return CarouselItemPhotoOpened(
-              listOfCards: listOfCards,
-              context: context,
-              itemIndex: itemIndex);
+            listOfCards: listOfCards,
+            listOfLearnedCards: listOfLearnedCards,
+            context: context,
+            itemIndex: itemIndex,
+            subtopicId: subtopicId,
+          );
         }
       },
       itemCount: listOfCards.length,
@@ -110,16 +133,23 @@ class CarouselItemWordOpened extends StatelessWidget {
     @required this.listOfCards,
     @required this.context,
     @required this.itemIndex,
+    this.listOfLearnedCards,
+    this.subtopicId,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
   final BuildContext context;
   final int itemIndex;
 
   @override
   Widget build(BuildContext context) {
-    var trainingState = Provider.of<TrainingFlashcardsState>(context);
+    listOfLearnedCards.forEach((element) {
+      print('Print CarouselItemWordOpened ' + element);
+    });
 
+    var trainingState = Provider.of<TrainingFlashcardsState>(context);
     return Padding(
       padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
       child: GestureDetector(
@@ -216,7 +246,11 @@ class CarouselItemWordOpened extends StatelessWidget {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: ButtonLearned(
+                      context: context,
                       heroTag: listOfCards[itemIndex].title,
+                      cardId: listOfCards[itemIndex].id,
+                      listOfLearnedCards: listOfLearnedCards,
+                      subtopicId: subtopicId,
                     ),
                   ),
                 ]),
@@ -240,9 +274,13 @@ class CarouselItemPhotoOpened extends StatefulWidget {
     @required this.listOfCards,
     @required this.context,
     @required this.itemIndex,
+    this.listOfLearnedCards,
+    this.subtopicId,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
   final BuildContext context;
   final int itemIndex;
 
@@ -410,7 +448,13 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: ButtonLearned(),
+                    child: ButtonLearned(
+                      context: context,
+                      heroTag: widget.listOfCards[widget.itemIndex].title,
+                      listOfLearnedCards: widget.listOfLearnedCards,
+                      cardId: widget.listOfCards[widget.itemIndex].id,
+                      subtopicId: widget.subtopicId,
+                    ),
                   ),
                 ]),
               ),
@@ -427,15 +471,21 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
   }
 }
 
-// Elements
-
 class ButtonLearned extends StatefulWidget {
   const ButtonLearned({
     Key key,
     this.heroTag,
+    this.context,
+    this.listOfLearnedCards,
+    this.subtopicId,
+    this.cardId,
   }) : super(key: key);
 
   final String heroTag;
+  final BuildContext context;
+  final List<String> listOfLearnedCards;
+  final String subtopicId;
+  final String cardId;
 
   @override
   _ButtonLearnedState createState() => _ButtonLearnedState();
@@ -452,6 +502,18 @@ class _ButtonLearnedState extends State<ButtonLearned> {
           ? FloatingActionButton.extended(
               heroTag: widget.heroTag,
               onPressed: () {
+                FirebaseUser user =
+                    Provider.of<FirebaseUser>(widget.context, listen: false);
+                widget.listOfLearnedCards.forEach((element) {
+                  print('Print ButtonLearned ' + element);
+                });
+                widget.listOfLearnedCards.add(widget.cardId);
+
+                DB.updateArrayOfLearnedCards(
+                    userId: user.uid,
+                    subtopicId: widget.subtopicId,
+                    learnedCards: widget.listOfLearnedCards);
+
                 setState(() {
                   _learned = true;
                 });
