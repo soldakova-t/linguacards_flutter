@@ -21,10 +21,6 @@ class TrainingFlashcards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    listOfLearnedCards.forEach((element) {
-      print('Print build ' + element);
-    });
-
     return WillPopScope(
       onWillPop: () async {
         var state =
@@ -98,11 +94,6 @@ class TrainingFlashcards extends StatelessWidget {
       },
       itemBuilder: (BuildContext context, int itemIndex) {
         if (trainingVariant == 0) {
-          print('trainingVariant == 0');
-          listOfLearnedCards.forEach((element) {
-            print('Print _buildCarousel ' + element);
-          });
-
           return CarouselItemWordOpened(
             listOfCards: listOfCards,
             listOfLearnedCards: listOfLearnedCards,
@@ -145,11 +136,9 @@ class CarouselItemWordOpened extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    listOfLearnedCards.forEach((element) {
-      print('Print CarouselItemWordOpened ' + element);
-    });
-
     var trainingState = Provider.of<TrainingFlashcardsState>(context);
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
     return Padding(
       padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
       child: GestureDetector(
@@ -243,16 +232,18 @@ class CarouselItemWordOpened extends StatelessWidget {
                       SizedBox(height: 110),
                     ],
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: ButtonLearned(
-                      context: context,
-                      heroTag: listOfCards[itemIndex].title,
-                      cardId: listOfCards[itemIndex].id,
-                      listOfLearnedCards: listOfLearnedCards,
-                      subtopicId: subtopicId,
-                    ),
-                  ),
+                  user != null
+                      ? Align(
+                          alignment: Alignment.bottomCenter,
+                          child: ButtonLearned(
+                            context: context,
+                            heroTag: listOfCards[itemIndex].title,
+                            cardId: listOfCards[itemIndex].id,
+                            listOfLearnedCards: listOfLearnedCards,
+                            subtopicId: subtopicId,
+                          ),
+                        )
+                      : Container(),
                 ]),
               ),
               Padding(
@@ -301,6 +292,7 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
   @override
   Widget build(BuildContext context) {
     var trainingState = Provider.of<TrainingFlashcardsState>(context);
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
 
     return Padding(
       padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
@@ -446,7 +438,8 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                       SizedBox(height: 65),
                     ],
                   ),
-                  Align(
+                  user != null
+                      ? Align(
                     alignment: Alignment.bottomCenter,
                     child: ButtonLearned(
                       context: context,
@@ -455,7 +448,7 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                       cardId: widget.listOfCards[widget.itemIndex].id,
                       subtopicId: widget.subtopicId,
                     ),
-                  ),
+                  ) : Container(),
                 ]),
               ),
               Padding(
@@ -504,9 +497,6 @@ class _ButtonLearnedState extends State<ButtonLearned> {
               onPressed: () {
                 FirebaseUser user =
                     Provider.of<FirebaseUser>(widget.context, listen: false);
-                widget.listOfLearnedCards.forEach((element) {
-                  print('Print ButtonLearned ' + element);
-                });
                 widget.listOfLearnedCards.add(widget.cardId);
 
                 DB.updateArrayOfLearnedCards(

@@ -103,15 +103,6 @@ class _CardsScreenState extends State<CardsScreen>
         .map((document) => Magicard.fromMap(document.documentID, document.data))
         .toList();
 
-    print('listOfLearnedCards 555');
-    listOfLearnedCards.forEach((element) {
-      print('Print listOfLearnedCards ' + element);
-    });
-
-    /*listOfCards.forEach((element) {
-      print('Print listOfCards ' + element.toString());
-    });*/
-
     return Stack(
       children: <Widget>[
         CustomScrollView(

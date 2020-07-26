@@ -243,14 +243,6 @@ class RadialAnimation extends StatelessWidget {
   }
 
   _routeToTraining(BuildContext context, int trainingVariant) {
-    /*listOfLearnedCards.forEach((element) {
-      print('Print _routeToTraining ' + element);
-    });
-
-    listOfCards.forEach((element) {
-      print('Print _routeToTraining ' + element.toString());
-    });*/
-
     Navigator.of(context).pop();
     Navigator.of(context).push(
       MaterialPageRoute(

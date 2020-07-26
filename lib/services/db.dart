@@ -24,18 +24,6 @@ class DB {
       {String userId, String subtopicId}) async {
     try {
       List<String> learnedCards = List<String>();
-
-      /*var learnedcardsQuery = Firestore.instance
-          .collection('users/' + userId.toString() + '/learnedCards')
-          .where('subtopic_id', isEqualTo: subtopicId)
-          .limit(1);
-          
-        await learnedcardsQuery.getDocuments().then((data) {
-        if (data.documents.length > 0) {
-          learnedCards = data.documents[0].data['learned_cards'].cast<String>();
-        }
-      });*/
-
       await Firestore.instance
           .collection('users/' + userId.toString() + '/learnedCards')
           .document(subtopicId)
@@ -46,8 +34,6 @@ class DB {
         }
       }).catchError((e) => print("error fetching data: $e"));
 
-      // learnedCards.forEach((element) { print('getEarlyLearnedCards ' + element); });
-      
       return learnedCards;
     } catch (e) {
       throw e;
