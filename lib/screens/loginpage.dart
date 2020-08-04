@@ -174,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
-        color: hexToColor('#464EFF'),
+        color: hexToColor('#A8ABFF'),
         disabledColor: hexToColor('#C5C7FF'),
         child: Center(
             child: codeSent

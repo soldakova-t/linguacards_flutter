@@ -9,10 +9,10 @@ import 'dart:async';
 
 class RadialMenu extends StatefulWidget {
   RadialMenu(
-      {Key key, this.listOfCards, this.listOfLearnedCards, this.subtopicId})
+      {Key key, this.listOfCards, this.listLearnedCardsIDs, this.subtopicId})
       : super(key: key);
   final List<Magicard> listOfCards;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
 
   createState() => _RadialMenuState();
@@ -48,7 +48,7 @@ class _RadialMenuState extends State<RadialMenu>
       controller: controller,
       isOpen: isOpen,
       listOfCards: widget.listOfCards,
-      listOfLearnedCards: widget.listOfLearnedCards,
+      listLearnedCardsIDs: widget.listLearnedCardsIDs,
       subtopicId: widget.subtopicId,
     );
   }
@@ -66,7 +66,7 @@ class RadialAnimation extends StatelessWidget {
     this.controller,
     this.isOpen,
     this.listOfCards,
-    this.listOfLearnedCards,
+    this.listLearnedCardsIDs,
     this.subtopicId,
   })  : translation = Tween<double>(
           begin: 0.0,
@@ -101,7 +101,7 @@ class RadialAnimation extends StatelessWidget {
   final Animation<double> scale;
   final bool isOpen;
   final List<Magicard> listOfCards;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
 
   @override
@@ -133,7 +133,7 @@ class RadialAnimation extends StatelessWidget {
             Future.delayed(Duration.zero, () {
               showDialog(
                   context: context,
-                  builder: (context) => buildDialogButtons(listOfLearnedCards));
+                  builder: (context) => buildDialogButtons(listLearnedCardsIDs));
             });
           },
         ),
@@ -141,7 +141,7 @@ class RadialAnimation extends StatelessWidget {
     );
   }
 
-  AnimatedBuilder buildDialogButtons(List<String> listOfLearnedCards) {
+  AnimatedBuilder buildDialogButtons(List<String> listLearnedCardsIDs) {
     return AnimatedBuilder(
         animation: controller,
         builder: (context, widget) {
@@ -157,11 +157,11 @@ class RadialAnimation extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.bottomRight,
                   children: <Widget>[
-                    _buildButton(context, 2, 270, listOfLearnedCards,
+                    _buildButton(context, 2, 270, listLearnedCardsIDs,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hidewords,
                         text: 'Скрыть английские слова'),
-                    _buildButton(context, 1, 270, listOfLearnedCards,
+                    _buildButton(context, 1, 270, listLearnedCardsIDs,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hideimages,
                         text: 'Скрыть изображения'),
@@ -194,7 +194,7 @@ class RadialAnimation extends StatelessWidget {
   }
 
   _buildButton(BuildContext context, int number, double angle,
-      List<String> listOfLearnedCards,
+      List<String> listLearnedCardsIDs,
       {Color color, IconData icon, String text}) {
     final double rad = radians(angle);
     return Transform(
@@ -248,7 +248,7 @@ class RadialAnimation extends StatelessWidget {
       MaterialPageRoute(
         builder: (BuildContext context) => TrainingFlashcards(
           listOfCards: listOfCards,
-          listOfLearnedCards: listOfLearnedCards,
+          listLearnedCardsIDs: listLearnedCardsIDs,
           trainingVariant: trainingVariant,
           subtopicId: subtopicId,
         ),

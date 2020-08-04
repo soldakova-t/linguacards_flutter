@@ -9,13 +9,13 @@ class TrainingFlashcards extends StatelessWidget {
   TrainingFlashcards({
     Key key,
     this.listOfCards,
-    this.listOfLearnedCards,
+    this.listLearnedCardsIDs,
     this.subtopicId,
     this.trainingVariant,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final int trainingVariant;
 
@@ -96,7 +96,7 @@ class TrainingFlashcards extends StatelessWidget {
         if (trainingVariant == 0) {
           return CarouselItemWordOpened(
             listOfCards: listOfCards,
-            listOfLearnedCards: listOfLearnedCards,
+            listLearnedCardsIDs: listLearnedCardsIDs,
             context: context,
             itemIndex: itemIndex,
             subtopicId: subtopicId,
@@ -104,7 +104,7 @@ class TrainingFlashcards extends StatelessWidget {
         } else {
           return CarouselItemPhotoOpened(
             listOfCards: listOfCards,
-            listOfLearnedCards: listOfLearnedCards,
+            listLearnedCardsIDs: listLearnedCardsIDs,
             context: context,
             itemIndex: itemIndex,
             subtopicId: subtopicId,
@@ -124,12 +124,12 @@ class CarouselItemWordOpened extends StatelessWidget {
     @required this.listOfCards,
     @required this.context,
     @required this.itemIndex,
-    this.listOfLearnedCards,
+    this.listLearnedCardsIDs,
     this.subtopicId,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final BuildContext context;
   final int itemIndex;
@@ -239,7 +239,7 @@ class CarouselItemWordOpened extends StatelessWidget {
                             context: context,
                             heroTag: listOfCards[itemIndex].title,
                             cardId: listOfCards[itemIndex].id,
-                            listOfLearnedCards: listOfLearnedCards,
+                            listLearnedCardsIDs: listLearnedCardsIDs,
                             subtopicId: subtopicId,
                           ),
                         )
@@ -265,12 +265,12 @@ class CarouselItemPhotoOpened extends StatefulWidget {
     @required this.listOfCards,
     @required this.context,
     @required this.itemIndex,
-    this.listOfLearnedCards,
+    this.listLearnedCardsIDs,
     this.subtopicId,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final BuildContext context;
   final int itemIndex;
@@ -440,15 +440,16 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                   ),
                   user != null
                       ? Align(
-                    alignment: Alignment.bottomCenter,
-                    child: ButtonLearned(
-                      context: context,
-                      heroTag: widget.listOfCards[widget.itemIndex].title,
-                      listOfLearnedCards: widget.listOfLearnedCards,
-                      cardId: widget.listOfCards[widget.itemIndex].id,
-                      subtopicId: widget.subtopicId,
-                    ),
-                  ) : Container(),
+                          alignment: Alignment.bottomCenter,
+                          child: ButtonLearned(
+                            context: context,
+                            heroTag: widget.listOfCards[widget.itemIndex].title,
+                            listLearnedCardsIDs: widget.listLearnedCardsIDs,
+                            cardId: widget.listOfCards[widget.itemIndex].id,
+                            subtopicId: widget.subtopicId,
+                          ),
+                        )
+                      : Container(),
                 ]),
               ),
               Padding(
@@ -469,16 +470,18 @@ class ButtonLearned extends StatefulWidget {
     Key key,
     this.heroTag,
     this.context,
-    this.listOfLearnedCards,
+    this.listLearnedCardsIDs,
     this.subtopicId,
     this.cardId,
+    this.learned,
   }) : super(key: key);
 
   final String heroTag;
   final BuildContext context;
-  final List<String> listOfLearnedCards;
+  final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final String cardId;
+  final bool learned;
 
   @override
   _ButtonLearnedState createState() => _ButtonLearnedState();
@@ -488,21 +491,28 @@ class _ButtonLearnedState extends State<ButtonLearned> {
   bool _learned = false;
 
   @override
+  void initState() {
+    super.initState();
+    _learned = widget.learned;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    FirebaseUser user =
+        Provider.of<FirebaseUser>(widget.context, listen: false);
+
     return Container(
       height: 48,
       child: _learned == false
           ? FloatingActionButton.extended(
               heroTag: widget.heroTag,
               onPressed: () {
-                FirebaseUser user =
-                    Provider.of<FirebaseUser>(widget.context, listen: false);
-                widget.listOfLearnedCards.add(widget.cardId);
+                widget.listLearnedCardsIDs.add(widget.cardId);
 
                 DB.updateArrayOfLearnedCards(
                     userId: user.uid,
                     subtopicId: widget.subtopicId,
-                    learnedCards: widget.listOfLearnedCards);
+                    learnedCardsIDs: widget.listLearnedCardsIDs);
 
                 setState(() {
                   _learned = true;
@@ -548,13 +558,27 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                           _learned = false;
                         });
                       },
-                      child: Text(
-                        'Вернуть',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF878787),
-                          decoration: TextDecoration.underline,
-                          decorationStyle: TextDecorationStyle.dotted,
+                      child: GestureDetector(
+                        onTap: () {
+                          widget.listLearnedCardsIDs.remove(widget.cardId);
+
+                          DB.updateArrayOfLearnedCards(
+                              userId: user.uid,
+                              subtopicId: widget.subtopicId,
+                              learnedCardsIDs: widget.listLearnedCardsIDs);
+
+                          setState(() {
+                            _learned = false;
+                          });
+                        },
+                        child: Text(
+                          'Вернуть',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF878787),
+                            decoration: TextDecoration.underline,
+                            decorationStyle: TextDecorationStyle.dotted,
+                          ),
                         ),
                       ),
                     ),

@@ -5,3 +5,4 @@ export 'about.dart';
 export 'cards.dart';
 export 'training_match.dart';
 export 'loginpage.dart';
+export 'market.dart';

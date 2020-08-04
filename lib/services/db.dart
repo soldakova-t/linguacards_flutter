@@ -20,7 +20,7 @@ class DB {
     });
   }
 
-  static Future<List<String>> getEarlyLearnedCards(
+  static Future<List<String>> getEarlyLearnedCardsIDs(
       {String userId, String subtopicId}) async {
     try {
       List<String> learnedCards = List<String>();
@@ -41,12 +41,12 @@ class DB {
   }
 
   static void updateArrayOfLearnedCards(
-      {String userId, String subtopicId, List<String> learnedCards}) async {
+      {String userId, String subtopicId, List<String> learnedCardsIDs}) async {
     await Firestore.instance
         .collection("users/" + userId + "/learnedCards")
         .document(subtopicId)
         .setData({
-      "learned_cards": learnedCards,
+      "learned_cards": learnedCardsIDs,
     });
   }
 }

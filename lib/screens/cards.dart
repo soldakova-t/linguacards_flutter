@@ -23,7 +23,7 @@ class _CardsScreenState extends State<CardsScreen>
   AnimationController _animatedFABController;
 
   List<Magicard> listOfCards = List<Magicard>();
-  List<String> listOfLearnedCards = List<String>();
+  List<String> listLearnedCardsIDs = List<String>();
 
   @override
   void initState() {
@@ -77,13 +77,13 @@ class _CardsScreenState extends State<CardsScreen>
 
             if (user != null) {
               return FutureBuilder<List<String>>(
-                future: DB.getEarlyLearnedCards(
+                future: DB.getEarlyLearnedCardsIDs(
                     userId: user.uid, subtopicId: widget.subtopic.id),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return LinearProgressIndicator();
                   } else {
-                    listOfLearnedCards = snapshot.data;
+                    listLearnedCardsIDs = snapshot.data;
                     return _buildList(context, documents);
                   }
                 },
@@ -91,7 +91,6 @@ class _CardsScreenState extends State<CardsScreen>
             } else {
               return _buildList(context, documents);
             }
-
           }
         },
       ),
@@ -102,6 +101,36 @@ class _CardsScreenState extends State<CardsScreen>
     listOfCards = snapshot
         .map((document) => Magicard.fromMap(document.documentID, document.data))
         .toList();
+
+    List<Magicard> notLearnedMagicards = List<Magicard>();
+    List<Magicard> learnedMagicards = List<Magicard>();
+    List<Magicard> listOfCardsSorted = List<Magicard>();
+
+    listOfCards.forEach((card) {
+      listLearnedCardsIDs.contains(card.id)
+          ? learnedMagicards.add(card)
+          : notLearnedMagicards.add(card);
+    });
+
+    listOfCardsSorted = notLearnedMagicards + learnedMagicards;
+
+    /*print('notLearnedMagicards = ');
+    notLearnedMagicards.forEach((element) {
+      print(element.toString());
+    });
+
+    print('learnedMagicards = ');
+    learnedMagicards.forEach((element) {
+      print(element.toString());
+    });*/
+
+    bool _cardIsLearned(int index) {
+      if (index >= listOfCards.length - learnedMagicards.length) {
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     return Stack(
       children: <Widget>[
@@ -139,9 +168,10 @@ class _CardsScreenState extends State<CardsScreen>
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => CardContent(
-                    card: Magicard.fromMap(
-                        snapshot[index].documentID, snapshot[index].data),
-                    learned: false,
+                    card: listOfCardsSorted[index],
+                    learned: _cardIsLearned(index),
+                    listLearnedCardsIDs: listLearnedCardsIDs,
+                    subtopicId: widget.subtopic.id,
                   ),
                   childCount: snapshot.length,
                 ),
@@ -154,8 +184,8 @@ class _CardsScreenState extends State<CardsScreen>
           child: Align(
             alignment: Alignment.bottomRight,
             child: RadialMenu(
-              listOfCards: listOfCards,
-              listOfLearnedCards: listOfLearnedCards,
+              listOfCards: notLearnedMagicards,
+              listLearnedCardsIDs: listLearnedCardsIDs,
               subtopicId: widget.subtopic.id,
             ),
           ),
@@ -235,18 +265,20 @@ String _textNumberOfCards(int number) {
 class CardContent extends StatelessWidget {
   final Magicard card;
   final bool learned;
+  final List<String> listLearnedCardsIDs;
+  final String subtopicId;
 
   const CardContent({
     Key key,
     this.card,
-    this.learned,
+    this.learned, this.listLearnedCardsIDs, this.subtopicId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(_createRoute(card));
+        Navigator.of(context).push(_createRoute(card, listLearnedCardsIDs, subtopicId));
       },
       child: Ink(
         color: Colors.white,
@@ -281,25 +313,27 @@ class CardContent extends StatelessWidget {
             trailing: SizedBox(
               width: 88,
               height: 25,
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.check,
-                    size: 18,
-                    color: Colors.green[600],
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    'Изучено',
-                    style: TextStyle(
-                      color: Colors.green[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+              child: learned
+                  ? Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.check,
+                          size: 18,
+                          color: Colors.green[600],
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          'Изучено',
+                          style: TextStyle(
+                            color: Colors.green[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Container(),
             ),
           ),
         ),
@@ -308,10 +342,13 @@ class CardContent extends StatelessWidget {
   }
 }
 
-Route _createRoute(Magicard card) {
+Route _createRoute(Magicard card, List<String> listLearnedCardsIDs, String subtopicId) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        CardDetailsScreen(card: card),
+    pageBuilder: (context, animation, secondaryAnimation) => CardDetailsScreen(
+      card: card,
+      listLearnedCardsIDs: listLearnedCardsIDs,
+      subtopicId: subtopicId,
+    ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
