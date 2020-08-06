@@ -5,10 +5,12 @@ import '../services/services.dart';
 import '../shared/shared.dart';
 
 class CardDetailsScreen extends StatelessWidget {
-  const CardDetailsScreen({Key key, this.card, this.listLearnedCardsIDs, this.subtopicId}) : super(key: key);
+  const CardDetailsScreen({Key key, this.card, this.listLearnedCardsIDs, this.subtopicId, this.mapSubtopicsProgress, this.numberOfCardsInSubtopic}) : super(key: key);
   final Magicard card;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
+  final Map<String, String> mapSubtopicsProgress;
+  final int numberOfCardsInSubtopic;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +138,8 @@ class CardDetailsScreen extends StatelessWidget {
                 listLearnedCardsIDs: listLearnedCardsIDs,
                 subtopicId: subtopicId,
                 learned: listLearnedCardsIDs.contains(card.id),
+                mapSubtopicsProgress: mapSubtopicsProgress,
+                numberOfCardsInSubtopic: numberOfCardsInSubtopic,
               ),
             ),
           ]),

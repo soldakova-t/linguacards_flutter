@@ -12,72 +12,66 @@ class TrainingFlashcards extends StatelessWidget {
     this.listLearnedCardsIDs,
     this.subtopicId,
     this.trainingVariant,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final int trainingVariant;
+  final Map<String, String> mapSubtopicsProgress;
+  final int numberOfCardsInSubtopic;
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        var state =
-            Provider.of<TrainingFlashcardsState>(context, listen: false);
-        state.progress = (1 / listOfCards.length);
-
-        Navigator.pop(context);
-        return false;
-      },
-      child: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            Container(
-              color: Colors.grey[100],
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 25.0,
-                  top: 29.0 + MediaQuery.of(context).padding.top - 12.0,
-                  right: 10.0,
-                  bottom: 29.0),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(
-                      right: 12,
-                    ),
-                    width: MediaQuery.of(context).size.width - 83.0,
-                    child: Consumer<TrainingFlashcardsState>(
-                      builder: (context, state, child) => AnimatedProgress(
-                        value: state.progress,
-                        height: 5.0,
-                      ),
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Container(
+            color: Colors.grey[100],
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+                left: 25.0,
+                top: 29.0 + MediaQuery.of(context).padding.top - 12.0,
+                right: 10.0,
+                bottom: 29.0),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(
+                    right: 12,
+                  ),
+                  width: MediaQuery.of(context).size.width - 83.0,
+                  child: Consumer<TrainingFlashcardsState>(
+                    builder: (context, state, child) => AnimatedProgress(
+                      value: state.progress,
+                      height: 5.0,
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      var state = Provider.of<TrainingFlashcardsState>(context,
-                          listen: false);
-                      state.progress = (1 / listOfCards.length);
-                      Navigator.of(context).pop();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Icon(Icons.close),
-                    ),
+                ),
+                InkWell(
+                  onTap: () {
+                    var state = Provider.of<TrainingFlashcardsState>(context,
+                        listen: false);
+                    state.progress = (1 / listOfCards.length);
+                    Navigator.of(context).pop();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Icon(Icons.close),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 60.0 + MediaQuery.of(context).padding.top, bottom: 20.0),
-              child: _buildCarousel(context, trainingVariant),
-            ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+                top: 60.0 + MediaQuery.of(context).padding.top, bottom: 20.0),
+            child: _buildCarousel(context, trainingVariant),
+          ),
+        ],
       ),
     );
   }
@@ -100,6 +94,8 @@ class TrainingFlashcards extends StatelessWidget {
             context: context,
             itemIndex: itemIndex,
             subtopicId: subtopicId,
+            mapSubtopicsProgress: mapSubtopicsProgress,
+            numberOfCardsInSubtopic: numberOfCardsInSubtopic,
           );
         } else {
           return CarouselItemPhotoOpened(
@@ -108,6 +104,8 @@ class TrainingFlashcards extends StatelessWidget {
             context: context,
             itemIndex: itemIndex,
             subtopicId: subtopicId,
+            mapSubtopicsProgress: mapSubtopicsProgress,
+            numberOfCardsInSubtopic: numberOfCardsInSubtopic,
           );
         }
       },
@@ -126,6 +124,8 @@ class CarouselItemWordOpened extends StatelessWidget {
     @required this.itemIndex,
     this.listLearnedCardsIDs,
     this.subtopicId,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
@@ -133,6 +133,8 @@ class CarouselItemWordOpened extends StatelessWidget {
   final String subtopicId;
   final BuildContext context;
   final int itemIndex;
+  final Map<String, String> mapSubtopicsProgress;
+  final int numberOfCardsInSubtopic;
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +243,9 @@ class CarouselItemWordOpened extends StatelessWidget {
                             cardId: listOfCards[itemIndex].id,
                             listLearnedCardsIDs: listLearnedCardsIDs,
                             subtopicId: subtopicId,
+                            learned: false,
+                            mapSubtopicsProgress: mapSubtopicsProgress,
+                            numberOfCardsInSubtopic: numberOfCardsInSubtopic,
                           ),
                         )
                       : Container(),
@@ -267,6 +272,8 @@ class CarouselItemPhotoOpened extends StatefulWidget {
     @required this.itemIndex,
     this.listLearnedCardsIDs,
     this.subtopicId,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
@@ -274,6 +281,8 @@ class CarouselItemPhotoOpened extends StatefulWidget {
   final String subtopicId;
   final BuildContext context;
   final int itemIndex;
+  final Map<String, String> mapSubtopicsProgress;
+  final int numberOfCardsInSubtopic;
 
   @override
   _CarouselItemPhotoOpenedState createState() =>
@@ -447,6 +456,10 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                             listLearnedCardsIDs: widget.listLearnedCardsIDs,
                             cardId: widget.listOfCards[widget.itemIndex].id,
                             subtopicId: widget.subtopicId,
+                            learned: false,
+                            mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                            numberOfCardsInSubtopic:
+                                widget.numberOfCardsInSubtopic,
                           ),
                         )
                       : Container(),
@@ -474,14 +487,18 @@ class ButtonLearned extends StatefulWidget {
     this.subtopicId,
     this.cardId,
     this.learned,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
   }) : super(key: key);
 
   final String heroTag;
   final BuildContext context;
   final List<String> listLearnedCardsIDs;
+  final Map<String, String> mapSubtopicsProgress;
   final String subtopicId;
   final String cardId;
   final bool learned;
+  final int numberOfCardsInSubtopic;
 
   @override
   _ButtonLearnedState createState() => _ButtonLearnedState();
@@ -509,10 +526,21 @@ class _ButtonLearnedState extends State<ButtonLearned> {
               onPressed: () {
                 widget.listLearnedCardsIDs.add(widget.cardId);
 
+                double _newProgress = widget.listLearnedCardsIDs.length /
+                    widget.numberOfCardsInSubtopic;
+                widget.mapSubtopicsProgress.update(
+                    widget.subtopicId, (value) => (_newProgress).toString(),
+                    ifAbsent: () => (_newProgress).toString());
+
                 DB.updateArrayOfLearnedCards(
                     userId: user.uid,
                     subtopicId: widget.subtopicId,
                     learnedCardsIDs: widget.listLearnedCardsIDs);
+
+                DB.updateSubtopicsProgress(
+                  userId: user.uid,
+                  subtopicsProgress: widget.mapSubtopicsProgress,
+                );
 
                 setState(() {
                   _learned = true;
@@ -562,10 +590,22 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                         onTap: () {
                           widget.listLearnedCardsIDs.remove(widget.cardId);
 
+                          double _newProgress =
+                              widget.listLearnedCardsIDs.length /
+                                  widget.numberOfCardsInSubtopic;
+                          widget.mapSubtopicsProgress.update(widget.subtopicId,
+                              (value) => (_newProgress).toString(),
+                              ifAbsent: () => (_newProgress).toString());
+
                           DB.updateArrayOfLearnedCards(
                               userId: user.uid,
                               subtopicId: widget.subtopicId,
                               learnedCardsIDs: widget.listLearnedCardsIDs);
+
+                          DB.updateSubtopicsProgress(
+                            userId: user.uid,
+                            subtopicsProgress: widget.mapSubtopicsProgress,
+                          );
 
                           setState(() {
                             _learned = false;

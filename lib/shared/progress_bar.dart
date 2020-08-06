@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magicards/shared/shared.dart';
 import 'dart:async';
 
-class AnimatedProgressWithDelay extends StatefulWidget {
+/*class AnimatedProgressWithDelay extends StatefulWidget {
   final double value;
   final double height;
 
@@ -31,7 +31,7 @@ class _AnimatedProgressWithDelayState<T>
     return ProgressLayoutBuilder(
         value: _currentValue, height: widget.height);
   }
-}
+}*/
 
 class AnimatedProgress extends StatelessWidget {
   final double value;

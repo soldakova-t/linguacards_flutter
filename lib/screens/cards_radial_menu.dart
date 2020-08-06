@@ -6,14 +6,20 @@ import 'package:magicards/shared/custom_icons_icons.dart';
 import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import 'dart:async';
+import 'package:provider/provider.dart';
 
 class RadialMenu extends StatefulWidget {
   RadialMenu(
-      {Key key, this.listOfCards, this.listLearnedCardsIDs, this.subtopicId})
+      {Key key,
+      this.listOfCards,
+      this.listLearnedCardsIDs,
+      this.subtopicId,
+      this.mapSubtopicsProgress})
       : super(key: key);
   final List<Magicard> listOfCards;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
+  final Map<String, String> mapSubtopicsProgress;
 
   createState() => _RadialMenuState();
 }
@@ -50,6 +56,7 @@ class _RadialMenuState extends State<RadialMenu>
       listOfCards: widget.listOfCards,
       listLearnedCardsIDs: widget.listLearnedCardsIDs,
       subtopicId: widget.subtopicId,
+      mapSubtopicsProgress: widget.mapSubtopicsProgress,
     );
   }
 
@@ -68,6 +75,7 @@ class RadialAnimation extends StatelessWidget {
     this.listOfCards,
     this.listLearnedCardsIDs,
     this.subtopicId,
+    this.mapSubtopicsProgress,
   })  : translation = Tween<double>(
           begin: 0.0,
           end: 70.0,
@@ -103,6 +111,7 @@ class RadialAnimation extends StatelessWidget {
   final List<Magicard> listOfCards;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
+  final Map<String, String> mapSubtopicsProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +142,8 @@ class RadialAnimation extends StatelessWidget {
             Future.delayed(Duration.zero, () {
               showDialog(
                   context: context,
-                  builder: (context) => buildDialogButtons(listLearnedCardsIDs));
+                  builder: (context) => buildDialogButtons(
+                      listLearnedCardsIDs, mapSubtopicsProgress));
             });
           },
         ),
@@ -141,7 +151,8 @@ class RadialAnimation extends StatelessWidget {
     );
   }
 
-  AnimatedBuilder buildDialogButtons(List<String> listLearnedCardsIDs) {
+  AnimatedBuilder buildDialogButtons(List<String> listLearnedCardsIDs,
+      Map<String, String> mapSubtopicsProgress) {
     return AnimatedBuilder(
         animation: controller,
         builder: (context, widget) {
@@ -158,10 +169,12 @@ class RadialAnimation extends StatelessWidget {
                   alignment: Alignment.bottomRight,
                   children: <Widget>[
                     _buildButton(context, 2, 270, listLearnedCardsIDs,
+                        mapSubtopicsProgress,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hidewords,
                         text: 'Скрыть английские слова'),
                     _buildButton(context, 1, 270, listLearnedCardsIDs,
+                        mapSubtopicsProgress,
                         color: Color(0xFF464EFF),
                         icon: CustomIcons.hideimages,
                         text: 'Скрыть изображения'),
@@ -193,9 +206,15 @@ class RadialAnimation extends StatelessWidget {
         });
   }
 
-  _buildButton(BuildContext context, int number, double angle,
+  _buildButton(
+      BuildContext context,
+      int number,
+      double angle,
       List<String> listLearnedCardsIDs,
-      {Color color, IconData icon, String text}) {
+      Map<String, String> mapSubtopicsProgress,
+      {Color color,
+      IconData icon,
+      String text}) {
     final double rad = radians(angle);
     return Transform(
       transform: Matrix4.identity()
@@ -230,7 +249,7 @@ class RadialAnimation extends StatelessWidget {
                   ),
                   backgroundColor: color,
                   onPressed: () {
-                    _routeToTraining(context, number - 1);
+                    _routeToTraining(context, number - 1, mapSubtopicsProgress);
                   },
                   elevation: 0,
                 ),
@@ -242,7 +261,11 @@ class RadialAnimation extends StatelessWidget {
     );
   }
 
-  _routeToTraining(BuildContext context, int trainingVariant) {
+  _routeToTraining(BuildContext context, int trainingVariant,
+      Map<String, String> mapSubtopicsProgress) {
+    var state = Provider.of<TrainingFlashcardsState>(context, listen: false);
+    state.progress = (1 / listOfCards.length);
+
     Navigator.of(context).pop();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -251,6 +274,9 @@ class RadialAnimation extends StatelessWidget {
           listLearnedCardsIDs: listLearnedCardsIDs,
           trainingVariant: trainingVariant,
           subtopicId: subtopicId,
+          mapSubtopicsProgress: mapSubtopicsProgress,
+          numberOfCardsInSubtopic:
+              listOfCards.length + listLearnedCardsIDs.length,
         ),
       ),
     );

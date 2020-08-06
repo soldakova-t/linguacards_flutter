@@ -25,7 +25,7 @@ class DB {
     try {
       List<String> learnedCards = List<String>();
       await Firestore.instance
-          .collection('users/' + userId.toString() + '/learnedCards')
+          .collection('users/' + userId + '/learnedCards')
           .document(subtopicId)
           .get()
           .then((data) {
@@ -47,6 +47,13 @@ class DB {
         .document(subtopicId)
         .setData({
       "learned_cards": learnedCardsIDs,
+    });
+  }
+
+  static void updateSubtopicsProgress(
+      {String userId, Map<String, String> subtopicsProgress}) async {
+    await Firestore.instance.collection("users").document(userId).setData({
+      "subtopics_progress": subtopicsProgress,
     });
   }
 }

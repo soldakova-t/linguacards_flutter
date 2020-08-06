@@ -9,7 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class CardsScreen extends StatefulWidget {
   final Subtopic subtopic;
-  CardsScreen({Key key, this.subtopic}) : super(key: key);
+  final Map<String, String> mapSubtopicsProgress;
+  CardsScreen({Key key, this.subtopic, this.mapSubtopicsProgress})
+      : super(key: key);
 
   @override
   _CardsScreenState createState() => _CardsScreenState();
@@ -51,6 +53,7 @@ class _CardsScreenState extends State<CardsScreen>
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: _buildBody(context),
@@ -172,6 +175,8 @@ class _CardsScreenState extends State<CardsScreen>
                     learned: _cardIsLearned(index),
                     listLearnedCardsIDs: listLearnedCardsIDs,
                     subtopicId: widget.subtopic.id,
+                    mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                    numberOfCardsInSubtopic: listOfCards.length,
                   ),
                   childCount: snapshot.length,
                 ),
@@ -183,11 +188,12 @@ class _CardsScreenState extends State<CardsScreen>
           padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
           child: Align(
             alignment: Alignment.bottomRight,
-            child: RadialMenu(
+            child: (notLearnedMagicards.length > 0) ? RadialMenu(
               listOfCards: notLearnedMagicards,
               listLearnedCardsIDs: listLearnedCardsIDs,
               subtopicId: widget.subtopic.id,
-            ),
+              mapSubtopicsProgress: widget.mapSubtopicsProgress,
+            ) : Container(),
           ),
         ),
       ],
@@ -267,18 +273,24 @@ class CardContent extends StatelessWidget {
   final bool learned;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
+  final Map<String, String> mapSubtopicsProgress;
+  final int numberOfCardsInSubtopic;
 
   const CardContent({
     Key key,
     this.card,
-    this.learned, this.listLearnedCardsIDs, this.subtopicId,
+    this.learned,
+    this.listLearnedCardsIDs,
+    this.subtopicId,
+    this.mapSubtopicsProgress, this.numberOfCardsInSubtopic,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(_createRoute(card, listLearnedCardsIDs, subtopicId));
+        Navigator.of(context).push(_createRoute(
+            card, listLearnedCardsIDs, subtopicId, mapSubtopicsProgress, numberOfCardsInSubtopic));
       },
       child: Ink(
         color: Colors.white,
@@ -342,12 +354,15 @@ class CardContent extends StatelessWidget {
   }
 }
 
-Route _createRoute(Magicard card, List<String> listLearnedCardsIDs, String subtopicId) {
+Route _createRoute(Magicard card, List<String> listLearnedCardsIDs,
+    String subtopicId, Map<String, String> mapSubtopicsProgress, int numberOfCardsInSubtopic) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CardDetailsScreen(
       card: card,
       listLearnedCardsIDs: listLearnedCardsIDs,
       subtopicId: subtopicId,
+      mapSubtopicsProgress: mapSubtopicsProgress,
+      numberOfCardsInSubtopic: numberOfCardsInSubtopic,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);

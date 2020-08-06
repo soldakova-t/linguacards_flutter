@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import '../screens/screens.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SubtopicsScreen extends StatefulWidget {
   final Topic topic;
@@ -14,12 +17,13 @@ class SubtopicsScreen extends StatefulWidget {
 class _SubtopicsScreenState extends State<SubtopicsScreen> {
   static const kExpandedHeight = 155.0;
   ScrollController _scrollController;
+  Map<String, String> _mapSubtopicsProgress;
 
   @override
   void initState() {
     super.initState();
-
     _scrollController = ScrollController()..addListener(() => setState(() {}));
+    _mapSubtopicsProgress = Map<String, String>();
   }
 
   bool get _showTitle {
@@ -29,6 +33,38 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+    if (user != null) {
+      print(user.uid);
+      return StreamBuilder<DocumentSnapshot>(
+        stream: Firestore.instance
+            .collection('users')
+            .document(user.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return _buildSubtopicsList(context, _mapSubtopicsProgress);
+          } else {
+              _mapSubtopicsProgress =
+                  Map<String, String>.from(snapshot.data['subtopics_progress']);
+            return _buildSubtopicsList(context, _mapSubtopicsProgress);
+          }
+        },
+      );
+    } else {
+      return _buildSubtopicsList(context, _mapSubtopicsProgress);
+    }
+  }
+
+  Scaffold _buildSubtopicsList(
+      BuildContext context, Map<String, String> mapSubtopicsProgress) {
+    print('mapSubtopicsProgress = ');
+
+    mapSubtopicsProgress.forEach((key, value) {
+      print(key + ' => ' + value);
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -64,7 +100,13 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) => SubtopicContent(
                   subtopic: widget.topic.subtopics[index],
-                  progress: 0.5,
+                  progress:
+                      (mapSubtopicsProgress[widget.topic.subtopics[index].id] !=
+                              null)
+                          ? double.parse(mapSubtopicsProgress[
+                              widget.topic.subtopics[index].id])
+                          : 0.0,
+                  mapSubtopicsProgress: mapSubtopicsProgress,
                 ),
                 childCount: widget.topic.subtopics.length,
               ),
@@ -142,11 +184,13 @@ class TopicDetails extends StatelessWidget {
 class SubtopicContent extends StatelessWidget {
   final Subtopic subtopic;
   final double progress;
+  final Map<String, String> mapSubtopicsProgress;
 
   const SubtopicContent({
     Key key,
     this.subtopic,
     this.progress,
+    this.mapSubtopicsProgress,
   }) : super(key: key);
 
   @override
@@ -155,7 +199,8 @@ class SubtopicContent extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(_createRoute(subtopic));
+        Navigator.of(context)
+            .push(_createRoute(subtopic, mapSubtopicsProgress));
       },
       child: Ink(
         color: Colors.white,
@@ -176,13 +221,13 @@ class SubtopicContent extends StatelessWidget {
               style: mySubtitle14Style,
             ),
             trailing: Container(
-              width: 115,
+              width: 121,
               child: Row(
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(right: 15),
                     width: 85,
-                    child: AnimatedProgressWithDelay(
+                    child: AnimatedProgress(
                       height: 3,
                       value: progress,
                     ),
@@ -204,10 +249,13 @@ class SubtopicContent extends StatelessWidget {
   }
 }
 
-Route _createRoute(Subtopic subtopic) {
+Route _createRoute(
+    Subtopic subtopic, Map<String, String> mapSubtopicsProgress) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        CardsScreen(subtopic: subtopic),
+    pageBuilder: (context, animation, secondaryAnimation) => CardsScreen(
+      subtopic: subtopic,
+      mapSubtopicsProgress: mapSubtopicsProgress,
+    ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;
