@@ -1,12 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:magicards/screens/profile.dart';
+import 'package:magicards/screens/settings.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
+  final String prevPage;
+
+  const LoginPage({Key key, this.prevPage}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -19,117 +23,139 @@ class _LoginPageState extends State<LoginPage> {
   bool phoneEntered = false;
   bool codeSent = false;
   bool incorrectPhoneFireBase = false;
-
   AuthServiceFirebase auth = AuthServiceFirebase();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.all(0.0),
-            children: <Widget>[
-              SizedBox(height: 25 + MediaQuery.of(context).padding.top),
-              _buildCloseButton(context),
-              Padding(
-                padding: const EdgeInsets.only(left: 25, right: 25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    SizedBox(height: 17 + MediaQuery.of(context).padding.top),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      height: 48,
-                      child: SvgPicture.asset('assets/icons/logo_auth.svg'),
-                    ),
-                    SizedBox(height: 26),
-                    Text(
-                      'Добро пожаловать в Magicards!',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.mainDarkColor,
+      body: Builder(
+        builder: (context) => Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.all(0.0),
+              children: <Widget>[
+                SizedBox(height: 25 + MediaQuery.of(context).padding.top),
+                _buildCloseButton(context),
+                Padding(
+                  padding: const EdgeInsets.only(left: 25, right: 25),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      SizedBox(height: 17 + MediaQuery.of(context).padding.top),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        height: 48,
+                        child: SvgPicture.asset('assets/icons/logo_auth.svg'),
                       ),
-                    ),
-                    SizedBox(height: 32),
-                    codeSent ? Container() : _buildPhoneInput(),
-                    codeSent ? _buildCodeInput() : Container(),
-                    SizedBox(height: 8),
-                    codeSent
-                        ? Container(
-                            height: 15,
-                          )
-                        : Text(
-                            incorrectPhoneFireBase
-                                ? 'Некорректный номер телефона'
-                                : 'Мы отправим SMS, чтобы подтвердить номер телефона',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: incorrectPhoneFireBase
-                                  ? MyColors.mainBrightColor
-                                  : hexToColor('#6D6F9D'),
-                            ),
-                          ),
-                    SizedBox(height: 24),
-                    _buildPhoneAuthButton(),
-                    SizedBox(height: 28),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Expanded(child: Divider()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'или',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: MyColors.subtitleColor,
-                            ),
-                          ),
+                      SizedBox(height: 26),
+                      Text(
+                        'Добро пожаловать в Magicards!',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: MyColors.mainDarkColor,
                         ),
-                        Expanded(child: Divider()),
-                      ],
-                    ),
-                    SizedBox(height: 22),
-                    _buildSocialAuthButton(
-                      'Google',
-                      auth.googleSignIn,
-                    ),
-                    SizedBox(height: 4),
-                    _buildSocialAuthButton(
-                      'Facebook',
-                      auth.loginFacebook,
-                    ),
-                    SizedBox(height: 4),
-                    FutureBuilder<Object>(
-                      future: auth.appleSignInAvailable,
-                      builder: (context, snapshot) {
-                        if (snapshot.data == true) {
-                          return _buildSocialAuthButton(
-                            'Apple',
-                            auth.appleSignIn,
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  ],
+                      ),
+                      SizedBox(height: 32),
+                      codeSent ? Container() : _buildPhoneInput(),
+                      codeSent ? _buildCodeInput() : Container(),
+                      SizedBox(height: 8),
+                      codeSent
+                          ? Container(
+                              height: 15,
+                            )
+                          : Text(
+                              incorrectPhoneFireBase
+                                  ? 'Некорректный номер телефона'
+                                  : 'Мы отправим SMS, чтобы подтвердить номер телефона',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: incorrectPhoneFireBase
+                                    ? MyColors.mainBrightColor
+                                    : hexToColor('#6D6F9D'),
+                              ),
+                            ),
+                      SizedBox(height: 24),
+                      _buildPhoneAuthButton(),
+                      SizedBox(height: 28),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'или',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: MyColors.subtitleColor,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      SizedBox(height: 22),
+                      _buildSocialAuthButton(
+                        'Google',
+                        auth.googleSignIn,
+                        "assets/icons/google_logo.svg",
+                        context,
+                      ),
+                      SizedBox(height: 4),
+                      _buildSocialAuthButton(
+                        'Facebook',
+                        auth.loginFacebook,
+                        "assets/icons/facebook_logo.svg",
+                        context,
+                      ),
+                      SizedBox(height: 4),
+                      FutureBuilder<Object>(
+                        future: auth.appleSignInAvailable,
+                        builder: (context, snapshot) {
+                          if (snapshot.data == true) {
+                            return _buildSocialAuthButton(
+                              'Apple',
+                              auth.appleSignIn,
+                              "assets/icons/apple_logo.svg",
+                              context,
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+      ),
     );
   }
 
-  InkWell _buildSocialAuthButton(String socialName, Function loginMethod) {
+  InkWell _buildSocialAuthButton(String socialName, Function loginMethod,
+      String iconPath, BuildContext context) {
     return InkWell(
       onTap: () async {
         var user = await loginMethod();
         if (user != null) {
-          _createProfileRoute();
+          switch (widget.prevPage) {
+            case "bottomNav":
+              //Navigator.of(context).push(_createProfileRoute());
+              break;
+            case "training":
+              Navigator.of(context).pop();
+              break;
+            case "cardDetails":
+              Navigator.of(context).pop();
+              break;
+            default:
+              print("widget.nextPage default");
+              //Navigator.of(context).push(_createProfileRoute());
+          }
         }
       },
       child: Container(
@@ -142,26 +168,33 @@ class _LoginPageState extends State<LoginPage> {
             color: MyColors.mainBgColor,
           ),
         ),
-        child: Text.rich(
-          TextSpan(
-            style: myExampleCard,
-            children: <InlineSpan>[
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SvgPicture.asset(iconPath),
+            SizedBox(width: 8),
+            Text.rich(
               TextSpan(
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: hexToColor('#6D6F9D'),
+                style: myExampleCard,
+                children: <InlineSpan>[
+                  TextSpan(
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: hexToColor('#6D6F9D'),
+                      ),
+                      text: 'Продолжить через '),
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: hexToColor('#6D6F9D'),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    text: socialName,
                   ),
-                  text: 'Продолжить через '),
-              TextSpan(
-                style: TextStyle(
-                  fontSize: 14,
-                  color: hexToColor('#6D6F9D'),
-                  fontWeight: FontWeight.bold,
-                ),
-                text: socialName,
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -174,8 +207,8 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
-        color: hexToColor('#A8ABFF'),
-        disabledColor: hexToColor('#C5C7FF'),
+        color: hexToColor('#464EFF'),
+        disabledColor: hexToColor('#8F94FF'),
         child: Center(
             child: codeSent
                 ? Text(
@@ -190,8 +223,9 @@ class _LoginPageState extends State<LoginPage> {
             ? null
             : () {
                 codeSent
-                    ? AuthServiceFirebase()
-                        .signInWithOTP(smsCode, verificationId)
+                    ? AuthServiceFirebase().signInWithOTP(
+                        smsCode, verificationId,
+                        nextPage: widget.prevPage, context: context)
                     : verifyPhone(phoneNo);
               },
       ),
@@ -419,7 +453,7 @@ class _LoginPageState extends State<LoginPage> {
 
 Route _createProfileRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ProfileScreen(),
+    pageBuilder: (context, animation, secondaryAnimation) => SettingsScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
       var end = Offset.zero;

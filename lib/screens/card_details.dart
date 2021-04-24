@@ -3,17 +3,50 @@ import 'package:flutter/material.dart';
 import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
-class CardDetailsScreen extends StatelessWidget {
-  const CardDetailsScreen({Key key, this.card, this.listLearnedCardsIDs, this.subtopicId, this.mapSubtopicsProgress, this.numberOfCardsInSubtopic}) : super(key: key);
+class CardDetailsScreen extends StatefulWidget {
+  const CardDetailsScreen({
+    Key key,
+    this.card,
+    this.listLearnedCardsIDs,
+    this.subtopicId,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
+    this.buildMessageYouAreSignedIn,
+    this.userInfo,
+  }) : super(key: key);
+
   final Magicard card;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final Map<String, String> mapSubtopicsProgress;
   final int numberOfCardsInSubtopic;
+  final bool buildMessageYouAreSignedIn;
+  final Map<String, dynamic> userInfo;
+
+  @override
+  _CardDetailsScreenState createState() => _CardDetailsScreenState();
+}
+
+class _CardDetailsScreenState extends State<CardDetailsScreen> {
+  String _engVersion;
+
+  @override
+  void initState() {
+    _engVersion = widget.userInfo["eng_version"];
+    Globals.playPronounciation(widget.card.sound[_engVersion] ?? "");
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+    print(widget.userInfo);
+    print(_engVersion);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -37,39 +70,45 @@ class CardDetailsScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 40.0, top: 30),
                   child: Text(
-                    card.title,
+                    capitalize(widget.card.title),
                     style: myH1Card,
                   ),
                 ),
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(left: 40.0),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        '[' + card.transcription + ']',
-                        style: myTranscriptionCard,
-                      ),
-                      SizedBox(width: 10),
-                      ClipOval(
-                        child: Container(
-                          height: 30,
-                          width: 30,
-                          color: Colors.grey[200],
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: SvgPicture.asset('assets/icons/sound.svg'),
+                  child: GestureDetector(
+                    onTap: () {
+                      Globals.playPronounciation(
+                          widget.card.sound[_engVersion] ?? "");
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          '[' + widget.card.transcription + ']',
+                          style: myTranscriptionCard,
+                        ),
+                        SizedBox(width: 10),
+                        ClipOval(
+                          child: Container(
+                            height: 30,
+                            width: 30,
+                            color: Colors.grey[200],
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: SvgPicture.asset('assets/icons/sound.svg'),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.only(left: 40.0),
                   child: Text(
-                    card.titleRus,
+                    capitalize(widget.card.titleRus),
                     style: myLabelTextStyleCard,
                   ),
                 ),
@@ -80,15 +119,15 @@ class CardDetailsScreen extends StatelessWidget {
                     child: Container(
                         width: double.infinity,
                         child: Image.network(
-                          card.photo,
-                          fit: card.whiteBg == '1'
+                          widget.card.photo,
+                          fit: widget.card.whiteBg == '1'
                               ? BoxFit.contain
                               : BoxFit.cover,
                         )),
                   ),
                 ),
-                SizedBox(height: 10),
-                Padding(
+                SizedBox(height: 30),
+                /*Padding(
                   padding:
                       const EdgeInsets.only(left: 40, top: 24.0, right: 40),
                   child: Text.rich(
@@ -125,22 +164,25 @@ class CardDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
+                ),*/
                 SizedBox(height: 110),
               ],
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: ButtonLearned(
-                context: context,
-                heroTag: card.title,
-                cardId: card.id,
-                listLearnedCardsIDs: listLearnedCardsIDs,
-                subtopicId: subtopicId,
-                learned: listLearnedCardsIDs.contains(card.id),
-                mapSubtopicsProgress: mapSubtopicsProgress,
-                numberOfCardsInSubtopic: numberOfCardsInSubtopic,
-              ),
+              child: user != null
+                  ? ButtonLearned(
+                      context: context,
+                      heroTag: widget.card.title,
+                      cardId: widget.card.id,
+                      listLearnedCardsIDs: widget.listLearnedCardsIDs,
+                      subtopicId: widget.subtopicId,
+                      learned:
+                          widget.listLearnedCardsIDs.contains(widget.card.id),
+                      mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                      numberOfCardsInSubtopic: widget.numberOfCardsInSubtopic,
+                    )
+                  : SignInBlock('signIn' + widget.card.title, "cardDetails"),
             ),
           ]),
         ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/shared/custom_icons_icons.dart';
 import 'package:magicards/shared/shared.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int selectedIndex;
@@ -13,23 +11,18 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
-
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       items: [
         BottomNavigationBarItem(
-            icon: Icon(CustomIcons.bottomnav_words,),
-            title: Text('Слова')),
+            icon: Icon(CustomIcons.bottomnav_home,),
+            title: Text('Главная')),
         BottomNavigationBarItem(
             icon: Icon(CustomIcons.bottomnav_search,),
             title: Text('Поиск')),
-        /*BottomNavigationBarItem(
-            icon: Icon(CustomIcons.bottomnav_heart,),
-            title: Text('Мой список')),*/
         BottomNavigationBarItem(
-            icon: Icon(CustomIcons.bottomnav_profile,),
-            title: user == null ? Text('Войти') : Text('Профиль')),
+            icon: Icon(CustomIcons.bottomnav_settings,),
+            title: Text('Профиль')),
       ].toList(),
       currentIndex: selectedIndex,
       selectedItemColor: MyColors.mainBrightColor,
@@ -43,14 +36,10 @@ class AppBottomNav extends StatelessWidget {
             if (selectedIndex != 0 || !isHomePage) { Navigator.pushNamed(context, '/'); }
             break;
           case 1:
-            if (selectedIndex != 1) { Navigator.pushNamed(context, '/about'); }
+            if (selectedIndex != 1) { Navigator.pushNamed(context, '/search'); }
             break;
           case 2:
-            if (selectedIndex != 2) { Navigator.pushNamed(context, '/profile'); }
-            break;
-            break;
-          case 3:
-            if (selectedIndex != 3) { Navigator.pushNamed(context, '/profile'); }
+            if (selectedIndex != 2) { Navigator.pushNamed(context, '/settings'); }
             break;
         }
       },

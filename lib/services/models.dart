@@ -6,11 +6,13 @@ class Subtopic {
   String id;
   String title;
   String titleRus;
+  bool premiumAccess;
 
   Subtopic({
     this.id,
     this.title,
     this.titleRus,
+    this.premiumAccess,
   });
 
   factory Subtopic.fromMap(Map data) {
@@ -18,6 +20,7 @@ class Subtopic {
       id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
+      premiumAccess: data['premiumAccess'] ?? false,
     );
   }
 }
@@ -64,6 +67,7 @@ class Magicard {
   final String transcription;
   final String photo;
   final String whiteBg;
+  final Map<String, dynamic> sound;
 
   Magicard.fromMap(String docId, Map<String, dynamic> map)
       : assert(docId != null),
@@ -74,7 +78,8 @@ class Magicard {
         titleRus = map['titleRus'] ?? '',
         transcription = map['transcription'] ?? '',
         whiteBg = map['whiteBg'] ?? '1',
-        photo = map['photo'];
+        photo = map['photo'],
+        sound = map['sound'] ?? Map<String, String>();
 
   @override
   String toString() => "Magicard<$title>";
@@ -100,6 +105,7 @@ class TrainingFlashcardsState with ChangeNotifier {
       duration: Duration(milliseconds: 200),
       curve: Curves.easeOut,
     );
+    
   }
 
   void prevPage() async {
@@ -109,3 +115,54 @@ class TrainingFlashcardsState with ChangeNotifier {
     );
   }
 }
+
+/*class User with ChangeNotifier {
+  String userId;
+  String userEngVersion;
+  String userPremium;
+  Map userSubtopicsProgress;
+
+  get id => userId;
+
+  set id (String newValue) {
+    userId = newValue;
+    notifyListeners();
+  }
+
+  get engVersion => userId;
+
+  set engVersion (String newValue) {
+    userId = newValue;
+    notifyListeners();
+  }
+
+  get premium => userId;
+
+  set premium (String newValue) {
+    userId = newValue;
+    notifyListeners();
+  }
+
+  get subtopicsProgress => userId;
+
+  set subtopicsProgress (String newValue) {
+    userId = newValue;
+    notifyListeners();
+  }
+
+  User({
+    this.userId,
+    this.userEngVersion,
+    this.userPremium,
+    this.userSubtopicsProgress,
+  });
+
+  factory User.fromMap(Map data) {
+    return User(
+      userId: data['id'] ?? '',
+      userEngVersion: data['eng_version'] ?? '',
+      userPremium: data['premium'] ?? '',
+      userSubtopicsProgress: data['subtopics_progress'] ?? '',
+    );
+  }
+}*/

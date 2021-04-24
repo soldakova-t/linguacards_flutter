@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
+import 'package:magicards/screens/screens.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-class TrainingFlashcards extends StatelessWidget {
+class TrainingFlashcards extends StatefulWidget {
   TrainingFlashcards({
     Key key,
     this.listOfCards,
@@ -14,6 +15,8 @@ class TrainingFlashcards extends StatelessWidget {
     this.trainingVariant,
     this.mapSubtopicsProgress,
     this.numberOfCardsInSubtopic,
+    this.showYouSignedInSnackBar,
+    this.userInfo,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
@@ -22,6 +25,22 @@ class TrainingFlashcards extends StatelessWidget {
   final int trainingVariant;
   final Map<String, String> mapSubtopicsProgress;
   final int numberOfCardsInSubtopic;
+  final bool showYouSignedInSnackBar;
+  final Map<String, dynamic> userInfo;
+
+  @override
+  _TrainingFlashcardsState createState() => _TrainingFlashcardsState();
+}
+
+class _TrainingFlashcardsState extends State<TrainingFlashcards> {
+  String _engVersion;
+
+  @override
+  void initState() {
+    _engVersion = widget.userInfo["eng_version"];
+    Globals.playPronounciation(widget.listOfCards[0].sound[_engVersion] ?? "");
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +74,7 @@ class TrainingFlashcards extends StatelessWidget {
                   onTap: () {
                     var state = Provider.of<TrainingFlashcardsState>(context,
                         listen: false);
-                    state.progress = (1 / listOfCards.length);
+                    state.progress = (1 / widget.listOfCards.length);
                     Navigator.of(context).pop();
                   },
                   child: Padding(
@@ -69,7 +88,7 @@ class TrainingFlashcards extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(
                 top: 60.0 + MediaQuery.of(context).padding.top, bottom: 20.0),
-            child: _buildCarousel(context, trainingVariant),
+            child: _buildCarousel(context, widget.trainingVariant),
           ),
         ],
       ),
@@ -84,38 +103,40 @@ class TrainingFlashcards extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       controller: state.controller,
       onPageChanged: (int idx) {
-        state.progress = ((idx + 1) / listOfCards.length);
+        state.progress = ((idx + 1) / widget.listOfCards.length);
+        Globals.playPronounciation(widget.listOfCards[idx].sound[_engVersion] ?? "");
       },
       itemBuilder: (BuildContext context, int itemIndex) {
         if (trainingVariant == 0) {
           return CarouselItemWordOpened(
-            listOfCards: listOfCards,
-            listLearnedCardsIDs: listLearnedCardsIDs,
+            listOfCards: widget.listOfCards,
+            listLearnedCardsIDs: widget.listLearnedCardsIDs,
             context: context,
             itemIndex: itemIndex,
-            subtopicId: subtopicId,
-            mapSubtopicsProgress: mapSubtopicsProgress,
-            numberOfCardsInSubtopic: numberOfCardsInSubtopic,
+            subtopicId: widget.subtopicId,
+            mapSubtopicsProgress: widget.mapSubtopicsProgress,
+            numberOfCardsInSubtopic: widget.numberOfCardsInSubtopic,
+            engVersion: _engVersion,
           );
         } else {
           return CarouselItemPhotoOpened(
-            listOfCards: listOfCards,
-            listLearnedCardsIDs: listLearnedCardsIDs,
+            listOfCards: widget.listOfCards,
+            listLearnedCardsIDs: widget.listLearnedCardsIDs,
             context: context,
             itemIndex: itemIndex,
-            subtopicId: subtopicId,
-            mapSubtopicsProgress: mapSubtopicsProgress,
-            numberOfCardsInSubtopic: numberOfCardsInSubtopic,
+            subtopicId: widget.subtopicId,
+            mapSubtopicsProgress: widget.mapSubtopicsProgress,
+            numberOfCardsInSubtopic: widget.numberOfCardsInSubtopic,
+            engVersion: _engVersion,
           );
         }
       },
-      itemCount: listOfCards.length,
+      itemCount: widget.listOfCards.length,
     );
   }
 }
 
 // Two layouts for different types of training.
-
 class CarouselItemWordOpened extends StatelessWidget {
   const CarouselItemWordOpened({
     Key key,
@@ -125,7 +146,7 @@ class CarouselItemWordOpened extends StatelessWidget {
     this.listLearnedCardsIDs,
     this.subtopicId,
     this.mapSubtopicsProgress,
-    this.numberOfCardsInSubtopic,
+    this.numberOfCardsInSubtopic, this.engVersion,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
@@ -135,11 +156,14 @@ class CarouselItemWordOpened extends StatelessWidget {
   final int itemIndex;
   final Map<String, String> mapSubtopicsProgress;
   final int numberOfCardsInSubtopic;
+  final String engVersion;
 
   @override
   Widget build(BuildContext context) {
     var trainingState = Provider.of<TrainingFlashcardsState>(context);
     FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+    print(engVersion);
 
     return Padding(
       padding: EdgeInsets.only(left: 4.0, top: 10.0, right: 4.0, bottom: 10.0),
@@ -176,40 +200,49 @@ class CarouselItemWordOpened extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 40.0, top: 30),
                         child: Text(
-                          listOfCards[itemIndex].title,
+                          capitalize(listOfCards[itemIndex].title),
                           style: myH1Card,
                         ),
                       ),
                       SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.only(left: 40.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text(
-                              '[' + listOfCards[itemIndex].transcription + ']',
-                              style: myTranscriptionCard,
-                            ),
-                            SizedBox(width: 10),
-                            ClipOval(
-                              child: Container(
-                                height: 30,
-                                width: 30,
-                                color: Colors.grey[200],
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: SvgPicture.asset(
-                                      'assets/icons/sound.svg'),
+                        child: GestureDetector(
+                          onTap: () {
+                            Globals.playPronounciation(
+                                listOfCards[itemIndex].sound[engVersion] ??
+                                    "");
+                          },
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                '[' +
+                                    listOfCards[itemIndex].transcription +
+                                    ']',
+                                style: myTranscriptionCard,
+                              ),
+                              SizedBox(width: 10),
+                              ClipOval(
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  color: Colors.grey[200],
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: SvgPicture.asset(
+                                        'assets/icons/sound.svg'),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 30),
                       Padding(
                         padding: const EdgeInsets.only(left: 40.0),
                         child: Text(
-                          listOfCards[itemIndex].titleRus,
+                          capitalize(listOfCards[itemIndex].titleRus),
                           style: myLabelTextStyleCard,
                         ),
                       ),
@@ -234,10 +267,10 @@ class CarouselItemWordOpened extends StatelessWidget {
                       SizedBox(height: 110),
                     ],
                   ),
-                  user != null
-                      ? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: ButtonLearned(
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: user != null
+                        ? ButtonLearned(
                             context: context,
                             heroTag: listOfCards[itemIndex].title,
                             cardId: listOfCards[itemIndex].id,
@@ -246,9 +279,10 @@ class CarouselItemWordOpened extends StatelessWidget {
                             learned: false,
                             mapSubtopicsProgress: mapSubtopicsProgress,
                             numberOfCardsInSubtopic: numberOfCardsInSubtopic,
-                          ),
-                        )
-                      : Container(),
+                          )
+                        : SignInBlock('signIn' + listOfCards[itemIndex].title,
+                            "training"),
+                  ),
                 ]),
               ),
               Padding(
@@ -273,7 +307,7 @@ class CarouselItemPhotoOpened extends StatefulWidget {
     this.listLearnedCardsIDs,
     this.subtopicId,
     this.mapSubtopicsProgress,
-    this.numberOfCardsInSubtopic,
+    this.numberOfCardsInSubtopic, this.engVersion,
   }) : super(key: key);
 
   final List<Magicard> listOfCards;
@@ -283,6 +317,7 @@ class CarouselItemPhotoOpened extends StatefulWidget {
   final int itemIndex;
   final Map<String, String> mapSubtopicsProgress;
   final int numberOfCardsInSubtopic;
+  final String engVersion;
 
   @override
   _CarouselItemPhotoOpenedState createState() =>
@@ -296,6 +331,11 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
     setState(() {
       _titleRusBg = Colors.white;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -388,8 +428,8 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                                       right: 50.0,
                                       bottom: 6.0),
                                   child: Text(
-                                    widget
-                                        .listOfCards[widget.itemIndex].titleRus,
+                                    capitalize(widget
+                                        .listOfCards[widget.itemIndex].titleRus),
                                     style: myLabelTextStyleCard,
                                   ),
                                 ),
@@ -407,38 +447,46 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                             Align(
                               alignment: Alignment.center,
                               child: Text(
-                                widget.listOfCards[widget.itemIndex].title,
+                                capitalize(widget.listOfCards[widget.itemIndex].title),
                                 style: myH1Card,
                               ),
                             ),
                             SizedBox(height: 10),
                             Align(
                               alignment: Alignment.center,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    '[' +
-                                        widget.listOfCards[widget.itemIndex]
-                                            .transcription +
-                                        ']',
-                                    style: myTranscriptionCard,
-                                  ),
-                                  SizedBox(width: 10),
-                                  ClipOval(
-                                    child: Container(
-                                      height: 30,
-                                      width: 30,
-                                      color: Colors.grey[200],
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(6.0),
-                                        child: SvgPicture.asset(
-                                            'assets/icons/sound.svg'),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Globals.playPronounciation(widget
+                                          .listOfCards[widget.itemIndex]
+                                          .sound[widget.engVersion] ??
+                                      "");
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      '[' +
+                                          widget.listOfCards[widget.itemIndex]
+                                              .transcription +
+                                          ']',
+                                      style: myTranscriptionCard,
+                                    ),
+                                    SizedBox(width: 10),
+                                    ClipOval(
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        color: Colors.grey[200],
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6.0),
+                                          child: SvgPicture.asset(
+                                              'assets/icons/sound.svg'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -447,10 +495,10 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                       SizedBox(height: 65),
                     ],
                   ),
-                  user != null
-                      ? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: ButtonLearned(
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: user != null
+                        ? ButtonLearned(
                             context: context,
                             heroTag: widget.listOfCards[widget.itemIndex].title,
                             listLearnedCardsIDs: widget.listLearnedCardsIDs,
@@ -460,9 +508,12 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                             mapSubtopicsProgress: widget.mapSubtopicsProgress,
                             numberOfCardsInSubtopic:
                                 widget.numberOfCardsInSubtopic,
-                          ),
-                        )
-                      : Container(),
+                          )
+                        : SignInBlock(
+                            'signIn' +
+                                widget.listOfCards[widget.itemIndex].title,
+                            "training"),
+                  ),
                 ]),
               ),
               Padding(
@@ -521,40 +572,46 @@ class _ButtonLearnedState extends State<ButtonLearned> {
     return Container(
       height: 48,
       child: _learned == false
-          ? FloatingActionButton.extended(
-              heroTag: widget.heroTag,
-              onPressed: () {
-                widget.listLearnedCardsIDs.add(widget.cardId);
-
-                double _newProgress = widget.listLearnedCardsIDs.length /
-                    widget.numberOfCardsInSubtopic;
-                widget.mapSubtopicsProgress.update(
-                    widget.subtopicId, (value) => (_newProgress).toString(),
-                    ifAbsent: () => (_newProgress).toString());
-
-                DB.updateArrayOfLearnedCards(
-                    userId: user.uid,
-                    subtopicId: widget.subtopicId,
-                    learnedCardsIDs: widget.listLearnedCardsIDs);
-
-                DB.updateSubtopicsProgress(
-                  userId: user.uid,
-                  subtopicsProgress: widget.mapSubtopicsProgress,
-                );
-
-                setState(() {
-                  _learned = true;
-                });
-              },
-              label: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: Text(
-                  'Изучено',
-                  style: myMainTextStyle,
-                ),
+          ? Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: MyColors.mainBrightColor, width: 1),
+                borderRadius: BorderRadius.circular(24),
               ),
-              backgroundColor: Colors.grey[200],
-              elevation: 1.0,
+              child: FloatingActionButton.extended(
+                heroTag: widget.heroTag,
+                onPressed: () {
+                  widget.listLearnedCardsIDs.add(widget.cardId);
+
+                  double _newProgress = widget.listLearnedCardsIDs.length /
+                      widget.numberOfCardsInSubtopic;
+                  widget.mapSubtopicsProgress.update(
+                      widget.subtopicId, (value) => (_newProgress).toString(),
+                      ifAbsent: () => (_newProgress).toString());
+
+                  DB.updateArrayOfLearnedCards(
+                      userId: user.uid,
+                      subtopicId: widget.subtopicId,
+                      learnedCardsIDs: widget.listLearnedCardsIDs);
+
+                  DB.updateSubtopicsProgress(
+                    user.uid,
+                    widget.mapSubtopicsProgress,
+                  );
+
+                  setState(() {
+                    _learned = true;
+                  });
+                },
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  child: Text(
+                    'Изучено',
+                    style: TextStyle(color: MyColors.mainBrightColor),
+                  ),
+                ),
+                backgroundColor: Colors.white,
+                elevation: 0.0,
+              ),
             )
           : Container(
               height: 48,
@@ -603,8 +660,8 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                               learnedCardsIDs: widget.listLearnedCardsIDs);
 
                           DB.updateSubtopicsProgress(
-                            userId: user.uid,
-                            subtopicsProgress: widget.mapSubtopicsProgress,
+                            user.uid,
+                            widget.mapSubtopicsProgress,
                           );
 
                           setState(() {
@@ -628,6 +685,75 @@ class _ButtonLearnedState extends State<ButtonLearned> {
             ),
     );
   }
+}
+
+class SignInBlock extends StatelessWidget {
+  const SignInBlock(this.heroTag, this.nextPage, {Key key}) : super(key: key);
+
+  final String heroTag;
+  final String nextPage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          SizedBox(
+            width: 260,
+            child: Text(
+              'Войдите, чтобы отмечать слова изученными. Это займет 1 минуту',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: MyColors.mainBrightColor, width: 1),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: FloatingActionButton.extended(
+              heroTag: heroTag,
+              onPressed: () {
+                Navigator.of(context).push(_createRouteToSignIn(nextPage));
+              },
+              label: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Text(
+                  'Войти',
+                  style: TextStyle(color: MyColors.mainBrightColor),
+                ),
+              ),
+              backgroundColor: Colors.white,
+              elevation: 0.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Route _createRouteToSignIn(String nextPage) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        LoginPage(prevPage: nextPage),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
 
 class ContainerShowMeaning extends StatefulWidget {

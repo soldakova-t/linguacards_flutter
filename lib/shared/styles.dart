@@ -14,6 +14,7 @@ class MyColors {
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
   static const Color inputBgColor = Color(0xFFF6F6F6);
   static const Color inputErrorColor = Color(0x0DFA5C5C);
+  static const Color hideAccessColor = Color(0xFFEDEDED);
 }
 
 // My Text Styles
@@ -71,13 +72,13 @@ const myH1Card = TextStyle(
 );
 
 const myTranscriptionCard = TextStyle(
-  fontSize: 13,
+  fontSize: 15,
   color: Color(0xFF878787),
   fontFamily: 'Helvetica',
 );
 
 const myLabelTextStyleCard = TextStyle(
-  fontSize: 14,
+  fontSize: 15,
   color: Color(0xFF878787),
 );
 

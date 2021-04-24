@@ -6,12 +6,19 @@ import '../services/services.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CardsScreen extends StatefulWidget {
   final Subtopic subtopic;
   final Map<String, String> mapSubtopicsProgress;
-  CardsScreen({Key key, this.subtopic, this.mapSubtopicsProgress})
-      : super(key: key);
+  final Map<String, dynamic> userInfo;
+
+  CardsScreen(
+    this.subtopic,
+    this.mapSubtopicsProgress, {
+    Key key,
+    this.userInfo,
+  }) : super(key: key);
 
   @override
   _CardsScreenState createState() => _CardsScreenState();
@@ -27,9 +34,15 @@ class _CardsScreenState extends State<CardsScreen>
   List<Magicard> listOfCards = List<Magicard>();
   List<String> listLearnedCardsIDs = List<String>();
 
+  bool hideCards;
+  String userEnglishVersion = "br";
+
   @override
   void initState() {
     super.initState();
+
+    hideCards = widget.subtopic.premiumAccess &&
+        (widget.userInfo != null ? !widget.userInfo["premium"] : true);
 
     _scrollController = ScrollController()..addListener(() => setState(() {}));
 
@@ -53,51 +66,95 @@ class _CardsScreenState extends State<CardsScreen>
 
   @override
   Widget build(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+    if (user != null) {
+      userEnglishVersion = widget.userInfo != null
+          ? (widget.userInfo["eng_version"] ?? "br")
+          : "br";
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _buildBody(context),
+      body: Stack(
+        children: <Widget>[
+          hideCards
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 180.0),
+                  child: _buildBody(context),
+                )
+              : _buildBody(context),
+          hideCards ? buildPremiumContainer() : Container(),
+        ],
+      ),
       bottomNavigationBar: AppBottomNav(
         selectedIndex: 0,
         isHomePage: false,
       ),
     );
+    
+  }
+
+  Align buildPremiumContainer() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: 180.0,
+        color: Colors.white,
+        child: Column(
+          children: <Widget>[
+            MainButton(title: 'Купить Премиум за 1490 ₽', action: () {}),
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 210,
+                height: 74,
+                child: Text(
+                  'Вы получите бессрочный доступ к каталогу из 2500+ карточек',
+                  style: mySubtitle14Style,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBody(BuildContext context) {
-    return Stack(children: <Widget>[
-      StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance
-            .collection('cards')
-            .where('subtopic', isEqualTo: widget.subtopic.id)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return LinearProgressIndicator();
-          } else {
-            var documents = snapshot.data.documents;
-            FirebaseUser user = Provider.of<FirebaseUser>(context);
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
 
-            if (user != null) {
-              return FutureBuilder<List<String>>(
-                future: DB.getEarlyLearnedCardsIDs(
-                    userId: user.uid, subtopicId: widget.subtopic.id),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return LinearProgressIndicator();
-                  } else {
-                    listLearnedCardsIDs = snapshot.data;
-                    return _buildList(context, documents);
-                  }
-                },
-              );
-            } else {
-              return _buildList(context, documents);
-            }
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance
+          .collection('cards')
+          .where('subtopic', isEqualTo: widget.subtopic.id)
+          .where('eng_version.$userEnglishVersion', isEqualTo: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return LinearProgressIndicator();
+        } else {
+          var documents = snapshot.data.documents;
+          if (user != null) {
+            return FutureBuilder<List<String>>(
+              future: DB.getEarlyLearnedCardsIDs(
+                  userId: user.uid, subtopicId: widget.subtopic.id),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return LinearProgressIndicator();
+                } else {
+                  listLearnedCardsIDs = snapshot.data;
+                  return _buildList(context, documents);
+                }
+              },
+            );
+          } else {
+            return _buildList(context, documents);
           }
-        },
-      ),
-    ]);
+        }
+      },
+    );
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
@@ -116,16 +173,6 @@ class _CardsScreenState extends State<CardsScreen>
     });
 
     listOfCardsSorted = notLearnedMagicards + learnedMagicards;
-
-    /*print('notLearnedMagicards = ');
-    notLearnedMagicards.forEach((element) {
-      print(element.toString());
-    });
-
-    print('learnedMagicards = ');
-    learnedMagicards.forEach((element) {
-      print(element.toString());
-    });*/
 
     bool _cardIsLearned(int index) {
       if (index >= listOfCards.length - learnedMagicards.length) {
@@ -160,13 +207,16 @@ class _CardsScreenState extends State<CardsScreen>
                   ? null
                   : FlexibleSpaceBar(
                       background: SubtopicDetails(
-                          subtopic: widget.subtopic,
-                          numberOfCards: listOfCards.length),
+                        subtopic: widget.subtopic,
+                        numberOfCards: listOfCards.length,
+                        showPremiumLabel: hideCards,
+                      ),
                     ),
             ),
             SliverPadding(
               padding: const EdgeInsets.only(
                 top: 15,
+                bottom: 30,
               ),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -177,6 +227,8 @@ class _CardsScreenState extends State<CardsScreen>
                     subtopicId: widget.subtopic.id,
                     mapSubtopicsProgress: widget.mapSubtopicsProgress,
                     numberOfCardsInSubtopic: listOfCards.length,
+                    hideCards: hideCards,
+                    userInfo: widget.userInfo,
                   ),
                   childCount: snapshot.length,
                 ),
@@ -188,12 +240,15 @@ class _CardsScreenState extends State<CardsScreen>
           padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
           child: Align(
             alignment: Alignment.bottomRight,
-            child: (notLearnedMagicards.length > 0) ? RadialMenu(
-              listOfCards: notLearnedMagicards,
-              listLearnedCardsIDs: listLearnedCardsIDs,
-              subtopicId: widget.subtopic.id,
-              mapSubtopicsProgress: widget.mapSubtopicsProgress,
-            ) : Container(),
+            child: (notLearnedMagicards.length > 0 && !hideCards)
+                ? RadialMenu(
+                    listOfCards: notLearnedMagicards,
+                    listLearnedCardsIDs: listLearnedCardsIDs,
+                    subtopicId: widget.subtopic.id,
+                    mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                    userInfo: widget.userInfo,
+                  )
+                : Container(),
           ),
         ),
       ],
@@ -204,8 +259,10 @@ class _CardsScreenState extends State<CardsScreen>
 class SubtopicDetails extends StatelessWidget {
   final Subtopic subtopic;
   final int numberOfCards;
+  final bool showPremiumLabel;
 
-  const SubtopicDetails({Key key, this.subtopic, this.numberOfCards})
+  const SubtopicDetails(
+      {Key key, this.subtopic, this.numberOfCards, this.showPremiumLabel})
       : super(key: key);
 
   @override
@@ -238,17 +295,37 @@ class SubtopicDetails extends StatelessWidget {
               top: 20,
               left: 28,
             ),
-            child: Container(
-              width: 76,
-              height: 25,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.white,
-              ),
-              child: Center(
-                child: Text(_textNumberOfCards(numberOfCards),
-                    style: myLabelTextStyle),
-              ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 76,
+                  height: 25,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                  ),
+                  child: Center(
+                    child: Text(_textNumberOfCards(numberOfCards),
+                        style: myLabelTextStyle),
+                  ),
+                ),
+                showPremiumLabel
+                    ? Row(
+                        children: <Widget>[
+                          SizedBox(width: 19),
+                          SvgPicture.asset("assets/icons/crown.svg"),
+                          SizedBox(width: 11),
+                          Text(
+                            "Премиум",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: MyColors.mainBrightColor,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(),
+              ],
             ),
           ),
         ],
@@ -275,6 +352,8 @@ class CardContent extends StatelessWidget {
   final String subtopicId;
   final Map<String, String> mapSubtopicsProgress;
   final int numberOfCardsInSubtopic;
+  final bool hideCards;
+  final Map<String, dynamic> userInfo;
 
   const CardContent({
     Key key,
@@ -282,80 +361,122 @@ class CardContent extends StatelessWidget {
     this.learned,
     this.listLearnedCardsIDs,
     this.subtopicId,
-    this.mapSubtopicsProgress, this.numberOfCardsInSubtopic,
+    this.mapSubtopicsProgress,
+    this.numberOfCardsInSubtopic,
+    this.hideCards,
+    this.userInfo,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(_createRoute(
-            card, listLearnedCardsIDs, subtopicId, mapSubtopicsProgress, numberOfCardsInSubtopic));
-      },
-      child: Ink(
-        color: Colors.white,
-        child: Padding(
-          key: ValueKey(card.title),
-          padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 0.0),
-          child: ListTile(
-            contentPadding: const EdgeInsets.only(
-              left: 0.0,
-              right: 0.0,
-            ),
-            leading: Padding(
-              padding: const EdgeInsets.only(right: 4.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  card.photo,
-                  height: 70,
-                  width: 70,
-                  fit: card.whiteBg == '1' ? BoxFit.contain : BoxFit.cover,
-                ),
+    return !hideCards
+        ? InkWell(
+            onTap: () {
+              Navigator.of(context).push(_createRouteToCardDetails(
+                  card,
+                  listLearnedCardsIDs,
+                  subtopicId,
+                  mapSubtopicsProgress,
+                  numberOfCardsInSubtopic,
+                  userInfo));
+            },
+            child: buildCardInnerContent(),
+          )
+        : buildCardInnerContent();
+  }
+
+  Widget buildCardInnerContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 0.0),
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, right: 20.0, bottom: 8.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                card.photo,
+                height: 70,
+                width: 70,
+                fit: card.whiteBg == '1' ? BoxFit.contain : BoxFit.cover,
               ),
             ),
-            title: Text(
-              card.title,
-              style: mySubtitle16Style,
-            ),
-            subtitle: Text(
-              card.titleRus,
-              style: mySubtitle14Style,
-            ),
-            trailing: SizedBox(
-              width: 88,
-              height: 25,
-              child: learned
-                  ? Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.check,
-                          size: 18,
-                          color: Colors.green[600],
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          'Изучено',
-                          style: TextStyle(
-                            color: Colors.green[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Container(),
-            ),
           ),
-        ),
+          hideCards
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      width: 74,
+                      height: 10,
+                      color: MyColors.hideAccessColor,
+                    ),
+                    SizedBox(height: 11),
+                    Container(
+                      width: 109,
+                      height: 10,
+                      color: MyColors.hideAccessColor,
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      capitalize(card.title),
+                      style: mySubtitle16Style,
+                    ),
+                    Text(
+                      capitalize(card.titleRus),
+                      style: mySubtitle14Style,
+                    ),
+                  ],
+                ),
+          hideCards
+              ? Container()
+              : Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 88,
+                      height: 25,
+                      child: learned
+                          ? Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.check,
+                                  size: 18,
+                                  color: Colors.green[600],
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  'Изучено',
+                                  style: TextStyle(
+                                    color: Colors.green[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    ),
+                  ),
+                ),
+        ],
       ),
     );
   }
 }
 
-Route _createRoute(Magicard card, List<String> listLearnedCardsIDs,
-    String subtopicId, Map<String, String> mapSubtopicsProgress, int numberOfCardsInSubtopic) {
+Route _createRouteToCardDetails(
+    Magicard card,
+    List<String> listLearnedCardsIDs,
+    String subtopicId,
+    Map<String, String> mapSubtopicsProgress,
+    int numberOfCardsInSubtopic,
+    Map<String, dynamic> userInfo) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CardDetailsScreen(
       card: card,
@@ -363,6 +484,7 @@ Route _createRoute(Magicard card, List<String> listLearnedCardsIDs,
       subtopicId: subtopicId,
       mapSubtopicsProgress: mapSubtopicsProgress,
       numberOfCardsInSubtopic: numberOfCardsInSubtopic,
+      userInfo: userInfo,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);

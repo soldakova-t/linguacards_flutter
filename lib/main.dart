@@ -10,6 +10,7 @@ import 'shared/shared.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         StreamProvider<FirebaseUser>.value(value: AuthServiceFirebase().user),
         ChangeNotifierProvider<TrainingFlashcardsState>(
           create: (_) => TrainingFlashcardsState(),
-        )
+        ),
       ],
       child: GestureDetector(
         onTap: () {
@@ -33,8 +34,8 @@ class MyApp extends StatelessWidget {
           routes: {
             '/': (context) => TopicsScreen(),
             '/topics': (context) => TopicsScreen(),
-            '/profile': (context) => ProfileScreen(),
-            '/about': (context) => AboutScreen(),
+            '/search': (context) => SearchScreen(),
+            '/settings': (context) => SettingsScreen(),
           },
 
           // Theme

@@ -7,6 +7,7 @@ import 'package:magicards/screens/training_flashcards.dart';
 import '../services/services.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class RadialMenu extends StatefulWidget {
   RadialMenu(
@@ -14,12 +15,14 @@ class RadialMenu extends StatefulWidget {
       this.listOfCards,
       this.listLearnedCardsIDs,
       this.subtopicId,
-      this.mapSubtopicsProgress})
+      this.mapSubtopicsProgress,
+      this.userInfo})
       : super(key: key);
   final List<Magicard> listOfCards;
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final Map<String, String> mapSubtopicsProgress;
+  final Map<String, dynamic> userInfo;
 
   createState() => _RadialMenuState();
 }
@@ -57,6 +60,7 @@ class _RadialMenuState extends State<RadialMenu>
       listLearnedCardsIDs: widget.listLearnedCardsIDs,
       subtopicId: widget.subtopicId,
       mapSubtopicsProgress: widget.mapSubtopicsProgress,
+      userInfo: widget.userInfo,
     );
   }
 
@@ -76,6 +80,7 @@ class RadialAnimation extends StatelessWidget {
     this.listLearnedCardsIDs,
     this.subtopicId,
     this.mapSubtopicsProgress,
+    this.userInfo,
   })  : translation = Tween<double>(
           begin: 0.0,
           end: 70.0,
@@ -112,38 +117,31 @@ class RadialAnimation extends StatelessWidget {
   final List<String> listLearnedCardsIDs;
   final String subtopicId;
   final Map<String, String> mapSubtopicsProgress;
+  final Map<String, dynamic> userInfo;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(right: 16.0, bottom: 20.0),
       child: SizedBox(
-        height: 58,
-        width: 58,
-        child: FloatingActionButton(
+        height: 50,
+        width: 158,
+        child: FloatingActionButton.extended(
           heroTag: "btnOpen",
           backgroundColor: MyColors.mainBrightColor,
-          child: Center(
-            child: Transform.rotate(
-              // angle: -60,
-              angle: 0,
-              child: SizedBox(
+          label:
+              /*SizedBox(
                 width: 42,
-                child: Icon(
-                  // CustomIcons.training,
-                  CustomIcons.bottomnav_words,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+                child: SvgPicture.asset('assets/icons/gym.svg'),
+              ),*/
+              Text("Тренироваться"),
           onPressed: () {
             controller.forward();
             Future.delayed(Duration.zero, () {
               showDialog(
                   context: context,
                   builder: (context) => buildDialogButtons(
-                      listLearnedCardsIDs, mapSubtopicsProgress));
+                      listLearnedCardsIDs, mapSubtopicsProgress, userInfo));
             });
           },
         ),
@@ -152,7 +150,7 @@ class RadialAnimation extends StatelessWidget {
   }
 
   AnimatedBuilder buildDialogButtons(List<String> listLearnedCardsIDs,
-      Map<String, String> mapSubtopicsProgress) {
+      Map<String, String> mapSubtopicsProgress, Map<String, dynamic> userInfo) {
     return AnimatedBuilder(
         animation: controller,
         builder: (context, widget) {
@@ -169,14 +167,14 @@ class RadialAnimation extends StatelessWidget {
                   alignment: Alignment.bottomRight,
                   children: <Widget>[
                     _buildButton(context, 2, 270, listLearnedCardsIDs,
-                        mapSubtopicsProgress,
+                        mapSubtopicsProgress, userInfo,
                         color: Color(0xFF464EFF),
-                        icon: CustomIcons.hidewords,
+                        icon: SvgPicture.asset('assets/icons/hide_words.svg'),
                         text: 'Скрыть английские слова'),
                     _buildButton(context, 1, 270, listLearnedCardsIDs,
-                        mapSubtopicsProgress,
+                        mapSubtopicsProgress, userInfo,
                         color: Color(0xFF464EFF),
-                        icon: CustomIcons.hideimages,
+                        icon: SvgPicture.asset('assets/icons/hide_images.svg'),
                         text: 'Скрыть изображения'),
                     Transform.scale(
                       scale: scale.value - 1,
@@ -212,8 +210,9 @@ class RadialAnimation extends StatelessWidget {
       double angle,
       List<String> listLearnedCardsIDs,
       Map<String, String> mapSubtopicsProgress,
+      Map<String, dynamic> userInfo,
       {Color color,
-      IconData icon,
+      SvgPicture icon,
       String text}) {
     final double rad = radians(angle);
     return Transform(
@@ -243,13 +242,11 @@ class RadialAnimation extends StatelessWidget {
                 width: 45,
                 child: FloatingActionButton(
                   heroTag: "subButton" + number.toString(),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                  ),
+                  child: icon,
                   backgroundColor: color,
                   onPressed: () {
-                    _routeToTraining(context, number - 1, mapSubtopicsProgress);
+                    _routeToTraining(
+                        context, number - 1, mapSubtopicsProgress, userInfo);
                   },
                   elevation: 0,
                 ),
@@ -262,7 +259,7 @@ class RadialAnimation extends StatelessWidget {
   }
 
   _routeToTraining(BuildContext context, int trainingVariant,
-      Map<String, String> mapSubtopicsProgress) {
+      Map<String, String> mapSubtopicsProgress, Map<String, dynamic> userInfo) {
     var state = Provider.of<TrainingFlashcardsState>(context, listen: false);
     state.progress = (1 / listOfCards.length);
 
@@ -277,6 +274,7 @@ class RadialAnimation extends StatelessWidget {
           mapSubtopicsProgress: mapSubtopicsProgress,
           numberOfCardsInSubtopic:
               listOfCards.length + listLearnedCardsIDs.length,
+          userInfo: userInfo,
         ),
       ),
     );

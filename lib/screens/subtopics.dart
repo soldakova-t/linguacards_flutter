@@ -5,6 +5,7 @@ import '../screens/screens.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/svg.dart';
 
 class SubtopicsScreen extends StatefulWidget {
   final Topic topic;
@@ -36,7 +37,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
 
     if (user != null) {
-      print(user.uid);
       return StreamBuilder<DocumentSnapshot>(
         stream: Firestore.instance
             .collection('users')
@@ -46,8 +46,10 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
           if (!snapshot.hasData) {
             return _buildSubtopicsList(context, _mapSubtopicsProgress);
           } else {
+            if (snapshot.data['subtopics_progress'] != null) {
               _mapSubtopicsProgress =
                   Map<String, String>.from(snapshot.data['subtopics_progress']);
+            }
             return _buildSubtopicsList(context, _mapSubtopicsProgress);
           }
         },
@@ -59,12 +61,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
 
   Scaffold _buildSubtopicsList(
       BuildContext context, Map<String, String> mapSubtopicsProgress) {
-    print('mapSubtopicsProgress = ');
-
-    mapSubtopicsProgress.forEach((key, value) {
-      print(key + ' => ' + value);
-    });
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -99,14 +95,13 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) => SubtopicContent(
-                  subtopic: widget.topic.subtopics[index],
-                  progress:
-                      (mapSubtopicsProgress[widget.topic.subtopics[index].id] !=
-                              null)
-                          ? double.parse(mapSubtopicsProgress[
-                              widget.topic.subtopics[index].id])
-                          : 0.0,
-                  mapSubtopicsProgress: mapSubtopicsProgress,
+                  widget.topic.subtopics[index],
+                  (mapSubtopicsProgress[widget.topic.subtopics[index].id] !=
+                          null)
+                      ? double.parse(mapSubtopicsProgress[
+                          widget.topic.subtopics[index].id])
+                      : 0.0,
+                  mapSubtopicsProgress,
                 ),
                 childCount: widget.topic.subtopics.length,
               ),
@@ -186,27 +181,47 @@ class SubtopicContent extends StatelessWidget {
   final double progress;
   final Map<String, String> mapSubtopicsProgress;
 
-  const SubtopicContent({
-    Key key,
+  const SubtopicContent(
     this.subtopic,
     this.progress,
-    this.mapSubtopicsProgress,
+    this.mapSubtopicsProgress, {
+    Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     int percentValue = (progress * 100).toInt();
 
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+
+    if (user != null) {
+      return StreamBuilder(
+          stream: DB.getUserInfoStream(user.uid),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasData) {
+              Map<String, dynamic> userInfo = snapshot.data;
+              return buildSubtopicInnerContent(context, percentValue, userInfo: userInfo);
+            } else {
+              return LinearProgressIndicator();
+            }
+          });
+    } else {
+      return buildSubtopicInnerContent(context, percentValue); 
+    }
+  }
+
+  InkWell buildSubtopicInnerContent(
+      BuildContext context, int percentValue, {Map<String, dynamic> userInfo}) {
     return InkWell(
       onTap: () {
-        Navigator.of(context)
-            .push(_createRoute(subtopic, mapSubtopicsProgress));
+        Navigator.of(context).push(
+            _createRouteToCards(subtopic, mapSubtopicsProgress, userInfo: userInfo));
       },
       child: Ink(
         color: Colors.white,
         child: Padding(
           key: ValueKey(subtopic.title),
-          padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 0.0),
+          padding: const EdgeInsets.only(left: 27.0, right: 8.0),
           child: ListTile(
             contentPadding: const EdgeInsets.only(
               left: 0.0,
@@ -221,24 +236,51 @@ class SubtopicContent extends StatelessWidget {
               style: mySubtitle14Style,
             ),
             trailing: Container(
-              width: 121,
+              width: 183,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(right: 15),
-                    width: 85,
-                    child: AnimatedProgress(
-                      height: 3,
-                      value: progress,
-                    ),
-                  ),
-                  Text(
-                    percentValue.toString() + '%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: MyColors.subtitleColor,
-                    ),
-                  ),
+                  !subtopic.premiumAccess || (userInfo != null ? userInfo["premium"] : false)
+                      ? Row(
+                          children: <Widget>[
+                            Container(
+                              width: 85,
+                              child: AnimatedProgress(
+                                height: 3,
+                                value: progress,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            SizedBox(
+                              width: 40,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  percentValue.toString() + '%',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: MyColors.subtitleColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: <Widget>[
+                            SvgPicture.asset("assets/icons/crown.svg"),
+                            SizedBox(width: 11),
+                            Text(
+                              "Премиум",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: MyColors.mainBrightColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                  SizedBox(width: 16),
+                  SvgPicture.asset("assets/icons/arrow_right.svg"),
                 ],
               ),
             ),
@@ -249,12 +291,13 @@ class SubtopicContent extends StatelessWidget {
   }
 }
 
-Route _createRoute(
-    Subtopic subtopic, Map<String, String> mapSubtopicsProgress) {
+Route _createRouteToCards(Subtopic subtopic,
+    Map<String, String> mapSubtopicsProgress, {Map<String, dynamic> userInfo}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CardsScreen(
-      subtopic: subtopic,
-      mapSubtopicsProgress: mapSubtopicsProgress,
+      subtopic,
+      mapSubtopicsProgress,
+      userInfo: userInfo,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);
