@@ -35,7 +35,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
 
   @override
   void initState() {
-    _engVersion = widget.userInfo["eng_version"];
+    if (widget.userInfo != null) _engVersion = widget.userInfo["eng_version"];
     Globals.playPronounciation(widget.card.sound[_engVersion] ?? "");
     super.initState();
   }

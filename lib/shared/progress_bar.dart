@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magicards/shared/shared.dart';
 import 'dart:async';
 
-/*class AnimatedProgressWithDelay extends StatefulWidget {
+class AnimatedProgressWithDelay extends StatefulWidget {
   final double value;
   final double height;
 
@@ -31,7 +31,7 @@ class _AnimatedProgressWithDelayState<T>
     return ProgressLayoutBuilder(
         value: _currentValue, height: widget.height);
   }
-}*/
+}
 
 class AnimatedProgress extends StatelessWidget {
   final double value;
@@ -66,7 +66,7 @@ class ProgressLayoutBuilder extends StatelessWidget {
               Container(
                 height: height,
                 decoration: BoxDecoration(
-                  color: hexToColor('#E2E1E1'),
+                  color: hexToColor("#EEEEEE"),
                   borderRadius: BorderRadius.all(
                     Radius.circular(height),
                   ),
@@ -78,7 +78,7 @@ class ProgressLayoutBuilder extends StatelessWidget {
                 height: height,
                 width: box.maxWidth * _floor(value),
                 decoration: BoxDecoration(
-                  color: MyColors.greenBrightColor,
+                  color: MyColors.mainBrightColor,
                   borderRadius: BorderRadius.all(
                     Radius.circular(height),
                   ),

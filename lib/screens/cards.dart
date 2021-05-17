@@ -31,8 +31,8 @@ class _CardsScreenState extends State<CardsScreen>
   ScrollController _scrollController;
   AnimationController _animatedFABController;
 
-  List<Magicard> listOfCards = List<Magicard>();
-  List<String> listLearnedCardsIDs = List<String>();
+  List<Magicard> listOfCards;
+  List<String> listLearnedCardsIDs;
 
   bool hideCards;
   String userEnglishVersion = "br";
@@ -41,8 +41,7 @@ class _CardsScreenState extends State<CardsScreen>
   void initState() {
     super.initState();
 
-    hideCards = widget.subtopic.premiumAccess &&
-        (widget.userInfo != null ? !widget.userInfo["premium"] : true);
+    hideCards = widget.userInfo != null ? !widget.userInfo["premium"] : true;
 
     _scrollController = ScrollController()..addListener(() => setState(() {}));
 

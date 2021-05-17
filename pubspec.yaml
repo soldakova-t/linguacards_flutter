@@ -41,10 +41,11 @@ dependencies:
   in_app_purchase: ^0.3.4+3
   flutter_launcher_icons: ^0.7.5
   audioplayers: ^0.15.1
+  fluttertoast: ^8.0.6
 
 dependency_overrides:
   flutter_svg: ^0.19.3
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

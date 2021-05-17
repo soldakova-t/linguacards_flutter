@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
 import 'package:provider/provider.dart';
 import 'shared/shared.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: MyColors.mainBgColor,
+  ));
+}
 
 class MyApp extends StatelessWidget {
   
@@ -40,13 +46,13 @@ class MyApp extends StatelessWidget {
 
           // Theme
           theme: ThemeData(
-            fontFamily: 'Nunito',
-            primaryColor: MyColors.mainBgColor,
-            backgroundColor: Colors.white,
+            fontFamily: "SF Compact Display",
+            primaryColor: MyColors.mainBrightColor,
+            backgroundColor: MyColors.mainBgColor,
             brightness: Brightness.light,
             textTheme: TextTheme(
-              bodyText2: TextStyle(fontSize: 18),
-              bodyText1: TextStyle(fontSize: 16),
+              bodyText2: myMainTextStyle, //"The default text style for Material."
+              bodyText1: myMainTextStyle,
               button:
                   TextStyle(letterSpacing: 1.5, fontWeight: FontWeight.bold),
               headline5: TextStyle(fontWeight: FontWeight.bold),

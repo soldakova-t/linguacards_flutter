@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apple_sign_in/apple_sign_in.dart';
@@ -45,8 +46,18 @@ class AuthServiceFirebase {
       AuthResult firebaseResult = await _auth.signInWithCredential(credential);
       FirebaseUser user = firebaseResult.user;
 
+      Fluttertoast.showToast(
+          msg: "Вы успешно авторизовались",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+
       return user;
     } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Авторизоваться не удалось",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+
       print(error);
       return null;
     }
@@ -71,9 +82,18 @@ class AuthServiceFirebase {
         DB.addNewUser(user.uid);
       }
 
+      Fluttertoast.showToast(
+          msg: "Вы успешно авторизовались",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+
       return user;
     } catch (error) {
-      print(error);
+      Fluttertoast.showToast(
+          msg: "Авторизоваться не удалось",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+
       return null;
     }
   }
@@ -103,13 +123,25 @@ class AuthServiceFirebase {
             DB.addNewUser(user.uid);
           }
 
-          print('FACEBOOK LOGGED IN');
+          Fluttertoast.showToast(
+              msg: "Вы успешно авторизовались",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM);
+
           break;
         case FacebookLoginStatus.cancelledByUser:
-          print('FACEBOOK CANCELED BY USER');
+          Fluttertoast.showToast(
+              msg: "Вы отменили авторизацию",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM);
+
           break;
         case FacebookLoginStatus.error:
-          print('FACEBOOK ERROR');
+          Fluttertoast.showToast(
+              msg: "Авторизоваться не удалось",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM);
+
           print(result.errorMessage);
           break;
       }
@@ -146,6 +178,11 @@ class AuthServiceFirebase {
           DB.addNewUser(authResult.user.uid);
         }
 
+        Fluttertoast.showToast(
+            msg: "Вы успешно авторизовались",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM);
+
         switch (nextPage) {
           case "bottomNav":
             //Navigator.of(context).push(_createProfileRoute());
@@ -158,10 +195,16 @@ class AuthServiceFirebase {
             break;
           default:
             print("widget.nextPage default");
-            Navigator.of(context).push(_createProfileRoute());
+            //Navigator.of(context).push(_createProfileRoute());
+            break;
         }
       }
     } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Авторизоваться не удалось",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+
       print('Failed with error: ' + e.toString());
     }
   }

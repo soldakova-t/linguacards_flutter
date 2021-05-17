@@ -5,3 +5,4 @@ export 'strings.dart';
 export 'styles.dart';
 export 'mainbutton.dart';
 export 'selectionlistitem.dart';
+export 'column_builder.dart';

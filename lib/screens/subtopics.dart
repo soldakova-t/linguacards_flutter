@@ -18,13 +18,12 @@ class SubtopicsScreen extends StatefulWidget {
 class _SubtopicsScreenState extends State<SubtopicsScreen> {
   static const kExpandedHeight = 155.0;
   ScrollController _scrollController;
-  Map<String, String> _mapSubtopicsProgress;
+  Map<String, String> _userSubtopicsProgress = Map<String, String>();
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(() => setState(() {}));
-    _mapSubtopicsProgress = Map<String, String>();
   }
 
   bool get _showTitle {
@@ -44,18 +43,18 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return _buildSubtopicsList(context, _mapSubtopicsProgress);
+            return _buildSubtopicsList(context, _userSubtopicsProgress);
           } else {
             if (snapshot.data['subtopics_progress'] != null) {
-              _mapSubtopicsProgress =
+              _userSubtopicsProgress =
                   Map<String, String>.from(snapshot.data['subtopics_progress']);
             }
-            return _buildSubtopicsList(context, _mapSubtopicsProgress);
+            return _buildSubtopicsList(context, _userSubtopicsProgress);
           }
         },
       );
     } else {
-      return _buildSubtopicsList(context, _mapSubtopicsProgress);
+      return _buildSubtopicsList(context, _userSubtopicsProgress);
     }
   }
 
@@ -200,22 +199,24 @@ class SubtopicContent extends StatelessWidget {
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.hasData) {
               Map<String, dynamic> userInfo = snapshot.data;
-              return buildSubtopicInnerContent(context, percentValue, userInfo: userInfo);
+              return buildSubtopicInnerContent(context, percentValue,
+                  userInfo: userInfo);
             } else {
               return LinearProgressIndicator();
             }
           });
     } else {
-      return buildSubtopicInnerContent(context, percentValue); 
+      return buildSubtopicInnerContent(context, percentValue);
     }
   }
 
-  InkWell buildSubtopicInnerContent(
-      BuildContext context, int percentValue, {Map<String, dynamic> userInfo}) {
+  InkWell buildSubtopicInnerContent(BuildContext context, int percentValue,
+      {Map<String, dynamic> userInfo}) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(
-            _createRouteToCards(subtopic, mapSubtopicsProgress, userInfo: userInfo));
+        Navigator.of(context).push(_createRouteToCards(
+            subtopic, mapSubtopicsProgress,
+            userInfo: userInfo));
       },
       child: Ink(
         color: Colors.white,
@@ -240,45 +241,31 @@ class SubtopicContent extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  !subtopic.premiumAccess || (userInfo != null ? userInfo["premium"] : false)
-                      ? Row(
-                          children: <Widget>[
-                            Container(
-                              width: 85,
-                              child: AnimatedProgress(
-                                height: 3,
-                                value: progress,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            SizedBox(
-                              width: 40,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  percentValue.toString() + '%',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: MyColors.subtitleColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Row(
-                          children: <Widget>[
-                            SvgPicture.asset("assets/icons/crown.svg"),
-                            SizedBox(width: 11),
-                            Text(
-                              "Премиум",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: MyColors.mainBrightColor,
-                              ),
-                            ),
-                          ],
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: 85,
+                        child: AnimatedProgress(
+                          height: 3,
+                          value: progress,
                         ),
+                      ),
+                      SizedBox(width: 8),
+                      SizedBox(
+                        width: 40,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            percentValue.toString() + '%',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: MyColors.subtitleColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(width: 16),
                   SvgPicture.asset("assets/icons/arrow_right.svg"),
                 ],
@@ -291,8 +278,9 @@ class SubtopicContent extends StatelessWidget {
   }
 }
 
-Route _createRouteToCards(Subtopic subtopic,
-    Map<String, String> mapSubtopicsProgress, {Map<String, dynamic> userInfo}) {
+Route _createRouteToCards(
+    Subtopic subtopic, Map<String, String> mapSubtopicsProgress,
+    {Map<String, dynamic> userInfo}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CardsScreen(
       subtopic,

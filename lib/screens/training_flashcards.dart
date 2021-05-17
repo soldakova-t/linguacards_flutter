@@ -37,7 +37,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
 
   @override
   void initState() {
-    _engVersion = widget.userInfo["eng_version"];
+    if (widget.userInfo != null) _engVersion = widget.userInfo["eng_version"];
     Globals.playPronounciation(widget.listOfCards[0].sound[_engVersion] ?? "");
     super.initState();
   }

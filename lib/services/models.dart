@@ -6,13 +6,19 @@ class Subtopic {
   String id;
   String title;
   String titleRus;
+  final String img;
+  final String imgPrev;
   bool premiumAccess;
+  bool popular;
 
   Subtopic({
     this.id,
     this.title,
     this.titleRus,
+    this.img,
+    this.imgPrev,
     this.premiumAccess,
+    this.popular
   });
 
   factory Subtopic.fromMap(Map data) {
@@ -20,7 +26,10 @@ class Subtopic {
       id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
+      img: data['img'] ?? '',
+      imgPrev: data['imgPrev'] ?? '',
       premiumAccess: data['premiumAccess'] ?? false,
+      popular: data['popular'] ?? false,
     );
   }
 }

@@ -6,11 +6,11 @@ Color hexToColor(String code) {
 }
 
 class MyColors {
-  static const Color mainBgColor = Color(0xFFF3F3F3);
-  static const Color mainDarkColor = Color(0xFF393560);
-  static const Color mainBrightColor = Color(0xFF464EFF);
+  static const Color mainBgColor = Color(0xFFF8F6F6);
+  static const Color mainDarkColor = Color(0xFF1B2C3B);
+  static const Color mainBrightColor = Color(0xff32b3fb);
   static const Color greenBrightColor = Color(0xFF1AC840);
-  static const Color subtitleColor = Color(0x99171245);
+  static const Color subtitleColor = Color(0xFF979797);
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
   static const Color inputBgColor = Color(0xFFF6F6F6);
   static const Color inputErrorColor = Color(0x0DFA5C5C);
@@ -18,6 +18,44 @@ class MyColors {
 }
 
 // My Text Styles
+
+const myMainTextStyle = TextStyle(
+  fontSize: 16, // In Figma 15.
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  // fontWeight: FontWeight.normal,
+);
+
+const myTitleStyle = TextStyle(
+  fontSize: 16, // In Figma 15.
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w900,
+);
+
+const mySubtitleStyle = TextStyle(
+  fontSize: 13, // In Figma 13.
+  color: MyColors.subtitleColor,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+);
+
+const myHeaderStyle = TextStyle(
+  fontSize: 23, // In Figma 21.
+  color: Colors.black,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w900,
+);
+
+const myLogoStyle = TextStyle(
+  fontSize: 17,
+  color: Colors.black,
+  fontFamily: "SF Compact Display",
+);
+
+// Are not used.
 const myH1 = TextStyle(
   fontSize: 28,
   color: MyColors.mainDarkColor,
@@ -39,13 +77,6 @@ const mySubtitle16Style = TextStyle(
 const mySubtitle14Style = TextStyle(
   fontSize: 14,
   color: MyColors.subtitleColor,
-);
-
-const myMainTextStyle = TextStyle(
-  fontSize: 14,
-  color: MyColors.mainDarkColor,
-  decoration: TextDecoration.none,
-  // fontWeight: FontWeight.normal,
 );
 
 const myVariantsTextStyle = TextStyle(
@@ -103,4 +134,3 @@ const labelSpeedDialStyle = TextStyle(
   fontSize: 15,
   backgroundColor: Colors.white,
 );
-

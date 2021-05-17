@@ -45,12 +45,14 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 17 + MediaQuery.of(context).padding.top),
                       Container(
                         alignment: Alignment.topLeft,
-                        height: 48,
+                        margin: const EdgeInsets.all(0.0),
+                        padding: const EdgeInsets.all(0.0),
+                        height: 58,
                         child: SvgPicture.asset('assets/icons/logo_auth.svg'),
                       ),
                       SizedBox(height: 26),
                       Text(
-                        'Добро пожаловать в Magicards!',
+                        'Добро пожаловать в Lingvicards!',
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -154,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
               break;
             default:
               print("widget.nextPage default");
-              //Navigator.of(context).push(_createProfileRoute());
+            //Navigator.of(context).push(_createProfileRoute());
           }
         }
       },
@@ -180,13 +182,15 @@ class _LoginPageState extends State<LoginPage> {
                   TextSpan(
                       style: TextStyle(
                         fontSize: 14,
-                        color: hexToColor('#6D6F9D'),
+                        //color: hexToColor('#6D6F9D'),
+                        color: MyColors.mainDarkColor,
                       ),
                       text: 'Продолжить через '),
                   TextSpan(
                     style: TextStyle(
                       fontSize: 14,
-                      color: hexToColor('#6D6F9D'),
+                        //color: hexToColor('#6D6F9D'),
+                        color: MyColors.mainDarkColor,
                       fontWeight: FontWeight.bold,
                     ),
                     text: socialName,
@@ -207,8 +211,8 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
-        color: hexToColor('#464EFF'),
-        disabledColor: hexToColor('#8F94FF'),
+        color: MyColors.mainBrightColor,
+        disabledColor: hexToColor('#84BFFF'),
         child: Center(
             child: codeSent
                 ? Text(
