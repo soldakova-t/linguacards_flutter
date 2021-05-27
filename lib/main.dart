@@ -38,9 +38,9 @@ class MyApp extends StatelessWidget {
 
           // Named Routes
           routes: {
-            '/': (context) => TopicsScreen(),
-            '/topics': (context) => TopicsScreen(),
-            '/search': (context) => SearchScreen(),
+            '/': (context) => MainScreen(),
+            '/main': (context) => MainScreen(),
+            '/words': (context) => CategoriesScreen(),
             '/settings': (context) => SettingsScreen(),
           },
 
@@ -53,8 +53,6 @@ class MyApp extends StatelessWidget {
             textTheme: TextTheme(
               bodyText2: myMainTextStyle, //"The default text style for Material."
               bodyText1: myMainTextStyle,
-              button:
-                  TextStyle(letterSpacing: 1.5, fontWeight: FontWeight.bold),
               headline5: TextStyle(fontWeight: FontWeight.bold),
               subtitle1: TextStyle(fontWeight: FontWeight.bold),
             ),

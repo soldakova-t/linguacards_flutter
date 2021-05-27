@@ -6,7 +6,7 @@ import '../shared/shared.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-class CardDetailsScreen extends StatefulWidget {
+/*class CardDetailsScreen extends StatefulWidget {
   const CardDetailsScreen({
     Key key,
     this.card,
@@ -189,4 +189,4 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
       ),
     );
   }
-}
+}*/

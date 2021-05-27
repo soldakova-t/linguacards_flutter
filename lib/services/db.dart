@@ -19,10 +19,29 @@ class DB {
     });
   }
 
-  static Future<List<String>> getEarlyLearnedCardsIDs(
-      {String userId, String subtopicId}) async {
+  /*static Stream<List<String>> getEarlyLearnedCardsIDs(
+      {String userId, String subtopicId}) async* {
     try {
-      List<String> learnedCards = List<String>();
+      //List<String> learnedCards = List<String>();
+      yield await Firestore.instance
+          .collection('users/' + userId + '/learnedCards')
+          .document(subtopicId)
+          .get()
+          .then((data) {
+        if (data.exists) {
+          return data['learned_cards'].cast<String>();
+        }
+      }).catchError((e) => print("error fetching data: $e"));
+
+      //return learnedCards;
+    } catch (e) {
+      throw e;
+    }
+  }*/
+
+  static Future<List<String>> getEarlyLearnedCardsIDs(String userId, String subtopicId) async {
+    try {
+      List<String> learnedCards = [];
       await Firestore.instance
           .collection('users/' + userId + '/learnedCards')
           .document(subtopicId)
@@ -36,6 +55,12 @@ class DB {
       return learnedCards;
     } catch (e) {
       throw e;
+    }
+  }  
+  
+  static Stream<List<String>> getEarlyLearnedCardsIDsStream(String userId, String subtopicId) async* {
+    while (true) {
+      yield await getEarlyLearnedCardsIDs(userId, subtopicId);
     }
   }
 

@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:magicards/shared/custom_icons_icons.dart';
-import '../services/globals.dart';
 import 'package:magicards/shared/shared.dart';
 
 class AppBottomNav extends StatelessWidget {
@@ -77,7 +75,7 @@ class AppBottomNav extends StatelessWidget {
                         break;
                       case 1:
                         if (selectedIndex != 1) {
-                          Navigator.pushNamed(context, '/search');
+                          Navigator.pushNamed(context, '/words');
                         }
                         break;
                       case 2:

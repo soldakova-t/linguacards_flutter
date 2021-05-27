@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class Subtopic {
+class Topic {
   String id;
   String title;
   String titleRus;
@@ -11,18 +11,17 @@ class Subtopic {
   bool premiumAccess;
   bool popular;
 
-  Subtopic({
-    this.id,
-    this.title,
-    this.titleRus,
-    this.img,
-    this.imgPrev,
-    this.premiumAccess,
-    this.popular
-  });
+  Topic(
+      {this.id,
+      this.title,
+      this.titleRus,
+      this.img,
+      this.imgPrev,
+      this.premiumAccess,
+      this.popular});
 
-  factory Subtopic.fromMap(Map data) {
-    return Subtopic(
+  factory Topic.fromMap(Map data) {
+    return Topic(
       id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
@@ -34,7 +33,7 @@ class Subtopic {
   }
 }
 
-class Topic {
+class Category {
   final String order;
   final String title;
   final String titleRus;
@@ -42,10 +41,10 @@ class Topic {
   final String imgPrev;
   final double imgPrevHeight;
   final String bgColor;
-  final List<Subtopic> subtopics;
+  final List<Topic> subtopics;
   final DocumentReference reference;
 
-  Topic.fromMap(Map map, {this.reference})
+  Category.fromMap(Map map, {this.reference})
       : assert(map['order'] != null),
         assert(map['title'] != null),
         assert(map['titleRus'] != null),
@@ -62,10 +61,10 @@ class Topic {
         imgPrevHeight = double.parse(map['imgPrevHeight']),
         bgColor = map['bgColor'],
         subtopics = (map['subtopics'] as List ?? [])
-            .map((v) => Subtopic.fromMap(v))
+            .map((v) => Topic.fromMap(v))
             .toList();
 
-  Topic.fromSnapshot(DocumentSnapshot snapshot)
+  Category.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 }
 
@@ -76,19 +75,24 @@ class Magicard {
   final String transcription;
   final String photo;
   final String whiteBg;
+  final String level;
   final Map<String, dynamic> sound;
+  final DocumentReference reference;
 
-  Magicard.fromMap(String docId, Map<String, dynamic> map)
-      : assert(docId != null),
-        assert(map['title'] != null),
+  Magicard.fromMap(String cardId, Map<String, dynamic> map, {this.reference})
+      : assert(map['title'] != null),
         assert(map['photo'] != null),
-        id = docId,
+        id = cardId,
         title = map['title'],
         titleRus = map['titleRus'] ?? '',
         transcription = map['transcription'] ?? '',
         whiteBg = map['whiteBg'] ?? '1',
+        level = map['level'] ?? 'A1 - A2',
         photo = map['photo'],
         sound = map['sound'] ?? Map<String, String>();
+
+  Magicard.fromSnapshot(String cardId, DocumentSnapshot snapshot)
+      : this.fromMap(cardId, snapshot.data, reference: snapshot.reference);
 
   @override
   String toString() => "Magicard<$title>";
@@ -98,7 +102,7 @@ class TrainingFlashcardsState with ChangeNotifier {
   double _progress = 0;
 
   final PageController controller = PageController(
-    viewportFraction: 0.9,
+    viewportFraction: 1.0, // Was 0.9.
     initialPage: 0,
   );
 
@@ -114,7 +118,6 @@ class TrainingFlashcardsState with ChangeNotifier {
       duration: Duration(milliseconds: 200),
       curve: Curves.easeOut,
     );
-    
   }
 
   void prevPage() async {

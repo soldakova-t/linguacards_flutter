@@ -1,37 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/shared/shared.dart';
-import 'dart:async';
-
-class AnimatedProgressWithDelay extends StatefulWidget {
-  final double value;
-  final double height;
-
-  AnimatedProgressWithDelay({Key key, this.value, this.height = 8})
-      : super(key: key);
-
-  @override
-  _AnimatedProgressWithDelayState createState() =>
-      _AnimatedProgressWithDelayState();
-}
-
-class _AnimatedProgressWithDelayState<T>
-    extends State<AnimatedProgressWithDelay> {
-  double _currentValue = 0.0;
-
-  _AnimatedProgressWithDelayState() {
-    Future.delayed(const Duration(milliseconds: 400), () {
-      setState(() {
-        _currentValue = widget.value;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ProgressLayoutBuilder(
-        value: _currentValue, height: widget.height);
-  }
-}
 
 class AnimatedProgress extends StatelessWidget {
   final double value;
@@ -66,7 +34,7 @@ class ProgressLayoutBuilder extends StatelessWidget {
               Container(
                 height: height,
                 decoration: BoxDecoration(
-                  color: hexToColor("#EEEEEE"),
+                  color: (value == 0) ? hexToColor("#F6F6F6") : hexToColor("#EEEEEE"),
                   borderRadius: BorderRadius.all(
                     Radius.circular(height),
                   ),
@@ -96,3 +64,38 @@ class ProgressLayoutBuilder extends StatelessWidget {
 _floor(double value, [min = 0.0]) {
   return value.sign <= min ? min : value;
 }
+
+
+// USE VERY CARAFULLY. DOESN'T WORK WITH STREAMBUILDER
+/*class AnimatedProgressWithDelay extends StatefulWidget {
+  final double value;
+  final double height;
+
+  AnimatedProgressWithDelay({Key key, this.value, this.height = 8})
+      : super(key: key);
+
+  @override
+  _AnimatedProgressWithDelayState createState() =>
+      _AnimatedProgressWithDelayState();
+}
+
+class _AnimatedProgressWithDelayState<T>
+    extends State<AnimatedProgressWithDelay> {
+  double _currentValue = 0.0;
+
+  _AnimatedProgressWithDelayState() {
+    Future.delayed(const Duration(milliseconds: 400), () {
+      setState(() {
+        print("setState" + widget.value.toString());
+        _currentValue = widget.value;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ProgressLayoutBuilder(
+        value: _currentValue, height: widget.height);
+  }
+}
+*/

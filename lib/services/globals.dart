@@ -1,6 +1,10 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:magicards/screens/screens.dart';
+import 'package:magicards/shared/styles.dart';
+
+import 'models.dart';
 
 /// Static global state. Immutable services that do not care about build context.
 class Globals {
@@ -29,7 +33,6 @@ String capitalize(String s) {
   }
 }
 
-
 double convertWidthFrom360(BuildContext context, double blockWidth) {
   final mediaQuery = MediaQuery.of(context);
   final newBlockWidth = mediaQuery.size.width * blockWidth / 360;
@@ -45,3 +48,43 @@ double convertHeightFrom360(
       blockWidth; // Height is proportional to width
   return newBlockHeight;
 }
+
+Route createRouteScreen(String ref,
+    {List<Topic> topics, String title, Topic topic, Map<String, String> mapSubtopicsProgress}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) {
+      if (ref == "/categories") {
+        return CategoriesScreen();
+      }
+      if (ref == "/topics" && topics != null) {
+        return TopicsScreen(
+          topics: topics,
+          title: title,
+        );
+      }
+      if (ref == "/popular_topics") {
+        return PopularTopicsScreen(
+          topics: topics,
+          title: title,
+        );
+      }
+      if (ref == "/cards" && topic != null) {
+        return CardsScreen(topic: topic, mapSubtopicsProgress: mapSubtopicsProgress);
+      }
+      return SearchScreen();
+    },
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+

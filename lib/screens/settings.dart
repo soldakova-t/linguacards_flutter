@@ -15,10 +15,11 @@ class SettingsScreen extends StatelessWidget {
 
     if (user != null) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: MyColors.mainBgColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Text('Настройки'),
+        elevation: 0, // Removes status bar's shadow.
+        backgroundColor: MyColors.mainBgColor,
+          title: Text('Профиль'),
           actions: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 10.0, right: 18.0),
@@ -47,7 +48,7 @@ class SettingsScreen extends StatelessWidget {
             user.phoneNumber == '' || user.phoneNumber == null
                 ? buildSocialNetworkUserHeader(user)
                 : buildPhoneHeader(user),
-            buildUserMenu(context),
+            // buildUserMenu(context),
           ],
         ),
         bottomNavigationBar: AppBottomNav(selectedIndex: 2),

@@ -189,8 +189,8 @@ class _LoginPageState extends State<LoginPage> {
                   TextSpan(
                     style: TextStyle(
                       fontSize: 14,
-                        //color: hexToColor('#6D6F9D'),
-                        color: MyColors.mainDarkColor,
+                      //color: hexToColor('#6D6F9D'),
+                      color: MyColors.mainDarkColor,
                       fontWeight: FontWeight.bold,
                     ),
                     text: socialName,
@@ -206,22 +206,18 @@ class _LoginPageState extends State<LoginPage> {
 
   Container _buildPhoneAuthButton() {
     return Container(
-      height: 56,
-      child: RaisedButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        color: MyColors.mainBrightColor,
-        disabledColor: hexToColor('#84BFFF'),
+      height: convertHeightFrom360(context, 360, 56),
+      child: ElevatedButton(
+        style: myPrimaryButtonStyle,
         child: Center(
             child: codeSent
                 ? Text(
                     'Войти',
-                    style: myAuthButtonTextStyle,
+                    style: myPrimaryButtonTextStyle,
                   )
                 : Text(
                     'Получить код по SMS',
-                    style: myAuthButtonTextStyle,
+                    style: myPrimaryButtonTextStyle,
                   )),
         onPressed: phoneEntered == false
             ? null

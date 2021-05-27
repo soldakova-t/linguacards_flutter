@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 
-class TopicsScreen extends StatelessWidget {
-  const TopicsScreen({Key key, this.topics, this.title = ""}) : super(key: key);
+class PopularTopicsScreen extends StatelessWidget {
+  const PopularTopicsScreen({Key key, this.topics, this.title = ""}) : super(key: key);
 
   final List<Topic> topics;
   final String title;
@@ -20,8 +20,8 @@ class TopicsScreen extends StatelessWidget {
         title: Text(title),
       ),
       bottomNavigationBar: AppBottomNav(
-        selectedIndex: 1,
-        isHomePage: false,
+        selectedIndex: 0,
+        isHomePage: true,
       ),
     );
   }

@@ -7,8 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SubtopicsScreen extends StatefulWidget {
-  final Topic topic;
+/*class SubtopicsScreen extends StatefulWidget {
+  final Category topic;
   SubtopicsScreen({Key key, this.topic}) : super(key: key);
 
   @override
@@ -117,7 +117,7 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
 }
 
 class TopicDetails extends StatelessWidget {
-  final Topic topic;
+  final Category topic;
 
   const TopicDetails({Key key, this.topic}) : super(key: key);
 
@@ -176,7 +176,7 @@ class TopicDetails extends StatelessWidget {
 }
 
 class SubtopicContent extends StatelessWidget {
-  final Subtopic subtopic;
+  final Topic subtopic;
   final double progress;
   final Map<String, String> mapSubtopicsProgress;
 
@@ -279,7 +279,7 @@ class SubtopicContent extends StatelessWidget {
 }
 
 Route _createRouteToCards(
-    Subtopic subtopic, Map<String, String> mapSubtopicsProgress,
+    Topic subtopic, Map<String, String> mapSubtopicsProgress,
     {Map<String, dynamic> userInfo}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => CardsScreen(
@@ -300,4 +300,4 @@ Route _createRouteToCards(
       );
     },
   );
-}
+}*/

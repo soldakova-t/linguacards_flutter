@@ -8,7 +8,7 @@ Color hexToColor(String code) {
 class MyColors {
   static const Color mainBgColor = Color(0xFFF8F6F6);
   static const Color mainDarkColor = Color(0xFF1B2C3B);
-  static const Color mainBrightColor = Color(0xff32b3fb);
+  static const Color mainBrightColor = Color(0xff32B3FC);
   static const Color greenBrightColor = Color(0xFF1AC840);
   static const Color subtitleColor = Color(0xFF979797);
   static const Color trainingVariantsIconsColor = Color(0xCC393560);
@@ -35,12 +35,36 @@ const myTitleStyle = TextStyle(
   fontWeight: FontWeight.w900,
 );
 
+const myCardTitleStyle = TextStyle(
+  fontSize: 16, // In Figma 15.
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w500,
+);
+
+const myLearnedCardTitleStyle = TextStyle(
+  fontSize: 16, // In Figma 15.
+  color: Colors.grey,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w500,
+);
+
 const mySubtitleStyle = TextStyle(
-  fontSize: 13, // In Figma 13.
+  fontSize: 14, // In Figma 13.
   color: MyColors.subtitleColor,
   decoration: TextDecoration.none,
   fontFamily: "SF Compact Display",
 );
+
+const myPercentStyle = TextStyle(
+  fontSize: 13,
+  color: MyColors.subtitleColor,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+);
+
 
 const myHeaderStyle = TextStyle(
   fontSize: 23, // In Figma 21.
@@ -53,6 +77,56 @@ const myLogoStyle = TextStyle(
   fontSize: 17,
   color: Colors.black,
   fontFamily: "SF Compact Display",
+);
+
+
+
+final ButtonStyle myPrimaryButtonStyle = ButtonStyle(
+  elevation: MaterialStateProperty.all(0.0),
+  shape: MaterialStateProperty.all(
+    RoundedRectangleBorder(
+      borderRadius:
+          BorderRadius.all(Radius.circular(12)),
+    ),
+  ),
+  backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+    if (states.contains(MaterialState.disabled)) {
+      return hexToColor("#A3DEFF"); // Disabled color
+    }
+    return MyColors.mainBrightColor; // Regular color
+  }),
+);
+
+
+const myPrimaryButtonTextStyle = TextStyle(
+  fontSize: 17,
+  color: Colors.white,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w600,
+);
+
+final ButtonStyle mySecondaryButtonStyle = ButtonStyle(
+  elevation: MaterialStateProperty.all(0.0),
+  shape: MaterialStateProperty.all(
+    RoundedRectangleBorder(
+      borderRadius:
+          BorderRadius.all(Radius.circular(12)),
+    ),
+  ),
+  backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+    if (states.contains(MaterialState.disabled)) {
+      return hexToColor("#A3DEFF"); // Disabled color
+    }
+    return hexToColor("#F3F3F3"); // Regular color
+  }),
+);
+
+
+const mySecondaryButtonTextStyle = TextStyle(
+  fontSize: 17,
+  color: MyColors.mainBrightColor,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w600,
 );
 
 // Are not used.

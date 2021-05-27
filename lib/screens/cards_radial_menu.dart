@@ -9,7 +9,7 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class RadialMenu extends StatefulWidget {
+/*class RadialMenu extends StatefulWidget {
   RadialMenu(
       {Key key,
       this.listOfCards,
@@ -279,4 +279,4 @@ class RadialAnimation extends StatelessWidget {
       ),
     );
   }
-}
+}*/
