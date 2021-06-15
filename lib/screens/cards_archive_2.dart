@@ -24,65 +24,44 @@ class _CardsScreenState extends State<CardsScreen> {
   List<Magicard> notLearnedCards = [];
   List<Magicard> learnedCards = [];
 
-/*@override
-  Widget build(BuildContext context) {
-    return LoadingScreen();
-  }*/
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true, // For making BottomNavigationBar transparent.
-      backgroundColor: MyColors.mainBgColor,
-      body: DefaultTabController(
-        length: 2,
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: convertHeightFrom360(context, 360, 10)),
-            Container(
-              height: convertHeightFrom360(context, 360, 32),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: convertWidthFrom360(context, 16)),
-                child: Material(
-                  color: hexToColor("#E4E4E5"),
-                  borderRadius: BorderRadius.circular(10),
-                  child: TabBar(
-                    indicatorPadding: const EdgeInsets.all(2.0),
-                    indicator: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    tabs: [
-                      Tab(text: "На изучении"),
-                      Tab(text: "Изучено"),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: convertHeightFrom360(context, 360, 8)),
-            Expanded(
-              child: _buildBody(context),
-            ),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        elevation: 0, // Removes status bar's shadow.
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        extendBody: true, // For making BottomNavigationBar transparent.
         backgroundColor: MyColors.mainBgColor,
-        title: Text(widget.topic.title),
-      ),
-      bottomNavigationBar: AppBottomNav(
-        selectedIndex: 1,
-        isHomePage: false,
+        body: _buildBody(context),
+        appBar: AppBar(
+          elevation: 0, // Removes status bar's shadow.
+          backgroundColor: MyColors.mainBgColor,
+          title: Text(widget.topic.title),
+          bottom: TabBar(
+            indicatorPadding: const EdgeInsets.all(4.0),
+            indicator: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            labelStyle: myNotLearnedTabLabelStyle,
+            unselectedLabelColor: MyColors.subtitleColor,
+            unselectedLabelStyle: myLearnedTabLabelStyle,
+            tabs: [
+              Tab(text: "На изучении"),
+              Tab(text: "Изученные"),
+            ],
+          ),
+        ),
+        bottomNavigationBar: AppBottomNav(
+          selectedIndex: 1,
+          isHomePage: false,
+        ),
       ),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
-    // String userEnglishVersion = "br";
+    String userEnglishVersion = "br";
 
     return TabBarView(
       children: [
@@ -97,21 +76,14 @@ class _CardsScreenState extends State<CardsScreen> {
                       stream: Firestore.instance
                           .collection('cards')
                           .where('subtopic', isEqualTo: widget.topic.id)
-                          .where('version_br', isEqualTo: true)
-                          .orderBy('number')
+                          .where('eng_version.$userEnglishVersion',
+                              isEqualTo: true)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return Container();
+                          return LinearProgressIndicator();
                         } else {
                           var documents = snapshot.data.documents;
-                          if (documents.length == 0)
-                            return Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Center(
-                                child: Text("В этой категории нет слов"),
-                              ),
-                            );
                           fillListOfAllCards(documents);
                           if (user != null) {
                             return FutureBuilder<List<String>>(
@@ -119,17 +91,7 @@ class _CardsScreenState extends State<CardsScreen> {
                                   user.uid, widget.topic.id),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
-                                  /*return Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 24.0),
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ),
-                                  );*/
-                                  return Container();
+                                  return LinearProgressIndicator();
                                 } else {
                                   listLearnedCardsIDs = snapshot.data;
                                   fillLearnedAndNotLearnedCards();
@@ -138,11 +100,8 @@ class _CardsScreenState extends State<CardsScreen> {
                                       children: [
                                         SizedBox(
                                             height: convertHeightFrom360(
-                                                context, 360, 8)),
+                                                context, 360, 16)),
                                         CardsList(cards: notLearnedCards),
-                                        SizedBox(
-                                            height: convertHeightFrom360(
-                                                context, 360, 66)),
                                       ],
                                     ),
                                   );

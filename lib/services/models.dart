@@ -68,7 +68,7 @@ class Category {
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 }
 
-class Magicard {
+/* class Magicard {
   final String id;
   final String title;
   final String titleRus;
@@ -96,6 +96,35 @@ class Magicard {
 
   @override
   String toString() => "Magicard<$title>";
+}*/
+
+class Magicard {
+  final String id;
+  final String number;
+  final String title;
+  final String titleRus;
+  final String transcriptionBr;
+  final String photo;
+  final String level;
+  final Map<String, dynamic> sound;
+  final DocumentReference reference;
+
+  Magicard.fromMap(String cardId, Map<String, dynamic> map, {this.reference})
+      : assert(map['title'] != null),
+        id = cardId,
+        title = map['title'],
+        number = map['number'],
+        titleRus = map['titleRus'] ?? '',
+        transcriptionBr = map['transcription_br'] ?? '',
+        level = map['level'] ?? 'A1 - A2',
+        photo = map['photo'] ?? '',
+        sound = map['sound'] ?? Map<String, String>();
+
+  Magicard.fromSnapshot(String cardId, DocumentSnapshot snapshot)
+      : this.fromMap(cardId, snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "<$title> <$number>";
 }
 
 class TrainingFlashcardsState with ChangeNotifier {

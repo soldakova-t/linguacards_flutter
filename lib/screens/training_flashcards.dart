@@ -24,7 +24,8 @@ class TrainingFlashcards extends StatefulWidget {
   final String topicId; // For updating when more cards are learned.
   final Map<String, String>
       mapSubtopicsProgress; // For updating when more cards are learned.
-  final int numberOfCardsInSubtopic; // For updating when more cards are learned.
+  final int
+      numberOfCardsInSubtopic; // For updating when more cards are learned.
 
   @override
   _TrainingFlashcardsState createState() => _TrainingFlashcardsState();
@@ -83,10 +84,10 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
             ),
           ),
           Positioned(
-            left: 16,
-            right: 16,
+            left: 0,
+            right: 0,
+            bottom: 0,
             top: 103 + MediaQuery.of(context).padding.top,
-            bottom: 24,
             child: _buildCarousel(context, widget.trainingVariant),
           ),
         ],
@@ -155,24 +156,45 @@ class CarouselItemWordOpened extends StatefulWidget {
 class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
   bool _showMeaningAndActions = false;
 
+  static void preload(BuildContext context, String path) {
+    var configuration = createLocalImageConfiguration(context);
+    new NetworkImage(path)..resolve(configuration);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var trainingState = Provider.of<TrainingFlashcardsState>(context);
+    var trainingState =
+        Provider.of<TrainingFlashcardsState>(context, listen: false);
+
+    String pathPhoto = "http://magicards.ru/photo/2020/10/1640/" +
+        widget.listOfCards[widget.itemIndex].number.toString() +
+        ".jpg";
+
+    preload(context, pathPhoto);
 
     return GestureDetector(
       onPanUpdate: (details) {
-        if (details.delta.dx < 0) {
+        if (details.delta.dx < 0 &&
+            (widget.itemIndex + 1) < widget.listOfCards.length) {
+          trainingState.progress =
+              (widget.itemIndex + 2) / widget.listOfCards.length;
           trainingState.nextPage();
         }
-        if (details.delta.dx > 0) {
+        if (details.delta.dx > 0 && widget.itemIndex > 0) {
+          trainingState.progress = widget.itemIndex / widget.listOfCards.length;
           trainingState.prevPage();
         }
       },
-
       child: Stack(
         children: <Widget>[
-          Stack(children: <Widget>[
-            Column(
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: MyColors.mainBgColor,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Text("Вспомните, что означает это слово:"),
@@ -193,7 +215,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                     children: <Widget>[
                       Text(
                         '[' +
-                            widget.listOfCards[widget.itemIndex].transcription +
+                            widget
+                                .listOfCards[widget.itemIndex].transcriptionBr +
                             ']',
                         style: myTranscriptionCard,
                       ),
@@ -229,9 +252,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                                     convertHeightFrom360(context, 360, 16)),
                               ),
                               image: DecorationImage(
-                                fit: BoxFit.fitHeight,
-                                image: NetworkImage(
-                                    widget.listOfCards[widget.itemIndex].photo),
+                                fit: BoxFit.fitWidth,
+                                image: NetworkImage(pathPhoto),
                               ),
                               color: Colors.white,
                             ),
@@ -247,33 +269,32 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                   ),
               ],
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _showMeaningAndActions == true
-                  ? Column(
-                      children: [
-                        ButtonLearned(
-                          context: context,
-                          heroTag: widget.listOfCards[widget.itemIndex].title,
-                          cardId: widget.listOfCards[widget.itemIndex].id,
-                          listLearnedCardsIDs: widget.listLearnedCardsIDs,
-                          topicId: widget.topicId,
-                          learned: false,
-                          mapSubtopicsProgress: widget.mapSubtopicsProgress,
-                          numberOfCardsInSubtopic:
-                              widget.numberOfCardsInSubtopic,
-                        ),
-                        SizedBox(height: 16),
-                        (widget.itemIndex < (widget.listOfCards.length - 1))
-                            ? _buildButtonNext()
-                            : _buildButtonFinish(),
-                      ],
-                    )
-                  : _buildButtonCheck(),
-            ),
-          ]),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 24,
+            child: _showMeaningAndActions == true
+                ? Column(
+                    children: [
+                      ButtonLearned(
+                        context: context,
+                        heroTag: widget.listOfCards[widget.itemIndex].title,
+                        cardId: widget.listOfCards[widget.itemIndex].id,
+                        listLearnedCardsIDs: widget.listLearnedCardsIDs,
+                        topicId: widget.topicId,
+                        learned: false,
+                        mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                        numberOfCardsInSubtopic: widget.numberOfCardsInSubtopic,
+                      ),
+                      SizedBox(height: 16),
+                      (widget.itemIndex < (widget.listOfCards.length - 1))
+                          ? _buildButtonNext()
+                          : _buildButtonFinish(),
+                    ],
+                  )
+                : _buildButtonCheck(),
+          ),
         ],
       ),
     );
@@ -301,8 +322,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
           style: myPrimaryButtonStyle,
           child: Center(child: Text("Далее", style: myPrimaryButtonTextStyle)),
           onPressed: () {
-            var state = Provider.of<TrainingFlashcardsState>(
-                widget.context,
+            var state = Provider.of<TrainingFlashcardsState>(widget.context,
                 listen: false);
             state.progress = (widget.itemIndex + 2) / widget.listOfCards.length;
             state.nextPage();

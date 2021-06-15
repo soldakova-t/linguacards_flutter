@@ -52,34 +52,35 @@ class _CardsListState extends State<CardsList> {
           children: [
             Row(
               children: [
-                widget.cards[index].photo != ""
-                    ? Padding(
-                        padding: EdgeInsets.only(
-                            right: convertWidthFrom360(context, 16)),
-                        child: Container(
-                          width: convertWidthFrom360(context, 70),
-                          height: convertHeightFrom360(context, 360, 46),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(
-                                  convertHeightFrom360(context, 360, 16)),
-                            ),
-                            image: DecorationImage(
-                              fit: BoxFit.fitHeight,
-                              image: NetworkImage(widget.cards[index].photo),
-                            ),
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    : Container(),
+                Padding(
+                  padding:
+                      EdgeInsets.only(right: convertWidthFrom360(context, 16)),
+                  child: Container(
+                    width: convertWidthFrom360(context, 70),
+                    height: convertHeightFrom360(context, 360, 46),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(convertHeightFrom360(context, 360, 16)),
+                      ),
+                      image: DecorationImage(
+                        fit: BoxFit.fitHeight,
+                        image: NetworkImage("http://magicards.ru/photo/2020/10/352/" + widget.cards[index].number.toString() + ".jpg"),
+                      ),
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      learned == false ? Text(widget.cards[index].title, style: myCardTitleStyle) : Text(widget.cards[index].title, style: myLearnedCardTitleStyle),
+                      learned == false
+                          ? Text(widget.cards[index].title,
+                              style: myCardTitleStyle)
+                          : Text(widget.cards[index].title,
+                              style: myCardTitleStyle),
                       SizedBox(height: convertHeightFrom360(context, 360, 3)),
                       Text(widget.cards[index].titleRus,
                           style: mySubtitleStyle),

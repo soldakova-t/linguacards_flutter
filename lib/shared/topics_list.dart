@@ -74,8 +74,11 @@ class _TopicsListState extends State<TopicsList> {
       onTap: () {
         if (userInfo != null) {
           if (userInfo["subtopics_progress"] != null) {
-            Map<String, dynamic> dynamicSubtopicsProgress = userInfo["subtopics_progress"];
-            Map<String, String> stringSubtopicsProgress = dynamicSubtopicsProgress.map((key, value) => MapEntry(key, value?.toString()));
+            Map<String, dynamic> dynamicSubtopicsProgress =
+                userInfo["subtopics_progress"];
+            Map<String, String> stringSubtopicsProgress =
+                dynamicSubtopicsProgress
+                    .map((key, value) => MapEntry(key, value?.toString()));
 
             Navigator.of(context).push(createRouteScreen("/cards",
                 topic: widget.topics[index],
@@ -89,7 +92,7 @@ class _TopicsListState extends State<TopicsList> {
       },
       child: Padding(
         padding:
-            EdgeInsets.only(bottom: convertHeightFrom360(context, 360, 12)),
+            EdgeInsets.only(bottom: convertHeightFrom360(context, 360, 10)),
         child: SizedBox(
           width: double.infinity,
           height: convertHeightFrom360(context, 360, 113),
@@ -104,9 +107,28 @@ class _TopicsListState extends State<TopicsList> {
                   ),
                 ),
               ),
+              // Label "Популярная"
+              /*widget.topics[index].popular
+                  ? Positioned(
+                      top: 0,
+                      right: 10,
+                      child: Container(
+                        height: convertHeightFrom360(context, 360, 17),
+                        width: convertWidthFrom360(context, 71),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              convertWidthFrom360(context, 6)),
+                          color: MyColors.popularBgColor,
+                        ),
+                        child: Center(
+                          child: Text("Популярная", style: myPopularLabelStyle),
+                        ),
+                      ),
+                    )
+                  : Container(),*/
               Positioned(
                 left: convertWidthFrom360(context, 16),
-                top: convertHeightFrom360(context, 360, 16),
+                top: convertHeightFrom360(context, 360, 20),
                 right: convertWidthFrom360(context, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

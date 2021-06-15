@@ -15,6 +15,7 @@ class MyColors {
   static const Color inputBgColor = Color(0xFFF6F6F6);
   static const Color inputErrorColor = Color(0x0DFA5C5C);
   static const Color hideAccessColor = Color(0xFFEDEDED);
+  static const Color popularBgColor = Color(0xFFFEFFDA);
 }
 
 // My Text Styles
@@ -43,12 +44,12 @@ const myCardTitleStyle = TextStyle(
   fontWeight: FontWeight.w500,
 );
 
-const myLearnedCardTitleStyle = TextStyle(
-  fontSize: 16, // In Figma 15.
-  color: Colors.grey,
+const myPopularLabelStyle = TextStyle(
+  fontSize: 10, // In Figma 15.
+  color: Colors.black,
   decoration: TextDecoration.none,
   fontFamily: "SF Compact Display",
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w900,
 );
 
 const mySubtitleStyle = TextStyle(
@@ -71,6 +72,17 @@ const myHeaderStyle = TextStyle(
   color: Colors.black,
   fontFamily: "SF Compact Display",
   fontWeight: FontWeight.w900,
+);
+
+
+const myNotLearnedTabLabelStyle = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w900,
+);
+
+const myLearnedTabLabelStyle = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.w400,
 );
 
 const myLogoStyle = TextStyle(
@@ -130,6 +142,15 @@ const mySecondaryButtonTextStyle = TextStyle(
 );
 
 // Are not used.
+
+const myLearnedCardTitleStyle = TextStyle(
+  fontSize: 16, // In Figma 15.
+  color: Colors.grey,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w500,
+);
+
 const myH1 = TextStyle(
   fontSize: 28,
   color: MyColors.mainDarkColor,

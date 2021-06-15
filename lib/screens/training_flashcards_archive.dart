@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
 import 'package:magicards/screens/screens.dart';
@@ -217,7 +217,7 @@ class CarouselItemWordOpened extends StatelessWidget {
                             children: <Widget>[
                               Text(
                                 '[' +
-                                    listOfCards[itemIndex].transcription +
+                                    listOfCards[itemIndex].transcriptionBr +
                                     ']',
                                 style: myTranscriptionCard,
                               ),
@@ -468,7 +468,7 @@ class _CarouselItemPhotoOpenedState extends State<CarouselItemPhotoOpened> {
                                     Text(
                                       '[' +
                                           widget.listOfCards[widget.itemIndex]
-                                              .transcription +
+                                              .transcription_br +
                                           ']',
                                       style: myTranscriptionCard,
                                     ),
@@ -816,4 +816,4 @@ class _ContainerShowMeaningState extends State<ContainerShowMeaning>
 
   @override
   bool get wantKeepAlive => true;
-}
+}*/
