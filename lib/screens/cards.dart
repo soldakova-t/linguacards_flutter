@@ -81,7 +81,7 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
     // String userEnglishVersion = "br";
 
     return TabBarView(
@@ -94,7 +94,7 @@ class _CardsScreenState extends State<CardsScreen> {
                 child: Column(
                   children: [
                     StreamBuilder<QuerySnapshot>(
-                      stream: Firestore.instance
+                      stream: FirebaseFirestore.instance
                           .collection('cards')
                           .where('subtopic', isEqualTo: widget.topic.id)
                           .where('version_br', isEqualTo: true)
@@ -104,7 +104,7 @@ class _CardsScreenState extends State<CardsScreen> {
                         if (!snapshot.hasData) {
                           return Container();
                         } else {
-                          var documents = snapshot.data.documents;
+                          var documents = snapshot.data.docs;
                           if (documents.length == 0)
                             return Padding(
                               padding: const EdgeInsets.all(24.0),
@@ -197,7 +197,7 @@ class _CardsScreenState extends State<CardsScreen> {
     for (var i = 0; i < documents.length; i++) {
       DocumentSnapshot cardSnapshot = documents[i];
       Magicard card =
-          Magicard.fromSnapshot(cardSnapshot.documentID, cardSnapshot);
+          Magicard.fromSnapshot(cardSnapshot.id, cardSnapshot);
       listOfAllCards.add(card);
     }
   }

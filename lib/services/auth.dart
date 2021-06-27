@@ -13,19 +13,19 @@ import 'package:magicards/screens/screens.dart';
 class AuthServiceFirebase {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Firestore _db = Firestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // Firebase user one-time fetch
-  Future<FirebaseUser> get getUser => _auth.currentUser();
+  User get getUser => _auth.currentUser;
 
   // Firebase user a realtime stream
-  Stream<FirebaseUser> get user => _auth.onAuthStateChanged;
+  Stream<User> get user => _auth.authStateChanges();
 
   // Determine if Apple Signin is available on device
   Future<bool> get appleSignInAvailable => AppleSignIn.isAvailable();
 
   /// Sign in with Apple
-  Future<FirebaseUser> appleSignIn() async {
+  Future<User> appleSignIn() async {
     try {
       final AuthorizationResult appleResult =
           await AppleSignIn.performRequests([
@@ -37,14 +37,14 @@ class AuthServiceFirebase {
       }
 
       final AuthCredential credential =
-          OAuthProvider(providerId: 'apple.com').getCredential(
+          OAuthProvider('apple.com').credential(
         accessToken:
             String.fromCharCodes(appleResult.credential.authorizationCode),
         idToken: String.fromCharCodes(appleResult.credential.identityToken),
       );
 
-      AuthResult firebaseResult = await _auth.signInWithCredential(credential);
-      FirebaseUser user = firebaseResult.user;
+      UserCredential firebaseResult = await _auth.signInWithCredential(credential);
+      User user = firebaseResult.user;
 
       Fluttertoast.showToast(
           msg: "Вы успешно авторизовались",
@@ -64,19 +64,19 @@ class AuthServiceFirebase {
   }
 
   /// Sign in with Google
-  Future<FirebaseUser> googleSignIn() async {
+  Future<User> googleSignIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication googleAuth =
           await googleSignInAccount.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
+      final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      AuthResult result = await _auth.signInWithCredential(credential);
-      FirebaseUser user = result.user;
+      UserCredential result = await _auth.signInWithCredential(credential);
+      User user = result.user;
 
       if (await DB.userExists(user.uid) == false) {
         DB.addNewUser(user.uid);
@@ -99,18 +99,18 @@ class AuthServiceFirebase {
   }
 
   /// This mehtod makes the real auth
-  Future<FirebaseUser> firebaseAuthWithFacebook(
+  Future<User> firebaseAuthWithFacebook(
       {@required FacebookAccessToken token}) async {
     AuthCredential credential =
-        FacebookAuthProvider.getCredential(accessToken: token.token);
-    FirebaseUser firebaseUser =
+        FacebookAuthProvider.credential(token.token);
+    User user =
         (await _auth.signInWithCredential(credential)).user;
-    return firebaseUser;
+    return user;
   }
 
   /// Sign in with Facebook
-  Future<FirebaseUser> loginFacebook() async {
-    FirebaseUser user;
+  Future<User> loginFacebook() async {
+    User user;
     try {
       final facebookLogin = new FacebookLogin();
       final result = await facebookLogin.logIn(['email']);
@@ -153,15 +153,15 @@ class AuthServiceFirebase {
   }
 
   /// Anonymous Firebase login
-  Future<FirebaseUser> anonLogin() async {
-    AuthResult result = await _auth.signInAnonymously();
-    FirebaseUser user = result.user;
+  Future<User> anonLogin() async {
+    UserCredential result = await _auth.signInAnonymously();
+    User user = result.user;
     return user;
   }
 
   /// Sign in with OTP (phone auth)
   signInWithOTP(smsCode, verId, {String nextPage, BuildContext context}) {
-    AuthCredential authCreds = PhoneAuthProvider.getCredential(
+    AuthCredential authCreds = PhoneAuthProvider.credential(
         verificationId: verId, smsCode: smsCode);
     signInWithCredential(authCreds, nextPage: nextPage, context: context);
   }
@@ -169,7 +169,7 @@ class AuthServiceFirebase {
   signInWithCredential(AuthCredential authCreds,
       {String nextPage, BuildContext context}) async {
     try {
-      AuthResult authResult =
+      UserCredential authResult =
           await FirebaseAuth.instance.signInWithCredential(authCreds);
       // String phone = authResult.user.phoneNumber;
 

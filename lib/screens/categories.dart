@@ -29,7 +29,7 @@ class CategoriesScreen extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream:
-          Firestore.instance.collection('topics').orderBy('order').snapshots(),
+          FirebaseFirestore.instance.collection('topics').orderBy('number').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LinearProgressIndicator();
@@ -37,11 +37,13 @@ class CategoriesScreen extends StatelessWidget {
           List<Category> categories = [];
 
           // Filling List<Category> categories.
-          for (var i = 0; i < snapshot.data.documents.length; i++) {
-            DocumentSnapshot categorySnapshot = snapshot.data.documents[i];
+          for (var i = 0; i < snapshot.data.docs.length; i++) {
+            DocumentSnapshot categorySnapshot = snapshot.data.docs[i];
             Category category = Category.fromSnapshot(categorySnapshot);
             categories.add(category);
           }
+          //return CategoriesList(categories: categories);
+
           return CategoriesList(categories: categories);
         }
       },

@@ -16,6 +16,7 @@ class MyColors {
   static const Color inputErrorColor = Color(0x0DFA5C5C);
   static const Color hideAccessColor = Color(0xFFEDEDED);
   static const Color popularBgColor = Color(0xFFFEFFDA);
+  static const Color additionalTextGreyColor = Color(0xFFB9B9B9);
 }
 
 // My Text Styles
@@ -197,20 +198,26 @@ const myH1Card = TextStyle(
   fontWeight: FontWeight.bold,
 );
 
-const myTranscriptionCard = TextStyle(
+const myProgress = TextStyle(
   fontSize: 15,
-  color: Color(0xFF878787),
+  color: MyColors.additionalTextGreyColor,
   fontFamily: 'Helvetica',
 );
 
-const myLabelTextStyleCard = TextStyle(
+const myTranscription = TextStyle(
   fontSize: 15,
-  color: Color(0xFF878787),
+  color: MyColors.additionalTextGreyColor,
+  fontFamily: 'Helvetica',
+);
+
+const myTitleRus = TextStyle(
+  fontSize: 15,
+  color: MyColors.additionalTextGreyColor,
 );
 
 const myExampleCard = TextStyle(
   fontSize: 14,
-  color: Color(0xFF878787),
+  color: MyColors.additionalTextGreyColor,
   decoration: TextDecoration.none,
 );
 

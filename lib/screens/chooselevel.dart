@@ -10,7 +10,7 @@ class ChooseLevel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     if (user != null) {
       return Scaffold(

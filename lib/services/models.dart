@@ -3,30 +3,30 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Topic {
+  String categoryNumber;
+  String number;
   String id;
   String title;
   String titleRus;
-  final String img;
-  final String imgPrev;
   bool premiumAccess;
   bool popular;
 
   Topic(
-      {this.id,
+      {this.categoryNumber,
+      this.number,
+      this.id,
       this.title,
       this.titleRus,
-      this.img,
-      this.imgPrev,
       this.premiumAccess,
       this.popular});
 
   factory Topic.fromMap(Map data) {
     return Topic(
+      categoryNumber: data['categoryNumber'] ?? '',
+      number: data['number'] ?? '',
       id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
-      img: data['img'] ?? '',
-      imgPrev: data['imgPrev'] ?? '',
       premiumAccess: data['premiumAccess'] ?? false,
       popular: data['popular'] ?? false,
     );
@@ -34,38 +34,37 @@ class Topic {
 }
 
 class Category {
-  final String order;
+  final String number;
   final String title;
   final String titleRus;
-  final String img;
-  final String imgPrev;
-  final double imgPrevHeight;
+  final double photoRightPadding;
+  final double photoBottomPadding;
+  final double photoHeight;
   final String bgColor;
   final List<Topic> subtopics;
   final DocumentReference reference;
 
   Category.fromMap(Map map, {this.reference})
-      : assert(map['order'] != null),
+      : assert(map['number'] != null),
         assert(map['title'] != null),
-        assert(map['titleRus'] != null),
-        assert(map['img'] != null),
-        assert(map['imgPrev'] != null),
-        assert(map['imgPrevHeight'] != null),
-        assert(double.parse(map['imgPrevHeight']) is double),
+        assert(map['titleRus'] != null),  
         assert(map['bgColor'] != null),
-        order = map['order'],
+        assert(map['photoRightPadding'] != null),
+        assert(map['photoBottomPadding'] != null),  
+        assert(map['photoHeight'] != null),
+        number = map['number'],
         title = map['title'],
         titleRus = map['titleRus'],
-        img = map['img'],
-        imgPrev = map['imgPrev'],
-        imgPrevHeight = double.parse(map['imgPrevHeight']),
+        photoRightPadding = double.parse(map['photoRightPadding']) ?? 8,
+        photoBottomPadding = double.parse(map['photoBottomPadding']) ?? 0,
+        photoHeight = double.parse(map['photoHeight']) ?? 104,
         bgColor = map['bgColor'],
         subtopics = (map['subtopics'] as List ?? [])
             .map((v) => Topic.fromMap(v))
             .toList();
 
   Category.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
+      : this.fromMap(snapshot.data(), reference: snapshot.reference);
 }
 
 /* class Magicard {
@@ -100,6 +99,7 @@ class Category {
 
 class Magicard {
   final String id;
+  final String subtopic;
   final String number;
   final String title;
   final String titleRus;
@@ -112,8 +112,9 @@ class Magicard {
   Magicard.fromMap(String cardId, Map<String, dynamic> map, {this.reference})
       : assert(map['title'] != null),
         id = cardId,
-        title = map['title'],
+        subtopic = map['subtopic'],
         number = map['number'],
+        title = map['title'],
         titleRus = map['titleRus'] ?? '',
         transcriptionBr = map['transcription_br'] ?? '',
         level = map['level'] ?? 'A1 - A2',
@@ -121,7 +122,7 @@ class Magicard {
         sound = map['sound'] ?? Map<String, String>();
 
   Magicard.fromSnapshot(String cardId, DocumentSnapshot snapshot)
-      : this.fromMap(cardId, snapshot.data, reference: snapshot.reference);
+      : this.fromMap(cardId, snapshot.data(), reference: snapshot.reference);
 
   @override
   String toString() => "<$title> <$number>";
@@ -129,6 +130,7 @@ class Magicard {
 
 class TrainingFlashcardsState with ChangeNotifier {
   double _progress = 0;
+  int _currentCardNumber = 1;
 
   final PageController controller = PageController(
     viewportFraction: 1.0, // Was 0.9.
@@ -136,9 +138,15 @@ class TrainingFlashcardsState with ChangeNotifier {
   );
 
   get progress => _progress;
+  get currentCardNumber => _currentCardNumber;
 
   set progress(double newValue) {
     _progress = newValue;
+    notifyListeners();
+  }
+
+  set currentCardNumber(int newValue) {
+    _currentCardNumber = newValue;
     notifyListeners();
   }
 

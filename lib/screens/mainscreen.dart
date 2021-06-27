@@ -15,12 +15,12 @@ class _MainScreenState extends State<MainScreen> {
   List<Category> categories = [];
   List<Topic> popularTopics = [];
   List<Topic> threePopularTopics = [];
-  FirebaseUser user;
+  User user;
   Map<String, String> userAllTopicsProgress = Map<String, String>();
 
   @override
   Widget build(BuildContext context) {
-    user = Provider.of<FirebaseUser>(context);
+    user = Provider.of<User>(context);
 
     return Scaffold(
       extendBody: true, // For making BottomNavigationBar transparent.
@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream:
-          Firestore.instance.collection('topics').orderBy('order').snapshots(),
+          FirebaseFirestore.instance.collection('topics').orderBy('number').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LinearProgressIndicator();
@@ -46,9 +46,9 @@ class _MainScreenState extends State<MainScreen> {
           popularTopics.clear();
           threePopularTopics.clear();
 
-          for (var i = 0; i < snapshot.data.documents.length; i++) {
+          for (var i = 0; i < snapshot.data.docs.length; i++) {
             // Filling List<Category> categories.
-            DocumentSnapshot categorySnapshot = snapshot.data.documents[i];
+            DocumentSnapshot categorySnapshot = snapshot.data.docs[i];
             Category category = Category.fromSnapshot(categorySnapshot);
             categories.add(category);
 

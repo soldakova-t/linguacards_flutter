@@ -38,26 +38,31 @@ class CategoriesList extends StatelessWidget {
             }),
       );
     } else {
-      return Padding(
-        padding: EdgeInsets.all(convertWidthFrom360(context, 16)),
-        child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: MediaQuery.of(context).size.width /
-                  (MediaQuery.of(context).size.height / 1.5), // Sets category height
-            ),
-            itemCount: categories.length,
-            itemBuilder: (BuildContext context, int index) {
-              double rightPadding = 0;
-              if (index.isEven) rightPadding = convertWidthFrom360(context, 16);
-              return Padding(
-                padding: EdgeInsets.only(
-                    right: rightPadding,
-                    bottom: convertHeightFrom360(context, 360, 16)),
-                child: _buildCategoriesListItem(
-                    context, categories[index], index),
-              );
-            }),
+      double categoryHeight = MediaQuery.of(context).size.width /
+          (MediaQuery.of(context).size.height / 1.5);
+
+      return Container(
+        child: Padding(
+          padding: EdgeInsets.all(convertWidthFrom360(context, 16)),
+          child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: categoryHeight,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (BuildContext context, int index) {
+                double rightPadding = 0;
+                if (index.isEven)
+                  rightPadding = convertWidthFrom360(context, 16);
+                return Padding(
+                  padding: EdgeInsets.only(
+                      right: rightPadding,
+                      bottom: convertHeightFrom360(context, 360, 16)),
+                  child: _buildCategoriesListItem(
+                      context, categories[index], index),
+                );
+              }),
+        ),
       );
     }
   }
@@ -66,7 +71,8 @@ class CategoriesList extends StatelessWidget {
       BuildContext context, Category category, int index) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(createRouteScreen("/topics", topics: category.subtopics, title: category.title));
+        Navigator.of(context).push(createRouteScreen("/topics",
+            topics: category.subtopics, title: category.title));
       },
       child: Stack(
         children: [
@@ -102,13 +108,14 @@ class CategoriesList extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: convertWidthFrom360(context, 16),
-            bottom: 0,
+            right: convertWidthFrom360(context, category.photoRightPadding),
+            bottom: convertWidthFrom360(context, category.photoBottomPadding),
             child: Container(
-              width: convertWidthFrom360(context, 76),
-              height: convertHeightFrom360(context, 76, 104),
+              height: convertHeightFrom360(context, 76, category.photoHeight),
               alignment: Alignment.bottomRight,
-              child: Image.network(category.imgPrev),
+              child: Image.network("http://magicards.ru/categories_photo/" +
+                  category.number.toString() +
+                  ".png"),
             ),
           ),
         ],

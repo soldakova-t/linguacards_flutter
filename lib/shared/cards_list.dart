@@ -23,7 +23,7 @@ class CardsList extends StatefulWidget {
 class _CardsListState extends State<CardsList> {
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     return Padding(
       padding:
@@ -41,6 +41,21 @@ class _CardsListState extends State<CardsList> {
   }
 
   Widget _buildCardsListItem(BuildContext context, int index, bool learned) {
+    int smallPhotoWidth = 352;
+    final mediaQuery = MediaQuery.of(context);
+
+    if (mediaQuery.devicePixelRatio <= 2) {
+      smallPhotoWidth = 176;
+    }
+
+    if (mediaQuery.devicePixelRatio > 2) {
+      smallPhotoWidth = 264;
+    }
+
+    if (mediaQuery.devicePixelRatio > 3) {
+      smallPhotoWidth = 352;
+    }
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(createRouteScreen("/"));
@@ -65,7 +80,14 @@ class _CardsListState extends State<CardsList> {
                       ),
                       image: DecorationImage(
                         fit: BoxFit.fitHeight,
-                        image: NetworkImage("http://magicards.ru/photo/2020/10/352/" + widget.cards[index].number.toString() + ".jpg"),
+                        image: NetworkImage(
+                            "http://magicards.ru/cards_photos/" +
+                                    widget.cards[index].subtopic.toString() +
+                                    "/" +
+                                    smallPhotoWidth.toString() +
+                                    "/" +
+                                    widget.cards[index].number.toString() +
+                                    ".jpg"),
                       ),
                       color: Colors.white,
                     ),

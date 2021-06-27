@@ -37,7 +37,12 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
   @override
   void initState() {
     //if (widget.userInfo != null) _engVersion = widget.userInfo["eng_version"];
-    Globals.playPronounciation(widget.listOfCards[0].sound[_engVersion] ?? "");
+    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
+            widget.listOfCards[0].subtopic.toString() +
+            "/" +
+            widget.listOfCards[0].number.toString() +
+            ".mp3" ??
+        "");
     super.initState();
   }
 
@@ -57,11 +62,26 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
                 Positioned(
                   left: 0,
                   top: 24,
-                  width: 84,
                   child: Consumer<TrainingFlashcardsState>(
-                    builder: (context, state, child) => AnimatedProgress(
-                      value: state.progress,
-                      height: 5.0,
+                    builder: (context, state, child) => Row(
+                      children: [
+                        Container(
+                          width: 84.0,
+                          child: AnimatedProgress(
+                            value: state.progress,
+                            height: 5.0,
+                          ),
+                        ),
+                        SizedBox(width: convertWidthFrom360(context, 18)),
+                        Container(
+                          child: Text(
+                            state.currentCardNumber.toString() +
+                                " из " +
+                                widget.listOfCards.length.toString(),
+                            style: myProgress,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -72,6 +92,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
                       var state = Provider.of<TrainingFlashcardsState>(context,
                           listen: false);
                       state.progress = (1 / widget.listOfCards.length);
+                      state.currentCardNumber = 1;
                       Navigator.of(context).pop();
                     },
                     child: Padding(
@@ -104,8 +125,12 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
       controller:
           state.controller, // Here we can change left and right paddings.
       onPageChanged: (int idx) {
-        Globals.playPronounciation(
-            widget.listOfCards[idx].sound[_engVersion] ?? "");
+        Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
+                widget.listOfCards[idx].subtopic.toString() +
+                "/" +
+                widget.listOfCards[idx].number.toString() +
+                ".mp3" ??
+            "");
       },
       itemBuilder: (BuildContext context, int itemIndex) {
         if (trainingVariant == 0) {
@@ -166,7 +191,26 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
     var trainingState =
         Provider.of<TrainingFlashcardsState>(context, listen: false);
 
-    String pathPhoto = "http://magicards.ru/photo/2020/10/1640/" +
+    int bigPhotoWidth = 1640;
+    final mediaQuery = MediaQuery.of(context);
+
+    if (mediaQuery.devicePixelRatio <= 2) {
+      bigPhotoWidth = 820;
+    }
+
+    if (mediaQuery.devicePixelRatio > 2) {
+      bigPhotoWidth = 1230;
+    }
+
+    if (mediaQuery.devicePixelRatio > 3) {
+      bigPhotoWidth = 1640;
+    }
+
+    String pathPhoto = "http://magicards.ru/cards_photos/" +
+        widget.listOfCards[widget.itemIndex].subtopic.toString() +
+        "/" +
+        bigPhotoWidth.toString() +
+        "/" +
         widget.listOfCards[widget.itemIndex].number.toString() +
         ".jpg";
 
@@ -178,10 +222,12 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
             (widget.itemIndex + 1) < widget.listOfCards.length) {
           trainingState.progress =
               (widget.itemIndex + 2) / widget.listOfCards.length;
+          trainingState.currentCardNumber = widget.itemIndex + 2;
           trainingState.nextPage();
         }
         if (details.delta.dx > 0 && widget.itemIndex > 0) {
           trainingState.progress = widget.itemIndex / widget.listOfCards.length;
+          trainingState.currentCardNumber = widget.itemIndex;
           trainingState.prevPage();
         }
       },
@@ -206,9 +252,13 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                 SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
-                    Globals.playPronounciation(widget
-                            .listOfCards[widget.itemIndex]
-                            .sound[widget.engVersion] ??
+                    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
+                            widget.listOfCards[widget.itemIndex].subtopic
+                                .toString() +
+                            "/" +
+                            widget.listOfCards[widget.itemIndex].number
+                                .toString() +
+                            ".mp3" ??
                         "");
                   },
                   child: Row(
@@ -218,7 +268,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                             widget
                                 .listOfCards[widget.itemIndex].transcriptionBr +
                             ']',
-                        style: myTranscriptionCard,
+                        style: myTranscription,
                       ),
                       SizedBox(width: 10),
                       ClipOval(
@@ -261,7 +311,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                           SizedBox(height: 5),
                           Text(
                             widget.listOfCards[widget.itemIndex].titleRus,
-                            style: myLabelTextStyleCard,
+                            style: myTitleRus,
                           ),
                         ],
                       ),
@@ -325,6 +375,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
             var state = Provider.of<TrainingFlashcardsState>(widget.context,
                 listen: false);
             state.progress = (widget.itemIndex + 2) / widget.listOfCards.length;
+            state.currentCardNumber = widget.itemIndex + 2;
             state.nextPage();
           }),
     );
@@ -384,8 +435,7 @@ class _ButtonLearnedState extends State<ButtonLearned> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user =
-        Provider.of<FirebaseUser>(widget.context, listen: false);
+    User user = Provider.of<User>(widget.context, listen: false);
 
     return Container(
       height: convertHeightFrom360(context, 360, 46),

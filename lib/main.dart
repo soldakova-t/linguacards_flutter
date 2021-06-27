@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -8,7 +9,11 @@ import 'screens/screens.dart';
 import 'package:provider/provider.dart';
 import 'shared/shared.dart';
 
-void main() {
+Future<void> main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(MyApp());
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: MyColors.mainBgColor,
@@ -21,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        StreamProvider<FirebaseUser>.value(value: AuthServiceFirebase().user),
+        StreamProvider<User>.value(value: AuthServiceFirebase().user),
         ChangeNotifierProvider<TrainingFlashcardsState>(
           create: (_) => TrainingFlashcardsState(),
         ),

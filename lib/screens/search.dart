@@ -39,11 +39,11 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: (name != "" && name != null)
-                  ? Firestore.instance
+                  ? FirebaseFirestore.instance
                       .collection("cards")
                       .where("nameSearch", arrayContains: name)
                       .snapshots()
-                  : Firestore.instance.collection("cards").snapshots(),
+                  : FirebaseFirestore.instance.collection("cards").snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) return Text('Error: ${snapshot.error}');
@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   default:
                     return ListView(
                       children:
-                          snapshot.data.documents.map((DocumentSnapshot card) {
+                          snapshot.data.docs.map((DocumentSnapshot card) {
                         return ListTile(
                           title: Row(
                             children: <Widget>[

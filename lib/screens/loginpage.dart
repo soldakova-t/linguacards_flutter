@@ -423,7 +423,7 @@ class _LoginPageState extends State<LoginPage> {
     };
 
     final PhoneVerificationFailed verificationfailed =
-        (AuthException authException) {
+        (FirebaseAuthException authException) {
       setState(() {
         incorrectPhoneFireBase = true;
       });

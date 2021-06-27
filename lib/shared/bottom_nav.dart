@@ -12,7 +12,7 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 60,
       width: MediaQuery.of(context).size.width,
       child: Align(
         alignment: FractionalOffset.bottomCenter,

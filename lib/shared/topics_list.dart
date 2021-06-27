@@ -29,7 +29,7 @@ class _TopicsListState extends State<TopicsList> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     return Padding(
       padding:
@@ -128,15 +128,24 @@ class _TopicsListState extends State<TopicsList> {
                   : Container(),*/
               Positioned(
                 left: convertWidthFrom360(context, 16),
-                top: convertHeightFrom360(context, 360, 20),
-                right: convertWidthFrom360(context, 16),
+                top: convertHeightFrom360(context, 360, 18),
+                right: convertWidthFrom360(context, 76),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(widget.topics[index].title, style: myTitleStyle),
                     SizedBox(height: convertHeightFrom360(context, 360, 5)),
                     Text(widget.topics[index].titleRus, style: mySubtitleStyle),
-                    SizedBox(height: convertHeightFrom360(context, 360, 17)),
+                    SizedBox(height: convertHeightFrom360(context, 360, 14)),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: convertWidthFrom360(context, 16),
+                bottom: convertHeightFrom360(context, 360, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
                     Text((progress * 100).toInt().toString() + "% изучено",
                         style: myPercentStyle),
                     SizedBox(height: convertWidthFrom360(context, 5)),
@@ -151,21 +160,23 @@ class _TopicsListState extends State<TopicsList> {
                 ),
               ),
               Positioned(
-                right: convertWidthFrom360(context, -8),
+                right: convertWidthFrom360(context, -4),
                 top: convertHeightFrom360(context, 360, 38),
-                child: widget.topics[index].imgPrev != ""
-                    ? Container(
+                child: Container(
                         width: convertWidthFrom360(context, 66),
                         height: convertHeightFrom360(context, 360, 66),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
                             fit: BoxFit.fitHeight,
-                            image: NetworkImage(widget.topics[index].imgPrev),
+                            image: NetworkImage("http://magicards.ru/topics_photos/" +
+                                    widget.topics[index].categoryNumber +
+                                    "/" +
+                                    widget.topics[index].number +
+                                    ".jpg"),
                           ),
                         ),
-                      )
-                    : Container(),
+                      ),
               ),
             ],
           ),

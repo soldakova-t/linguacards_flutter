@@ -22,7 +22,7 @@ class _ChooseVariantState extends State<ChooseVariant> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     if (user != null) {
       return StreamBuilder(

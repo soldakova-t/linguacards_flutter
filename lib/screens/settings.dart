@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     if (user != null) {
       return Scaffold(
@@ -59,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget buildUserMenu(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    User user = Provider.of<User>(context);
 
     return StreamBuilder(
         stream: DB.getUserInfoStream(user.uid),
@@ -163,7 +163,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildPhoneHeader(FirebaseUser user) => Padding(
+  Widget buildPhoneHeader(User user) => Padding(
         padding: const EdgeInsets.only(
             top: 49.0, right: 27, bottom: 34.0, left: 27.0),
         child: Container(
@@ -177,21 +177,21 @@ class SettingsScreen extends StatelessWidget {
         ),
       );
 
-  Widget buildSocialNetworkUserHeader(FirebaseUser user) {
+  Widget buildSocialNetworkUserHeader(User user) {
     return Padding(
       padding:
           const EdgeInsets.only(top: 34.0, right: 27, bottom: 44.0, left: 27.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          if (user.photoUrl != null)
+          if (user.photoURL != null)
             Container(
               width: 42,
               height: 42,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: NetworkImage(user.photoUrl),
+                  image: NetworkImage(user.photoURL),
                 ),
               ),
             ),

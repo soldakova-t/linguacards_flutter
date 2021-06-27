@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class DB {
   static Future<bool> userExists(String userId) async {
     try {
-      var collectionRef = Firestore.instance.collection('users');
-      var doc = await collectionRef.document(userId).get();
+      var collectionRef = FirebaseFirestore.instance.collection('users');
+      var doc = await collectionRef.doc(userId).get();
       return doc.exists;
     } catch (e) {
       throw e;
@@ -13,7 +13,7 @@ class DB {
   }
 
   static void addNewUser(String userId) async {
-    await Firestore.instance.collection("users").document(userId).setData({
+    await FirebaseFirestore.instance.collection("users").doc(userId).set({
       "premium": false,
       "eng_version": "br",
     });
@@ -42,9 +42,9 @@ class DB {
   static Future<List<String>> getEarlyLearnedCardsIDs(String userId, String subtopicId) async {
     try {
       List<String> learnedCards = [];
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection('users/' + userId + '/learnedCards')
-          .document(subtopicId)
+          .doc(subtopicId)
           .get()
           .then((data) {
         if (data.exists) {
@@ -66,10 +66,10 @@ class DB {
 
   static void updateArrayOfLearnedCards(
       {String userId, String subtopicId, List<String> learnedCardsIDs}) async {
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("users/" + userId + "/learnedCards")
-        .document(subtopicId)
-        .setData({
+        .doc(subtopicId)
+        .set({
       "learned_cards": learnedCardsIDs,
     });
   }
@@ -77,13 +77,13 @@ class DB {
   static Future<Map<String, dynamic>> getUserInfo(String userId) async {
     try {
       Map<String, dynamic> userInfo = Map<String, dynamic>();
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
-          .document(userId)
+          .doc(userId)
           .get()
           .then((data) {
         if (data.exists) {
-          userInfo = data.data;
+          userInfo = data.data();
         }
       }).catchError((e) => print("error fetching data: $e"));
 
@@ -99,18 +99,18 @@ class DB {
     }
   }
 
-  static Future<String> getUserEnglishVariant(FirebaseUser user) async {
+  static Future<String> getUserEnglishVariant(User user) async {
     try {
       if (user == null) return "br";
 
       Map<String, dynamic> userInfo = Map<String, dynamic>();
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
-          .document(user.uid)
+          .doc(user.uid)
           .get()
           .then((data) {
         if (data.exists) {
-          userInfo = data.data;
+          userInfo = data.data();
         }
       }).catchError((e) => print("error fetching data: $e"));
 
@@ -126,19 +126,19 @@ class DB {
     Map<String, dynamic> getUserInfo;
     getUserInfo = await DB.getUserInfo(userId);
     getUserInfo["subtopics_progress"] = subtopicsProgress;
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("users")
-        .document(userId)
-        .updateData(getUserInfo);
+        .doc(userId)
+        .update(getUserInfo);
   }
 
   static void updateEnglishVariant(String userId, String englishVariant) async {
     Map<String, dynamic> getUserInfo;
     getUserInfo = await DB.getUserInfo(userId);
     getUserInfo["eng_version"] = englishVariant;
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("users")
-        .document(userId)
-        .updateData(getUserInfo);
+        .doc(userId)
+        .update(getUserInfo);
   }
 }
