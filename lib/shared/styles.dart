@@ -128,9 +128,9 @@ final ButtonStyle mySecondaryButtonStyle = ButtonStyle(
   ),
   backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
     if (states.contains(MaterialState.disabled)) {
-      return hexToColor("#A3DEFF"); // Disabled color
+      return hexToColor("#ECEBEB"); // Disabled color
     }
-    return hexToColor("#F3F3F3"); // Regular color
+    return hexToColor("#ECEBEB"); // Regular color
   }),
 );
 
@@ -212,7 +212,7 @@ const myTranscription = TextStyle(
 
 const myTitleRus = TextStyle(
   fontSize: 15,
-  color: MyColors.additionalTextGreyColor,
+  color: MyColors.subtitleColor,
 );
 
 const myExampleCard = TextStyle(

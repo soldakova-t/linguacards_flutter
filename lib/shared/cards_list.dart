@@ -58,8 +58,28 @@ class _CardsListState extends State<CardsList> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(createRouteScreen("/"));
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40)),
+              elevation: 16,
+              child: Container(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: <Widget>[
+                    SizedBox(height: 20),
+                    CardDetails(card: widget.cards[index]),
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
       },
+      behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: double.infinity,
         height: convertHeightFrom360(context, 360, 59),
@@ -82,12 +102,12 @@ class _CardsListState extends State<CardsList> {
                         fit: BoxFit.fitHeight,
                         image: NetworkImage(
                             "http://magicards.ru/cards_photos/" +
-                                    widget.cards[index].subtopic.toString() +
-                                    "/" +
-                                    smallPhotoWidth.toString() +
-                                    "/" +
-                                    widget.cards[index].number.toString() +
-                                    ".jpg"),
+                                widget.cards[index].subtopic.toString() +
+                                "/" +
+                                smallPhotoWidth.toString() +
+                                "/" +
+                                widget.cards[index].number.toString() +
+                                ".jpg"),
                       ),
                       color: Colors.white,
                     ),
@@ -106,6 +126,7 @@ class _CardsListState extends State<CardsList> {
                       SizedBox(height: convertHeightFrom360(context, 360, 3)),
                       Text(widget.cards[index].titleRus,
                           style: mySubtitleStyle),
+                      SizedBox(height: convertHeightFrom360(context, 360, 6)),
                     ],
                   ),
                 ),
@@ -125,6 +146,35 @@ class _CardsListState extends State<CardsList> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class CardDetails extends StatelessWidget {
+  const CardDetails({Key key, this.card}) : super(key: key);
+  final Magicard card;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(36.0),
+      child: Material(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.green[100],
+        child: SizedBox(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(card.title),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -107,6 +107,11 @@ class Magicard {
   final String photo;
   final String level;
   final Map<String, dynamic> sound;
+  final String partOfSpeech;
+  final String syn1;
+  final String syn2;
+  final String example1;
+  final String example2;
   final DocumentReference reference;
 
   Magicard.fromMap(String cardId, Map<String, dynamic> map, {this.reference})
@@ -119,7 +124,12 @@ class Magicard {
         transcriptionBr = map['transcription_br'] ?? '',
         level = map['level'] ?? 'A1 - A2',
         photo = map['photo'] ?? '',
-        sound = map['sound'] ?? Map<String, String>();
+        sound = map['sound'] ?? Map<String, String>(),
+        partOfSpeech = map['partOfSpeech'] ?? 'noun',
+        syn1 = map['syn1'] ?? '',
+        syn2 = map['syn2'] ?? '',
+        example1 = map['example1'] ?? '',
+        example2 = map['example2'] ?? '';
 
   Magicard.fromSnapshot(String cardId, DocumentSnapshot snapshot)
       : this.fromMap(cardId, snapshot.data(), reference: snapshot.reference);
@@ -149,6 +159,7 @@ class TrainingFlashcardsState with ChangeNotifier {
     _currentCardNumber = newValue;
     notifyListeners();
   }
+
 
   void nextPage() async {
     await controller.nextPage(

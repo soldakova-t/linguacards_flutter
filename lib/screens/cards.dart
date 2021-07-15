@@ -21,8 +21,10 @@ class CardsScreen extends StatefulWidget {
 class _CardsScreenState extends State<CardsScreen> {
   List<String> listLearnedCardsIDs;
   List<Magicard> listOfAllCards = [];
-  List<Magicard> notLearnedCards = [];
-  List<Magicard> learnedCards = [];
+  List<Magicard> notLearnedCardsLevel1 = [];
+  List<Magicard> notLearnedCardsLevel2 = [];
+  List<Magicard> learnedCardsLevel1 = [];
+  List<Magicard> learnedCardsLevel2 = [];
 
 /*@override
   Widget build(BuildContext context) {
@@ -98,7 +100,6 @@ class _CardsScreenState extends State<CardsScreen> {
                           .collection('cards')
                           .where('subtopic', isEqualTo: widget.topic.id)
                           .where('version_br', isEqualTo: true)
-                          .orderBy('number')
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
@@ -139,7 +140,8 @@ class _CardsScreenState extends State<CardsScreen> {
                                         SizedBox(
                                             height: convertHeightFrom360(
                                                 context, 360, 8)),
-                                        CardsList(cards: notLearnedCards),
+                                        CardsList(cards: notLearnedCardsLevel1),
+                                        CardsList(cards: notLearnedCardsLevel2),
                                         SizedBox(
                                             height: convertHeightFrom360(
                                                 context, 360, 66)),
@@ -182,9 +184,13 @@ class _CardsScreenState extends State<CardsScreen> {
           ),
         ),
         SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: CardsList(cards: learnedCards, learned: true),
+          child: Column(
+            children: [
+              SizedBox(height: convertHeightFrom360(context, 360, 8)),
+              CardsList(cards: learnedCardsLevel1, learned: true),
+              CardsList(cards: learnedCardsLevel2, learned: true),
+              SizedBox(height: convertHeightFrom360(context, 360, 66)),
+            ],
           ),
         ),
       ],
@@ -196,20 +202,27 @@ class _CardsScreenState extends State<CardsScreen> {
 
     for (var i = 0; i < documents.length; i++) {
       DocumentSnapshot cardSnapshot = documents[i];
-      Magicard card =
-          Magicard.fromSnapshot(cardSnapshot.id, cardSnapshot);
+      Magicard card = Magicard.fromSnapshot(cardSnapshot.id, cardSnapshot);
       listOfAllCards.add(card);
     }
   }
 
   fillLearnedAndNotLearnedCards() {
-    learnedCards.clear();
-    notLearnedCards.clear();
+    learnedCardsLevel1.clear();
+    learnedCardsLevel2.clear();
+    notLearnedCardsLevel1.clear();
+    notLearnedCardsLevel2.clear();
 
     listOfAllCards.forEach((card) {
-      listLearnedCardsIDs.contains(card.id)
-          ? learnedCards.add(card)
-          : notLearnedCards.add(card);
+      if (listLearnedCardsIDs.contains(card.id)) {
+        card.level == "A1 - A2"
+            ? learnedCardsLevel1.add(card)
+            : learnedCardsLevel2.add(card);
+      } else {
+        card.level == "A1 - A2"
+            ? notLearnedCardsLevel1.add(card)
+            : notLearnedCardsLevel2.add(card);
+      }
     });
   }
 
@@ -223,14 +236,16 @@ class _CardsScreenState extends State<CardsScreen> {
             : () {
                 var state = Provider.of<TrainingFlashcardsState>(context,
                     listen: false);
-                state.progress = (1 / notLearnedCards.length);
+                state.progress = (1 /
+                    (notLearnedCardsLevel1 + notLearnedCardsLevel2).length);
 
                 Navigator.of(context)
                     .push(
                       MaterialPageRoute(
                         builder: (BuildContext context) => TrainingFlashcards(
                             trainingVariant: 0,
-                            listOfCards: notLearnedCards,
+                            listOfCards:
+                                notLearnedCardsLevel1 + notLearnedCardsLevel2,
                             listLearnedCardsIDs: listLearnedCardsIDs,
                             topicId: widget.topic.id,
                             mapSubtopicsProgress: widget.mapSubtopicsProgress,

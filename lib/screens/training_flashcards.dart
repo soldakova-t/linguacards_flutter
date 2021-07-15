@@ -40,7 +40,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
     Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
             widget.listOfCards[0].subtopic.toString() +
             "/" +
-            widget.listOfCards[0].number.toString() +
+            widget.listOfCards[0].title +
             ".mp3" ??
         "");
     super.initState();
@@ -128,7 +128,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
         Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
                 widget.listOfCards[idx].subtopic.toString() +
                 "/" +
-                widget.listOfCards[idx].number.toString() +
+                widget.listOfCards[idx].title +
                 ".mp3" ??
             "");
       },
@@ -250,16 +250,21 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                   style: myH1Card,
                 ),
                 SizedBox(height: 10),
+                Text(
+                  widget.listOfCards[widget.itemIndex].partOfSpeech,
+                  style: myTranscription,
+                ),
+                SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
-                    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
-                            widget.listOfCards[widget.itemIndex].subtopic
-                                .toString() +
-                            "/" +
-                            widget.listOfCards[widget.itemIndex].number
-                                .toString() +
-                            ".mp3" ??
-                        "");
+                    Globals.playPronounciation(
+                        "http://magicards.ru/cards_sounds/" +
+                                widget.listOfCards[widget.itemIndex].subtopic
+                                    .toString() +
+                                "/" +
+                                widget.listOfCards[widget.itemIndex].title +
+                                ".mp3" ??
+                            "");
                   },
                   child: Row(
                     children: <Widget>[
@@ -285,6 +290,29 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                     ],
                   ),
                 ),
+                SizedBox(height: 10),
+                if (_showMeaningAndActions == true &&
+                    (widget.listOfCards[widget.itemIndex].syn1 != '' ||
+                        widget.listOfCards[widget.itemIndex].syn2 != ''))
+                  RichText(
+                    text: TextSpan(
+                      text: "also ",
+                      style: myTranscription,
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: widget.listOfCards[widget.itemIndex].syn1,
+                            style: TextStyle(color: Colors.black)),
+                        if (widget.listOfCards[widget.itemIndex].syn1 != '' &&
+                            widget.listOfCards[widget.itemIndex].syn2 != '')
+                          TextSpan(
+                              text: ", ",
+                              style: TextStyle(color: Colors.black)),
+                        TextSpan(
+                            text: widget.listOfCards[widget.itemIndex].syn2,
+                            style: TextStyle(color: Colors.black)),
+                      ],
+                    ),
+                  ),
                 SizedBox(height: 40),
                 if (_showMeaningAndActions == true)
                   Expanded(
