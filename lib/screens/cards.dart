@@ -84,116 +84,159 @@ class _CardsScreenState extends State<CardsScreen> {
 
   Widget _buildBody(BuildContext context) {
     User user = Provider.of<User>(context);
-    // String userEnglishVersion = "br";
 
-    return TabBarView(
-      children: [
-        Container(
-          height: double.infinity,
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('cards')
-                          .where('subtopic', isEqualTo: widget.topic.id)
-                          .where('version_br', isEqualTo: true)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Container();
-                        } else {
-                          var documents = snapshot.data.docs;
-                          if (documents.length == 0)
-                            return Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Center(
-                                child: Text("В этой категории нет слов"),
-                              ),
-                            );
-                          fillListOfAllCards(documents);
-                          if (user != null) {
-                            return FutureBuilder<List<String>>(
-                              future: DB.getEarlyLearnedCardsIDs(
-                                  user.uid, widget.topic.id),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  /*return Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 24.0),
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        child: CircularProgressIndicator(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('cards')
+          .where('subtopic', isEqualTo: widget.topic.id)
+          .where('version_br', isEqualTo: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        } else {
+          var documents = snapshot.data.docs;
+          if (documents.length == 0)
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: Text("В этой категории нет слов"),
+              ),
+            );
+          fillListOfAllCards(documents);
+
+          if (user != null) {
+            return Consumer<TrainingFlashcardsState>(
+              builder: (context, state, child) {
+                return FutureBuilder<List<String>>(
+                  future: DB.getEarlyLearnedCardsIDs(user.uid, widget.topic.id),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      /*return Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 24.0),
+                                            child: Container(
+                                              width: 50,
+                                              height: 50,
+                                              child: CircularProgressIndicator(),
+                                            ),
+                                          ),
+                                        );*/
+                      return Container();
+                    } else {
+                      listLearnedCardsIDs = snapshot.data;
+                      fillLearnedAndNotLearnedCards();
+
+                      return TabBarView(
+                        children: [
+                          // TAB 1: Not learned cards
+                          Container(
+                            height: double.infinity,
+                            child: Stack(
+                              children: [
+                                SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                                height: convertHeightFrom360(
+                                                    context, 360, 8)),
+                                            CardsList(
+                                                cards: notLearnedCardsLevel1,
+                                                listLearnedCardsIDs:
+                                                    listLearnedCardsIDs,
+                                                topicId: widget.topic.id,
+                                                mapSubtopicsProgress:
+                                                    widget.mapSubtopicsProgress,
+                                                numberOfCardsInSubtopic:
+                                                    listOfAllCards.length),
+                                            CardsList(
+                                                cards: notLearnedCardsLevel2,
+                                                listLearnedCardsIDs:
+                                                    listLearnedCardsIDs,
+                                                topicId: widget.topic.id,
+                                                mapSubtopicsProgress:
+                                                    widget.mapSubtopicsProgress,
+                                                numberOfCardsInSubtopic:
+                                                    listOfAllCards.length),
+                                            SizedBox(
+                                                height: convertHeightFrom360(
+                                                    context, 360, 66)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );*/
-                                  return Container();
-                                } else {
-                                  listLearnedCardsIDs = snapshot.data;
-                                  fillLearnedAndNotLearnedCards();
-                                  return SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                            height: convertHeightFrom360(
-                                                context, 360, 8)),
-                                        CardsList(cards: notLearnedCardsLevel1),
-                                        CardsList(cards: notLearnedCardsLevel2),
-                                        SizedBox(
-                                            height: convertHeightFrom360(
-                                                context, 360, 66)),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                            );
-                          } else {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: CardsList(cards: listOfAllCards),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                    SizedBox(height: convertHeightFrom360(context, 360, 80)),
-                  ],
-                ),
-              ),
-              Positioned(
-                height: convertHeightFrom360(context, 360, 50),
-                bottom: convertHeightFrom360(context, 360, 69),
-                left: convertWidthFrom360(context, 16),
-                right: convertWidthFrom360(context, 16),
-                child: _buildTrainingButton(),
-              ),
-              Positioned(
-                height: convertHeightFrom360(context, 360, 69),
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  color: MyColors.mainBgColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: convertHeightFrom360(context, 360, 8)),
-              CardsList(cards: learnedCardsLevel1, learned: true),
-              CardsList(cards: learnedCardsLevel2, learned: true),
-              SizedBox(height: convertHeightFrom360(context, 360, 66)),
-            ],
-          ),
-        ),
-      ],
+                                    ],
+                                  ),
+                                ),
+                                Positioned(
+                                  height:
+                                      convertHeightFrom360(context, 360, 50),
+                                  bottom:
+                                      convertHeightFrom360(context, 360, 69),
+                                  left: convertWidthFrom360(context, 16),
+                                  right: convertWidthFrom360(context, 16),
+                                  child: _buildTrainingButton(),
+                                ),
+                                Positioned(
+                                  height:
+                                      convertHeightFrom360(context, 360, 69),
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    color: MyColors.mainBgColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // TAB 2: Learned cards
+                          SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                    height:
+                                        convertHeightFrom360(context, 360, 8)),
+                                CardsList(
+                                    cards: learnedCardsLevel1,
+                                    listLearnedCardsIDs: listLearnedCardsIDs,
+                                    topicId: widget.topic.id,
+                                    mapSubtopicsProgress:
+                                        widget.mapSubtopicsProgress,
+                                    numberOfCardsInSubtopic:
+                                        listOfAllCards.length,
+                                    learned: true), // Can remove?..
+                                CardsList(
+                                    cards: learnedCardsLevel2,
+                                    listLearnedCardsIDs: listLearnedCardsIDs,
+                                    topicId: widget.topic.id,
+                                    mapSubtopicsProgress:
+                                        widget.mapSubtopicsProgress,
+                                    numberOfCardsInSubtopic:
+                                        listOfAllCards.length,
+                                    learned: true),
+                                SizedBox(
+                                    height:
+                                        convertHeightFrom360(context, 360, 66)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                );
+              },
+            );
+          } else {
+            return Container(
+              child: Text("Карточки для незалогиненного"),
+            );
+          }
+        }
+      },
     );
   }
 
@@ -227,32 +270,41 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildTrainingButton() {
-    return ElevatedButton(
-        style: myPrimaryButtonStyle,
-        child: Center(
-            child: Text("Тренироваться", style: myPrimaryButtonTextStyle)),
-        onPressed: widget.mapSubtopicsProgress[widget.topic.id] == "1.0"
-            ? null
-            : () {
-                var state = Provider.of<TrainingFlashcardsState>(context,
-                    listen: false);
-                state.progress = (1 /
-                    (notLearnedCardsLevel1 + notLearnedCardsLevel2).length);
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        Container(
+          width: double.infinity,
+          height: 40,
+          color: MyColors.mainBgColor,
+        ),
+        ElevatedButton(
+          style: myPrimaryButtonStyle,
+          child: Center(
+              child: Text("Тренироваться", style: myPrimaryButtonTextStyle)),
+          onPressed: widget.mapSubtopicsProgress[widget.topic.id] == "1.0"
+              ? null
+              : () {
+                  var state = Provider.of<TrainingFlashcardsState>(context,
+                      listen: false);
+                  state.progress = (1 /
+                      (notLearnedCardsLevel1 + notLearnedCardsLevel2).length);
 
-                Navigator.of(context)
-                    .push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => TrainingFlashcards(
-                            trainingVariant: 0,
-                            listOfCards:
-                                notLearnedCardsLevel1 + notLearnedCardsLevel2,
-                            listLearnedCardsIDs: listLearnedCardsIDs,
-                            topicId: widget.topic.id,
-                            mapSubtopicsProgress: widget.mapSubtopicsProgress,
-                            numberOfCardsInSubtopic: listOfAllCards.length),
-                      ),
-                    )
-                    .then((value) => setState(() {}));
-              });
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => TrainingFlashcards(
+                          trainingVariant: 0,
+                          listOfCards:
+                              notLearnedCardsLevel1 + notLearnedCardsLevel2,
+                          listLearnedCardsIDs: listLearnedCardsIDs,
+                          topicId: widget.topic.id,
+                          mapSubtopicsProgress: widget.mapSubtopicsProgress,
+                          numberOfCardsInSubtopic: listOfAllCards.length),
+                    ),
+                  );
+                },
+        ),
+      ],
+    );
   }
 }

@@ -426,7 +426,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
   }
 }
 
-class ButtonLearned extends StatefulWidget {
+/*class ButtonLearned extends StatefulWidget {
   const ButtonLearned({
     Key key,
     this.heroTag,
@@ -637,4 +637,4 @@ Route _createRouteToSignIn(String nextPage) {
       );
     },
   );
-}
+}*/

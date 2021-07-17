@@ -141,6 +141,7 @@ class Magicard {
 class TrainingFlashcardsState with ChangeNotifier {
   double _progress = 0;
   int _currentCardNumber = 1;
+  bool _needRefreshCardsList = true;
 
   final PageController controller = PageController(
     viewportFraction: 1.0, // Was 0.9.
@@ -149,6 +150,7 @@ class TrainingFlashcardsState with ChangeNotifier {
 
   get progress => _progress;
   get currentCardNumber => _currentCardNumber;
+  get needRefreshCardsList => _needRefreshCardsList;
 
   set progress(double newValue) {
     _progress = newValue;
@@ -160,6 +162,10 @@ class TrainingFlashcardsState with ChangeNotifier {
     notifyListeners();
   }
 
+  set needRefreshCardsList(bool newValue) {
+    _needRefreshCardsList = newValue;
+    notifyListeners();
+  }
 
   void nextPage() async {
     await controller.nextPage(
