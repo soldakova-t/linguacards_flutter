@@ -19,7 +19,7 @@ class CardsScreen extends StatefulWidget {
 }
 
 class _CardsScreenState extends State<CardsScreen> {
-  List<String> listLearnedCardsIDs;
+  List<String> listLearnedCardsIDs = [];
   List<Magicard> listOfAllCards = [];
   List<Magicard> notLearnedCardsLevel1 = [];
   List<Magicard> notLearnedCardsLevel2 = [];
@@ -108,8 +108,9 @@ class _CardsScreenState extends State<CardsScreen> {
           if (user != null) {
             return Consumer<TrainingFlashcardsState>(
               builder: (context, state, child) {
-                return FutureBuilder<List<String>>(
-                  future: DB.getEarlyLearnedCardsIDs(user.uid, widget.topic.id),
+                return StreamBuilder<List<String>>(
+                  stream: DB.getEarlyLearnedCardsIDsStream(
+                      user.uid, widget.topic.id),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       /*return Center(
@@ -125,9 +126,11 @@ class _CardsScreenState extends State<CardsScreen> {
                       return Container();
                     } else {
                       listLearnedCardsIDs = snapshot.data;
+                      print(listLearnedCardsIDs);
                       fillLearnedAndNotLearnedCards();
+                      return Container();
 
-                      return TabBarView(
+                      /*return TabBarView(
                         children: [
                           // TAB 1: Not learned cards
                           Container(
@@ -162,8 +165,9 @@ class _CardsScreenState extends State<CardsScreen> {
                                                 numberOfCardsInSubtopic:
                                                     listOfAllCards.length),
                                             SizedBox(
-                                                height: convertHeightFrom360(
-                                                    context, 360, 66)),
+                                              height: convertHeightFrom360(
+                                                  context, 360, 134),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -224,15 +228,68 @@ class _CardsScreenState extends State<CardsScreen> {
                             ),
                           ),
                         ],
-                      );
+                      );*/
                     }
                   },
                 );
               },
             );
           } else {
-            return Container(
-              child: Text("Карточки для незалогиненного"),
+            return TabBarView(
+              children: [
+                // TAB 1: Not learned cards
+                Container(
+                  height: double.infinity,
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                      height: convertHeightFrom360(
+                                          context, 360, 8)),
+                                  CardsList(cards: listOfAllCards),
+                                  SizedBox(
+                                    height:
+                                        convertHeightFrom360(context, 360, 134),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        height: convertHeightFrom360(context, 360, 69),
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          color: MyColors.mainBgColor,
+                        ),
+                      ),
+                      Positioned(
+                        height: convertHeightFrom360(context, 360, 50),
+                        bottom: convertHeightFrom360(context, 360, 69),
+                        left: convertWidthFrom360(context, 16),
+                        right: convertWidthFrom360(context, 16),
+                        child: _buildTrainingButton(),
+                      ),
+                    ],
+                  ),
+                ),
+                // TAB 2: Learned cards
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text(
+                    "Войдите в приложение, чтобы отмечать слова изученными",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             );
           }
         }
@@ -270,6 +327,8 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildTrainingButton() {
+    User user = Provider.of<User>(context);
+
     return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
@@ -278,24 +337,54 @@ class _CardsScreenState extends State<CardsScreen> {
           height: 40,
           color: MyColors.mainBgColor,
         ),
-        ElevatedButton(
-          style: myPrimaryButtonStyle,
-          child: Center(
-              child: Text("Тренироваться", style: myPrimaryButtonTextStyle)),
-          onPressed: widget.mapSubtopicsProgress[widget.topic.id] == "1.0"
-              ? null
-              : () {
+        user != null
+            ? ElevatedButton(
+                style: myPrimaryButtonStyle,
+                child: Center(
+                    child:
+                        Text("Тренироваться", style: myPrimaryButtonTextStyle)),
+                onPressed: widget.mapSubtopicsProgress[widget.topic.id] == "1.0"
+                    ? null
+                    : () {
+                        var state = Provider.of<TrainingFlashcardsState>(
+                            context,
+                            listen: false);
+                        state.progress = (1 /
+                            (notLearnedCardsLevel1 + notLearnedCardsLevel2)
+                                .length);
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                TrainingFlashcards(
+                                    trainingVariant: 0,
+                                    listOfCards: notLearnedCardsLevel1 +
+                                        notLearnedCardsLevel2,
+                                    listLearnedCardsIDs: listLearnedCardsIDs,
+                                    topicId: widget.topic.id,
+                                    mapSubtopicsProgress:
+                                        widget.mapSubtopicsProgress,
+                                    numberOfCardsInSubtopic:
+                                        listOfAllCards.length),
+                          ),
+                        );
+                      },
+              )
+            : ElevatedButton(
+                style: myPrimaryButtonStyle,
+                child: Center(
+                    child:
+                        Text("Тренироваться", style: myPrimaryButtonTextStyle)),
+                onPressed: () {
                   var state = Provider.of<TrainingFlashcardsState>(context,
                       listen: false);
-                  state.progress = (1 /
-                      (notLearnedCardsLevel1 + notLearnedCardsLevel2).length);
+                  state.progress = (1 / listOfAllCards.length);
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (BuildContext context) => TrainingFlashcards(
                           trainingVariant: 0,
-                          listOfCards:
-                              notLearnedCardsLevel1 + notLearnedCardsLevel2,
+                          listOfCards: listOfAllCards,
                           listLearnedCardsIDs: listLearnedCardsIDs,
                           topicId: widget.topic.id,
                           mapSubtopicsProgress: widget.mapSubtopicsProgress,
@@ -303,7 +392,7 @@ class _CardsScreenState extends State<CardsScreen> {
                     ),
                   );
                 },
-        ),
+              )
       ],
     );
   }

@@ -54,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
         bottomNavigationBar: AppBottomNav(selectedIndex: 2),
       );
     } else {
-      return LoginPage(prevPage: "bottomNav");
+      return LoginPage(prevPage: "cardDetails");
     }
   }
 

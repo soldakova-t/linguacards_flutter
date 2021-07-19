@@ -212,6 +212,8 @@ class _CardDetailsState extends State<CardDetails> {
         widget.card.number.toString() +
         ".jpg";
 
+    User user = Provider.of<User>(context);
+
     return Container(
       width: convertWidthFrom360(context, 312),
       child: Column(
@@ -319,7 +321,7 @@ class _CardDetailsState extends State<CardDetails> {
                   cardId: widget.card.id,
                   listLearnedCardsIDs: widget.listLearnedCardsIDs,
                   topicId: widget.topicId,
-                  learned: widget.listLearnedCardsIDs.contains(widget.card.id),
+                  learned: user != null ? widget.listLearnedCardsIDs.contains(widget.card.id) : false,
                   mapSubtopicsProgress: widget.mapSubtopicsProgress,
                   numberOfCardsInSubtopic: widget.numberOfCardsInSubtopic,
                 ),

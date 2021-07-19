@@ -53,33 +53,38 @@ class _ButtonLearnedState extends State<ButtonLearned> {
               child: Center(
                   child: Text("Отметить изученным",
                       style: mySecondaryButtonTextStyle)),
-              onPressed: () {
-                widget.listLearnedCardsIDs.add(widget.cardId);
+              onPressed: user != null
+                  ? () {
+                      widget.listLearnedCardsIDs.add(widget.cardId);
 
-                DB.updateArrayOfLearnedCards(
-                    userId: user.uid,
-                    subtopicId: widget.topicId,
-                    learnedCardsIDs: widget.listLearnedCardsIDs);
+                      DB.updateArrayOfLearnedCards(
+                          userId: user.uid,
+                          subtopicId: widget.topicId,
+                          learnedCardsIDs: widget.listLearnedCardsIDs);
 
-                double _newProgress = widget.listLearnedCardsIDs.length /
-                    widget.numberOfCardsInSubtopic;
-                widget.mapSubtopicsProgress.update(
-                    widget.topicId, (value) => (_newProgress).toString(),
-                    ifAbsent: () => (_newProgress).toString());
+                      double _newProgress = widget.listLearnedCardsIDs.length /
+                          widget.numberOfCardsInSubtopic;
+                      widget.mapSubtopicsProgress.update(
+                          widget.topicId, (value) => (_newProgress).toString(),
+                          ifAbsent: () => (_newProgress).toString());
 
-                DB.updateSubtopicsProgress(
-                  user.uid,
-                  widget.mapSubtopicsProgress,
-                );
+                      DB.updateSubtopicsProgress(
+                        user.uid,
+                        widget.mapSubtopicsProgress,
+                      );
 
-                setState(() {
-                  _learned = true;
-                });
+                      setState(() {
+                        _learned = true;
+                      });
 
-                var state = Provider.of<TrainingFlashcardsState>(context,
-                    listen: false);
-                state.needRefreshCardsList = true;
-              })
+                      var state = Provider.of<TrainingFlashcardsState>(context,
+                          listen: false);
+                      state.needRefreshCardsList = true;
+                    }
+                  : () {
+                      Navigator.pushNamed(context, '/settings');
+                    },
+            )
           : Container(
               height: 48,
               alignment: Alignment.center,

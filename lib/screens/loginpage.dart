@@ -152,10 +152,11 @@ class _LoginPageState extends State<LoginPage> {
               Navigator.of(context).pop();
               break;
             case "cardDetails":
+              print("prevPage cardDetails");
               Navigator.of(context).pop();
               break;
             default:
-              print("widget.nextPage default");
+              print("prevPage default");
             //Navigator.of(context).push(_createProfileRoute());
           }
         }

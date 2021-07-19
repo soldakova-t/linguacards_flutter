@@ -23,9 +23,9 @@ class DB {
       {String userId, String subtopicId}) async* {
     try {
       //List<String> learnedCards = List<String>();
-      yield await Firestore.instance
+      yield await FirebaseFirestore.instance
           .collection('users/' + userId + '/learnedCards')
-          .document(subtopicId)
+          .doc(subtopicId)
           .get()
           .then((data) {
         if (data.exists) {
@@ -56,9 +56,10 @@ class DB {
     } catch (e) {
       throw e;
     }
-  }  
-  
-  static Stream<List<String>> getEarlyLearnedCardsIDsStream(String userId, String subtopicId) async* {
+  }
+
+  static Stream<List<String>> getEarlyLearnedCardsIDsStream(
+      String userId, String subtopicId) async* {
     while (true) {
       yield await getEarlyLearnedCardsIDs(userId, subtopicId);
     }
@@ -91,8 +92,8 @@ class DB {
     } catch (e) {
       throw e;
     }
-  }  
-  
+  }
+
   static Stream<Map<String, dynamic>> getUserInfoStream(String userId) async* {
     while (true) {
       yield await getUserInfo(userId);
@@ -119,7 +120,6 @@ class DB {
       throw e;
     }
   }
-
 
   static void updateSubtopicsProgress(
       String userId, Map<String, String> subtopicsProgress) async {
