@@ -36,8 +36,10 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream:
-          FirebaseFirestore.instance.collection('topics').orderBy('number').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('topics')
+          .orderBy('number')
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LinearProgressIndicator();
@@ -56,7 +58,8 @@ class _MainScreenState extends State<MainScreen> {
             for (var i = 0; i < category.subtopics.length; i++) {
               if (category.subtopics[i].popular) {
                 popularTopics.add(category.subtopics[i]);
-                if (threePopularTopics.length < 3) threePopularTopics.add(category.subtopics[i]);
+                if (threePopularTopics.length < 3)
+                  threePopularTopics.add(category.subtopics[i]);
               }
             }
           }

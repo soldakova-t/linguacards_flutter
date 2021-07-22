@@ -138,32 +138,35 @@ class Magicard {
   String toString() => "<$title> <$number>";
 }
 
-class TrainingFlashcardsState with ChangeNotifier {
-  double _progress = 0;
+class LearningState {
+  Map<String, String> mapTopicsProgress;
+  Topic topic;
+  int numberOfCardsInSubtopic;
+  List<Magicard> cardsForTraining = [];
+  List<String> listLearnedCardsIDs = [];
+  Magicard card;
+
+}
+
+class TrainingState with ChangeNotifier {
+  double _trainingProgress = 0;
   int _currentCardNumber = 1;
-  bool _needRefreshCardsList = true;
 
   final PageController controller = PageController(
     viewportFraction: 1.0, // Was 0.9.
     initialPage: 0,
   );
 
-  get progress => _progress;
+  get trainingProgress => _trainingProgress;
   get currentCardNumber => _currentCardNumber;
-  get needRefreshCardsList => _needRefreshCardsList;
 
-  set progress(double newValue) {
-    _progress = newValue;
+  set trainingProgress(double newValue) {
+    _trainingProgress = newValue;
     notifyListeners();
   }
 
   set currentCardNumber(int newValue) {
     _currentCardNumber = newValue;
-    notifyListeners();
-  }
-
-  set needRefreshCardsList(bool newValue) {
-    _needRefreshCardsList = newValue;
     notifyListeners();
   }
 

@@ -50,7 +50,7 @@ double convertHeightFrom360(
 }
 
 Route createRouteScreen(String ref,
-    {List<Topic> topics, String title, Topic topic, Map<String, String> mapSubtopicsProgress}) {
+    {List<Topic> topics, String title}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) {
       if (ref == "/categories") {
@@ -68,8 +68,8 @@ Route createRouteScreen(String ref,
           title: title,
         );
       }
-      if (ref == "/cards" && topic != null) {
-        return CardsScreen(topic: topic, mapSubtopicsProgress: mapSubtopicsProgress);
+      if (ref == "/cards") {
+        return CardsScreen();
       }
       return SearchScreen();
     },

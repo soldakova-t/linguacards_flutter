@@ -7,47 +7,38 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class ButtonLearned extends StatefulWidget {
-  const ButtonLearned({
-    Key key,
-    this.heroTag,
-    this.context,
-    this.listLearnedCardsIDs,
-    this.topicId,
-    this.cardId,
-    this.learned,
-    this.mapSubtopicsProgress,
-    this.numberOfCardsInSubtopic,
-  }) : super(key: key);
-
-  final String heroTag;
-  final BuildContext context;
-  final List<String> listLearnedCardsIDs;
-  final Map<String, String> mapSubtopicsProgress;
-  final String topicId;
-  final String cardId;
-  final bool learned;
-  final int numberOfCardsInSubtopic;
-
   @override
   _ButtonLearnedState createState() => _ButtonLearnedState();
 }
 
 class _ButtonLearnedState extends State<ButtonLearned> {
-  bool _learned = false;
+  var learningState;
+  Magicard card;
+  User user;
+  bool learned = false;
 
   @override
   void initState() {
     super.initState();
-    _learned = widget.learned;
+
+    learningState = Provider.of<LearningState>(context, listen: false);
+    card = learningState.card;
+
+    user = Provider.of<User>(context, listen: false);
+    if (user != null) {
+      if (learningState.listLearnedCardsIDs != null) {
+        if (learningState.listLearnedCardsIDs.contains(card.id)) {
+          learned = true;
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(widget.context, listen: false);
-
     return Container(
       height: convertHeightFrom360(context, 360, 46),
-      child: _learned == false
+      child: learned == false
           ? ElevatedButton(
               style: mySecondaryButtonStyle,
               child: Center(
@@ -55,31 +46,30 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                       style: mySecondaryButtonTextStyle)),
               onPressed: user != null
                   ? () {
-                      widget.listLearnedCardsIDs.add(widget.cardId);
+                      learningState.listLearnedCardsIDs.add(card.id);
 
                       DB.updateArrayOfLearnedCards(
                           userId: user.uid,
-                          subtopicId: widget.topicId,
-                          learnedCardsIDs: widget.listLearnedCardsIDs);
+                          subtopicId: learningState.topic.id,
+                          learnedCardsIDs: learningState.listLearnedCardsIDs);
 
-                      double _newProgress = widget.listLearnedCardsIDs.length /
-                          widget.numberOfCardsInSubtopic;
-                      widget.mapSubtopicsProgress.update(
-                          widget.topicId, (value) => (_newProgress).toString(),
+                      double _newProgress =
+                          learningState.listLearnedCardsIDs.length /
+                              learningState.numberOfCardsInSubtopic;
+                      learningState.mapTopicsProgress.update(
+                          learningState.topic.id,
+                          (value) => (_newProgress).toString(),
                           ifAbsent: () => (_newProgress).toString());
 
                       DB.updateSubtopicsProgress(
                         user.uid,
-                        widget.mapSubtopicsProgress,
+                        learningState.mapTopicsProgress,
                       );
 
                       setState(() {
-                        _learned = true;
+                        learned = true;
                       });
 
-                      var state = Provider.of<TrainingFlashcardsState>(context,
-                          listen: false);
-                      state.needRefreshCardsList = true;
                     }
                   : () {
                       Navigator.pushNamed(context, '/settings');
@@ -112,38 +102,37 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _learned = false;
+                          learned = false;
                         });
                       },
                       child: GestureDetector(
                         onTap: () {
-                          widget.listLearnedCardsIDs.remove(widget.cardId);
+                          learningState.listLearnedCardsIDs
+                              .remove(learningState.card.id);
 
                           DB.updateArrayOfLearnedCards(
                               userId: user.uid,
-                              subtopicId: widget.topicId,
-                              learnedCardsIDs: widget.listLearnedCardsIDs);
+                              subtopicId: learningState.topic.id,
+                              learnedCardsIDs:
+                                  learningState.listLearnedCardsIDs);
 
                           double _newProgress =
-                              widget.listLearnedCardsIDs.length /
-                                  widget.numberOfCardsInSubtopic;
-                          widget.mapSubtopicsProgress.update(widget.topicId,
+                              learningState.listLearnedCardsIDs.length /
+                                  learningState.numberOfCardsInSubtopic;
+                          learningState.mapTopicsProgress.update(
+                              learningState.topic.id,
                               (value) => (_newProgress).toString(),
                               ifAbsent: () => (_newProgress).toString());
 
                           DB.updateSubtopicsProgress(
                             user.uid,
-                            widget.mapSubtopicsProgress,
+                            learningState.mapTopicsProgress,
                           );
 
                           setState(() {
-                            _learned = false;
+                            learned = false;
                           });
 
-                          var state = Provider.of<TrainingFlashcardsState>(
-                              context,
-                              listen: false);
-                          state.needRefreshCardsList = true;
                         },
                         child: Text(
                           "Вернуть",

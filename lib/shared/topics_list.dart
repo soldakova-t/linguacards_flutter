@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:magicards/services/models.dart';
@@ -7,6 +5,7 @@ import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
 import 'package:provider/provider.dart';
 import '../services/globals.dart';
+import '../services/db.dart';
 
 class TopicsList extends StatefulWidget {
   const TopicsList({
@@ -25,11 +24,9 @@ class TopicsList extends StatefulWidget {
 }
 
 class _TopicsListState extends State<TopicsList> {
-  Map<String, dynamic> userInfo;
-
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
+    var learningState = Provider.of<LearningState>(context, listen: false);
 
     return Padding(
       padding:
@@ -37,58 +34,67 @@ class _TopicsListState extends State<TopicsList> {
       child: ColumnBuilder(
           itemCount: widget.topics.length,
           itemBuilder: (BuildContext context, int index) {
+
+            double progress = 0.0;
+
+            User user = Provider.of<User>(context);
             if (user != null) {
               return StreamBuilder(
                 stream: DB.getUserInfoStream(user.uid),
                 builder:
                     (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.hasData) {
-                    userInfo = snapshot.data;
-                    return _buildTopicsListItem(context, index,
-                        userInfo: userInfo);
+                    Map<String, dynamic> userInfo = snapshot.data;
+
+                    // Updating learningState.mapTopicsProgress if userInfo != null
+                    if (userInfo != null) {
+                      if (userInfo["subtopics_progress"] != null) {
+                        learningState.mapTopicsProgress =
+                            Map<String, String>.from(Map<String, dynamic>.from(
+                                userInfo["subtopics_progress"]));
+                      }
+                    }
+
+                    // Updating progress for current topic if learningState.mapTopicsProgress != null
+                    if (learningState.mapTopicsProgress != null) {
+                      if (learningState
+                              .mapTopicsProgress[widget.topics[index].id] !=
+                          null) {
+                        progress = double.parse(learningState
+                            .mapTopicsProgress[widget.topics[index].id]);
+                      }
+                    }
+
+                    return _TopicsListItem(
+                        topic: widget.topics[index], progress: progress);
                   } else {
                     return Container();
                   }
                 },
               );
             } else {
-              return _buildTopicsListItem(context, index);
+              learningState.mapTopicsProgress = null;
+              return _TopicsListItem(
+                  topic: widget.topics[index], progress: progress);
             }
           }),
     );
   }
+}
 
-  Widget _buildTopicsListItem(BuildContext context, int index,
-      {Map<String, dynamic> userInfo}) {
-    double progress = 0.0;
-    if (userInfo != null) {
-      if (userInfo["subtopics_progress"] != null) {
-        if (userInfo["subtopics_progress"][widget.topics[index].id] != null) {
-          progress = double.parse(
-              userInfo["subtopics_progress"][widget.topics[index].id]);
-        }
-      }
-    }
+class _TopicsListItem extends StatelessWidget {
+  const _TopicsListItem({Key key, this.topic, this.progress}) : super(key: key);
 
+  final Topic topic;
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (userInfo != null) {
-          if (userInfo["subtopics_progress"] != null) {
-            Map<String, dynamic> dynamicSubtopicsProgress =
-                userInfo["subtopics_progress"];
-            Map<String, String> stringSubtopicsProgress =
-                dynamicSubtopicsProgress
-                    .map((key, value) => MapEntry(key, value?.toString()));
-
-            Navigator.of(context).push(createRouteScreen("/cards",
-                topic: widget.topics[index],
-                mapSubtopicsProgress: stringSubtopicsProgress));
-          } else
-            return Navigator.of(context)
-                .push(createRouteScreen("/cards", topic: widget.topics[index]));
-        } else
-          return Navigator.of(context)
-              .push(createRouteScreen("/cards", topic: widget.topics[index]));
+        var learningState = Provider.of<LearningState>(context, listen: false);
+        learningState.topic = topic;
+        return Navigator.of(context).push(createRouteScreen("/cards"));
       },
       child: Padding(
         padding:
@@ -108,7 +114,7 @@ class _TopicsListState extends State<TopicsList> {
                 ),
               ),
               // Label "Популярная"
-              /*widget.topics[index].popular
+              /*topic.popular
                   ? Positioned(
                       top: 0,
                       right: 10,
@@ -133,9 +139,9 @@ class _TopicsListState extends State<TopicsList> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(widget.topics[index].title, style: myTitleStyle),
+                    Text(topic.title, style: myTitleStyle),
                     SizedBox(height: convertHeightFrom360(context, 360, 5)),
-                    Text(widget.topics[index].titleRus, style: mySubtitleStyle),
+                    Text(topic.titleRus, style: mySubtitleStyle),
                     SizedBox(height: convertHeightFrom360(context, 360, 14)),
                   ],
                 ),
@@ -163,20 +169,20 @@ class _TopicsListState extends State<TopicsList> {
                 right: convertWidthFrom360(context, -4),
                 top: convertHeightFrom360(context, 360, 38),
                 child: Container(
-                        width: convertWidthFrom360(context, 66),
-                        height: convertHeightFrom360(context, 360, 66),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.fitHeight,
-                            image: NetworkImage("http://magicards.ru/topics_photos/" +
-                                    widget.topics[index].categoryNumber +
-                                    "/" +
-                                    widget.topics[index].number +
-                                    ".jpg"),
-                          ),
-                        ),
-                      ),
+                  width: convertWidthFrom360(context, 66),
+                  height: convertHeightFrom360(context, 360, 66),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.fitHeight,
+                      image: NetworkImage("http://magicards.ru/topics_photos/" +
+                          topic.categoryNumber +
+                          "/" +
+                          topic.number +
+                          ".jpg"),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

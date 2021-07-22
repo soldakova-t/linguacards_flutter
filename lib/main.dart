@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'shared/shared.dart';
 
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
@@ -21,15 +20,13 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         StreamProvider<User>.value(value: AuthServiceFirebase().user),
-        ChangeNotifierProvider<TrainingFlashcardsState>(
-          create: (_) => TrainingFlashcardsState(),
-        ),
+        Provider<LearningState>(create: (_) => LearningState()),
+        ChangeNotifierProvider<TrainingState>(create: (_) => TrainingState()),
       ],
       child: GestureDetector(
         onTap: () {
@@ -56,7 +53,8 @@ class MyApp extends StatelessWidget {
             backgroundColor: MyColors.mainBgColor,
             brightness: Brightness.light,
             textTheme: TextTheme(
-              bodyText2: myMainTextStyle, //"The default text style for Material."
+              bodyText2:
+                  myMainTextStyle, //"The default text style for Material."
               bodyText1: myMainTextStyle,
               headline5: TextStyle(fontWeight: FontWeight.bold),
               subtitle1: TextStyle(fontWeight: FontWeight.bold),

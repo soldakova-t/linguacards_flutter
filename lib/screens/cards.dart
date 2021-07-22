@@ -7,13 +7,6 @@ import '../shared/shared.dart';
 import 'training_flashcards.dart';
 
 class CardsScreen extends StatefulWidget {
-  const CardsScreen({Key key, this.topic, this.mapSubtopicsProgress})
-      : super(key: key);
-
-  final Topic topic;
-  final Map<String, String>
-      mapSubtopicsProgress; // For updating when more cards are learned.
-
   @override
   _CardsScreenState createState() => _CardsScreenState();
 }
@@ -26,13 +19,10 @@ class _CardsScreenState extends State<CardsScreen> {
   List<Magicard> learnedCardsLevel1 = [];
   List<Magicard> learnedCardsLevel2 = [];
 
-/*@override
-  Widget build(BuildContext context) {
-    return LoadingScreen();
-  }*/
-
   @override
   Widget build(BuildContext context) {
+    var learningState = Provider.of<LearningState>(context, listen: false);
+
     return Scaffold(
       extendBody: true, // For making BottomNavigationBar transparent.
       backgroundColor: MyColors.mainBgColor,
@@ -73,7 +63,7 @@ class _CardsScreenState extends State<CardsScreen> {
       appBar: AppBar(
         elevation: 0, // Removes status bar's shadow.
         backgroundColor: MyColors.mainBgColor,
-        title: Text(widget.topic.title),
+        title: Text(learningState.topic.title),
       ),
       bottomNavigationBar: AppBottomNav(
         selectedIndex: 1,
@@ -84,11 +74,12 @@ class _CardsScreenState extends State<CardsScreen> {
 
   Widget _buildBody(BuildContext context) {
     User user = Provider.of<User>(context);
+    var learningState = Provider.of<LearningState>(context, listen: false);
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('cards')
-          .where('subtopic', isEqualTo: widget.topic.id)
+          .where('subtopic', isEqualTo: learningState.topic.id)
           .where('version_br', isEqualTo: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -105,139 +96,126 @@ class _CardsScreenState extends State<CardsScreen> {
             );
           fillListOfAllCards(documents);
 
-          if (user != null) {
-            return Consumer<TrainingFlashcardsState>(
-              builder: (context, state, child) {
-                return StreamBuilder<List<String>>(
-                  stream: DB.getEarlyLearnedCardsIDsStream(
-                      user.uid, widget.topic.id),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      /*return Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 24.0),
-                                            child: Container(
-                                              width: 50,
-                                              height: 50,
-                                              child: CircularProgressIndicator(),
-                                            ),
-                                          ),
-                                        );*/
-                      return Container();
-                    } else {
-                      listLearnedCardsIDs = snapshot.data;
-                      print(listLearnedCardsIDs);
-                      fillLearnedAndNotLearnedCards();
-                      return Container();
+          learningState.numberOfCardsInSubtopic = listOfAllCards.length;
 
-                      /*return TabBarView(
-                        children: [
-                          // TAB 1: Not learned cards
-                          Container(
-                            height: double.infinity,
-                            child: Stack(
-                              children: [
-                                SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            SizedBox(
-                                                height: convertHeightFrom360(
-                                                    context, 360, 8)),
-                                            CardsList(
-                                                cards: notLearnedCardsLevel1,
-                                                listLearnedCardsIDs:
-                                                    listLearnedCardsIDs,
-                                                topicId: widget.topic.id,
-                                                mapSubtopicsProgress:
-                                                    widget.mapSubtopicsProgress,
-                                                numberOfCardsInSubtopic:
-                                                    listOfAllCards.length),
-                                            CardsList(
-                                                cards: notLearnedCardsLevel2,
-                                                listLearnedCardsIDs:
-                                                    listLearnedCardsIDs,
-                                                topicId: widget.topic.id,
-                                                mapSubtopicsProgress:
-                                                    widget.mapSubtopicsProgress,
-                                                numberOfCardsInSubtopic:
-                                                    listOfAllCards.length),
-                                            SizedBox(
+          if (user != null) {
+            return StreamBuilder<List<String>>(
+                stream: DB.getEarlyLearnedCardsIDsStream(
+                    user.uid, learningState.topic.id),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 24.0),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+                  } else {
+                    listLearnedCardsIDs = snapshot.data;
+                    fillLearnedAndNotLearnedCards();
+
+                    learningState.listLearnedCardsIDs = [];
+                    learningState.cardsForTraining = [];
+
+                    learningState.listLearnedCardsIDs = listLearnedCardsIDs;
+                    learningState.cardsForTraining =
+                        notLearnedCardsLevel1 + notLearnedCardsLevel2;
+
+                    return TabBarView(
+                      children: [
+                        // TAB 1: Not learned cards
+                        Container(
+                          height: double.infinity,
+                          child: Stack(
+                            children: [
+                              SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
                                               height: convertHeightFrom360(
-                                                  context, 360, 134),
-                                            ),
-                                          ],
-                                        ),
+                                                  context, 360, 8)),
+                                          CardsList(
+                                              cards: notLearnedCardsLevel1),
+                                          CardsList(
+                                              cards: notLearnedCardsLevel2),
+                                          SizedBox(
+                                            height: convertHeightFrom360(
+                                                context, 360, 134),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                                Positioned(
-                                  height:
-                                      convertHeightFrom360(context, 360, 50),
-                                  bottom:
-                                      convertHeightFrom360(context, 360, 69),
-                                  left: convertWidthFrom360(context, 16),
-                                  right: convertWidthFrom360(context, 16),
-                                  child: _buildTrainingButton(),
+                              ),
+                              Positioned(
+                                height: convertHeightFrom360(context, 360, 50),
+                                bottom: convertHeightFrom360(context, 360, 69),
+                                left: convertWidthFrom360(context, 16),
+                                right: convertWidthFrom360(context, 16),
+                                child: _buildTrainingButton(),
+                              ),
+                              Positioned(
+                                height: convertHeightFrom360(context, 360, 69),
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  color: MyColors.mainBgColor,
                                 ),
-                                Positioned(
-                                  height:
-                                      convertHeightFrom360(context, 360, 69),
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Container(
-                                    color: MyColors.mainBgColor,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          // TAB 2: Learned cards
-                          SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                    height:
-                                        convertHeightFrom360(context, 360, 8)),
-                                CardsList(
-                                    cards: learnedCardsLevel1,
-                                    listLearnedCardsIDs: listLearnedCardsIDs,
-                                    topicId: widget.topic.id,
-                                    mapSubtopicsProgress:
-                                        widget.mapSubtopicsProgress,
-                                    numberOfCardsInSubtopic:
-                                        listOfAllCards.length,
-                                    learned: true), // Can remove?..
-                                CardsList(
-                                    cards: learnedCardsLevel2,
-                                    listLearnedCardsIDs: listLearnedCardsIDs,
-                                    topicId: widget.topic.id,
-                                    mapSubtopicsProgress:
-                                        widget.mapSubtopicsProgress,
-                                    numberOfCardsInSubtopic:
-                                        listOfAllCards.length,
-                                    learned: true),
-                                SizedBox(
-                                    height:
-                                        convertHeightFrom360(context, 360, 66)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );*/
-                    }
-                  },
-                );
-              },
-            );
+                        ),
+                        // TAB 2: Learned cards
+                        SingleChildScrollView(
+                          child: (learnedCardsLevel1 + learnedCardsLevel2)
+                                      .length !=
+                                  0
+                              ? Column(
+                                  children: [
+                                    SizedBox(
+                                        height: convertHeightFrom360(
+                                            context, 360, 8)),
+                                    CardsList(
+                                        cards:
+                                            learnedCardsLevel1), // Can remove?..
+                                    CardsList(cards: learnedCardsLevel2),
+                                    SizedBox(
+                                        height: convertHeightFrom360(
+                                            context, 360, 66)),
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(24.0),
+                                      child: Text(
+                                        "Вы еще не отметили ни одно слово из этой темы изученным",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        )
+                      ],
+                    );
+                  }
+                });
           } else {
+            learningState.cardsForTraining = [];
+            learningState.cardsForTraining = listOfAllCards;
+
             return TabBarView(
               children: [
-                // TAB 1: Not learned cards
+                // TAB 1: All cards
                 Container(
                   height: double.infinity,
                   child: Stack(
@@ -281,7 +259,7 @@ class _CardsScreenState extends State<CardsScreen> {
                     ],
                   ),
                 ),
-                // TAB 2: Learned cards
+                // TAB 2: Offer to sign in
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Text(
@@ -327,8 +305,7 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Widget _buildTrainingButton() {
-    User user = Provider.of<User>(context);
-
+    var learningState = Provider.of<LearningState>(context, listen: false);
     return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
@@ -337,62 +314,25 @@ class _CardsScreenState extends State<CardsScreen> {
           height: 40,
           color: MyColors.mainBgColor,
         ),
-        user != null
-            ? ElevatedButton(
-                style: myPrimaryButtonStyle,
-                child: Center(
-                    child:
-                        Text("Тренироваться", style: myPrimaryButtonTextStyle)),
-                onPressed: widget.mapSubtopicsProgress[widget.topic.id] == "1.0"
-                    ? null
-                    : () {
-                        var state = Provider.of<TrainingFlashcardsState>(
-                            context,
-                            listen: false);
-                        state.progress = (1 /
-                            (notLearnedCardsLevel1 + notLearnedCardsLevel2)
-                                .length);
-
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                TrainingFlashcards(
-                                    trainingVariant: 0,
-                                    listOfCards: notLearnedCardsLevel1 +
-                                        notLearnedCardsLevel2,
-                                    listLearnedCardsIDs: listLearnedCardsIDs,
-                                    topicId: widget.topic.id,
-                                    mapSubtopicsProgress:
-                                        widget.mapSubtopicsProgress,
-                                    numberOfCardsInSubtopic:
-                                        listOfAllCards.length),
-                          ),
-                        );
-                      },
-              )
-            : ElevatedButton(
-                style: myPrimaryButtonStyle,
-                child: Center(
-                    child:
-                        Text("Тренироваться", style: myPrimaryButtonTextStyle)),
-                onPressed: () {
-                  var state = Provider.of<TrainingFlashcardsState>(context,
-                      listen: false);
-                  state.progress = (1 / listOfAllCards.length);
+        ElevatedButton(
+          style: myPrimaryButtonStyle,
+          child: Center(
+              child: Text("Тренироваться", style: myPrimaryButtonTextStyle)),
+          onPressed: learningState.cardsForTraining.length == 0
+              ? null
+              : () {
+                  var trainingState =
+                      Provider.of<TrainingState>(context, listen: false);
+                  trainingState.trainingProgress =
+                      (1 / learningState.cardsForTraining.length);
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => TrainingFlashcards(
-                          trainingVariant: 0,
-                          listOfCards: listOfAllCards,
-                          listLearnedCardsIDs: listLearnedCardsIDs,
-                          topicId: widget.topic.id,
-                          mapSubtopicsProgress: widget.mapSubtopicsProgress,
-                          numberOfCardsInSubtopic: listOfAllCards.length),
+                      builder: (BuildContext context) => TrainingFlashcards(),
                     ),
                   );
                 },
-              )
+        )
       ],
     );
   }
