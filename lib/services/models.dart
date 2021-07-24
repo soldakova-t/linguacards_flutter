@@ -10,6 +10,7 @@ class Topic {
   String titleRus;
   bool premiumAccess;
   bool popular;
+  int numberOfCards;
 
   Topic(
       {this.categoryNumber,
@@ -18,7 +19,8 @@ class Topic {
       this.title,
       this.titleRus,
       this.premiumAccess,
-      this.popular});
+      this.popular,
+      this.numberOfCards});
 
   factory Topic.fromMap(Map data) {
     return Topic(
@@ -29,6 +31,7 @@ class Topic {
       titleRus: data['titleRus'] ?? '',
       premiumAccess: data['premiumAccess'] ?? false,
       popular: data['popular'] ?? false,
+      numberOfCards: data['numberOfCards'] ?? 1,
     );
   }
 }
@@ -139,13 +142,12 @@ class Magicard {
 }
 
 class LearningState {
-  Map<String, String> mapTopicsProgress;
+  Map<String, int> topicsNumbersLearnedCards = {};
   Topic topic;
-  int numberOfCardsInSubtopic;
+  int numberOfCardsInTopic = 1;
   List<Magicard> cardsForTraining = [];
   List<String> listLearnedCardsIDs = [];
   Magicard card;
-
 }
 
 class TrainingState with ChangeNotifier {

@@ -46,30 +46,35 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                       style: mySecondaryButtonTextStyle)),
               onPressed: user != null
                   ? () {
-                      learningState.listLearnedCardsIDs.add(card.id);
+                      List<String> newListLearnedCardsIDs =
+                          learningState.listLearnedCardsIDs;
+
+                      newListLearnedCardsIDs.add(learningState.card.id);
+
+                      Map<String, int> newtTopicsNumbersLearnedCards =
+                          learningState.topicsNumbersLearnedCards;
+
+                      newtTopicsNumbersLearnedCards[learningState.topic.id] =
+                          learningState.listLearnedCardsIDs.length;
 
                       DB.updateArrayOfLearnedCards(
                           userId: user.uid,
                           subtopicId: learningState.topic.id,
-                          learnedCardsIDs: learningState.listLearnedCardsIDs);
+                          learnedCardsIDs: newListLearnedCardsIDs);
 
-                      double _newProgress =
-                          learningState.listLearnedCardsIDs.length /
-                              learningState.numberOfCardsInSubtopic;
-                      learningState.mapTopicsProgress.update(
-                          learningState.topic.id,
-                          (value) => (_newProgress).toString(),
-                          ifAbsent: () => (_newProgress).toString());
-
-                      DB.updateSubtopicsProgress(
+                      DB.updateTopicsNumbersLearnedCards(
                         user.uid,
-                        learningState.mapTopicsProgress,
+                        newtTopicsNumbersLearnedCards,
                       );
+
+                      learningState.listLearnedCardsIDs =
+                          newListLearnedCardsIDs;
+                      learningState.topicsNumbersLearnedCards =
+                          newtTopicsNumbersLearnedCards;
 
                       setState(() {
                         learned = true;
                       });
-
                     }
                   : () {
                       Navigator.pushNamed(context, '/settings');
@@ -107,32 +112,35 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                       },
                       child: GestureDetector(
                         onTap: () {
-                          learningState.listLearnedCardsIDs
-                              .remove(learningState.card.id);
+                      List<String> newListLearnedCardsIDs =
+                          learningState.listLearnedCardsIDs;
+
+                      newListLearnedCardsIDs.remove(learningState.card.id);
+
+                      Map<String, int> newtTopicsNumbersLearnedCards =
+                          learningState.topicsNumbersLearnedCards;
+
+                      newtTopicsNumbersLearnedCards[learningState.topic.id] =
+                          learningState.listLearnedCardsIDs.length;
 
                           DB.updateArrayOfLearnedCards(
                               userId: user.uid,
                               subtopicId: learningState.topic.id,
-                              learnedCardsIDs:
-                                  learningState.listLearnedCardsIDs);
+                              learnedCardsIDs: newListLearnedCardsIDs);
 
-                          double _newProgress =
-                              learningState.listLearnedCardsIDs.length /
-                                  learningState.numberOfCardsInSubtopic;
-                          learningState.mapTopicsProgress.update(
-                              learningState.topic.id,
-                              (value) => (_newProgress).toString(),
-                              ifAbsent: () => (_newProgress).toString());
-
-                          DB.updateSubtopicsProgress(
+                          DB.updateTopicsNumbersLearnedCards(
                             user.uid,
-                            learningState.mapTopicsProgress,
+                            newtTopicsNumbersLearnedCards,
                           );
+
+                          learningState.listLearnedCardsIDs =
+                              newListLearnedCardsIDs;
+                          learningState.topicsNumbersLearnedCards =
+                              newtTopicsNumbersLearnedCards;
 
                           setState(() {
                             learned = false;
                           });
-
                         },
                         child: Text(
                           "Вернуть",

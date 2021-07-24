@@ -34,11 +34,11 @@ class _TopicsListState extends State<TopicsList> {
       child: ColumnBuilder(
           itemCount: widget.topics.length,
           itemBuilder: (BuildContext context, int index) {
-
-            double progress = 0.0;
+            int numberOfLearnedCards = 0;
 
             User user = Provider.of<User>(context);
             if (user != null) {
+              
               return StreamBuilder(
                 stream: DB.getUserInfoStream(user.uid),
                 builder:
@@ -47,35 +47,36 @@ class _TopicsListState extends State<TopicsList> {
                     Map<String, dynamic> userInfo = snapshot.data;
 
                     // Updating learningState.mapTopicsProgress if userInfo != null
+                    learningState.topicsNumbersLearnedCards = {};
+                    
                     if (userInfo != null) {
-                      if (userInfo["subtopics_progress"] != null) {
-                        learningState.mapTopicsProgress =
-                            Map<String, String>.from(Map<String, dynamic>.from(
-                                userInfo["subtopics_progress"]));
+                      if (userInfo["topics_numbers_learned_cards"] != null) {
+                        learningState.topicsNumbersLearnedCards =
+                            Map<String, int>.from(Map<String, dynamic>.from(
+                                userInfo["topics_numbers_learned_cards"]));
                       }
                     }
 
                     // Updating progress for current topic if learningState.mapTopicsProgress != null
-                    if (learningState.mapTopicsProgress != null) {
+                    if (learningState.topicsNumbersLearnedCards != null) {
                       if (learningState
-                              .mapTopicsProgress[widget.topics[index].id] !=
+                              .topicsNumbersLearnedCards[widget.topics[index].id] !=
                           null) {
-                        progress = double.parse(learningState
-                            .mapTopicsProgress[widget.topics[index].id]);
+                        numberOfLearnedCards = learningState
+                            .topicsNumbersLearnedCards[widget.topics[index].id];
                       }
                     }
-
+                    
                     return _TopicsListItem(
-                        topic: widget.topics[index], progress: progress);
+                        widget.topics[index], numberOfLearnedCards);
                   } else {
                     return Container();
                   }
                 },
               );
             } else {
-              learningState.mapTopicsProgress = null;
-              return _TopicsListItem(
-                  topic: widget.topics[index], progress: progress);
+              learningState.topicsNumbersLearnedCards = null;
+              return _TopicsListItem(widget.topics[index], 0);
             }
           }),
     );
@@ -83,13 +84,17 @@ class _TopicsListState extends State<TopicsList> {
 }
 
 class _TopicsListItem extends StatelessWidget {
-  const _TopicsListItem({Key key, this.topic, this.progress}) : super(key: key);
+  const _TopicsListItem(this.topic, this.numberOfLearnedCards, {Key key})
+      : super(key: key);
 
   final Topic topic;
-  final double progress;
+  final int numberOfLearnedCards;
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context, listen: false);
+    double progress = numberOfLearnedCards / topic.numberOfCards;
+
     return GestureDetector(
       onTap: () {
         var learningState = Provider.of<LearningState>(context, listen: false);
@@ -101,7 +106,7 @@ class _TopicsListItem extends StatelessWidget {
             EdgeInsets.only(bottom: convertHeightFrom360(context, 360, 10)),
         child: SizedBox(
           width: double.infinity,
-          height: convertHeightFrom360(context, 360, 113),
+          height: convertHeightFrom360(context, 360, 115),
           child: Stack(
             children: <Widget>[
               Positioned.fill(
@@ -113,25 +118,23 @@ class _TopicsListItem extends StatelessWidget {
                   ),
                 ),
               ),
-              // Label "Популярная"
-              /*topic.popular
-                  ? Positioned(
-                      top: 0,
-                      right: 10,
-                      child: Container(
-                        height: convertHeightFrom360(context, 360, 17),
-                        width: convertWidthFrom360(context, 71),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              convertWidthFrom360(context, 6)),
-                          color: MyColors.popularBgColor,
-                        ),
-                        child: Center(
-                          child: Text("Популярная", style: myPopularLabelStyle),
-                        ),
-                      ),
-                    )
-                  : Container(),*/
+              // Label popular topic
+              /*Positioned(
+                top: 0,
+                right: 16,
+                child: Container(
+                  height: convertHeightFrom360(context, 360, 17),
+                  width: convertWidthFrom360(context, 71),
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(convertWidthFrom360(context, 6)),
+                    color: MyColors.popularBgColor,
+                  ),
+                  child: Center(
+                    child: Text("Популярная", style: myPopularLabelStyle),
+                  ),
+                ),
+              ),*/
               Positioned(
                 left: convertWidthFrom360(context, 16),
                 top: convertHeightFrom360(context, 360, 18),
@@ -142,7 +145,7 @@ class _TopicsListItem extends StatelessWidget {
                     Text(topic.title, style: myTitleStyle),
                     SizedBox(height: convertHeightFrom360(context, 360, 5)),
                     Text(topic.titleRus, style: mySubtitleStyle),
-                    SizedBox(height: convertHeightFrom360(context, 360, 14)),
+                    SizedBox(height: convertHeightFrom360(context, 360, 5)),
                   ],
                 ),
               ),
@@ -151,12 +154,16 @@ class _TopicsListItem extends StatelessWidget {
                 bottom: convertHeightFrom360(context, 360, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text((progress * 100).toInt().toString() + "% изучено",
+                  children: [
+                    Text(
+                        "изучено " +
+                            numberOfLearnedCards.toString() +
+                            " слов из " +
+                            topic.numberOfCards.toString(),
                         style: myPercentStyle),
                     SizedBox(height: convertWidthFrom360(context, 5)),
                     Container(
-                      width: convertWidthFrom360(context, 120),
+                      width: convertWidthFrom360(context, 150),
                       child: AnimatedProgress(
                         height: convertHeightFrom360(context, 360, 3),
                         value: progress,

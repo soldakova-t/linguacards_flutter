@@ -121,11 +121,11 @@ class DB {
     }
   }
 
-  static void updateSubtopicsProgress(
-      String userId, Map<String, String> subtopicsProgress) async {
+  static void updateTopicsNumbersLearnedCards(
+      String userId, Map<String, int> topicsNumbersLearnedCards) async {
     Map<String, dynamic> getUserInfo;
     getUserInfo = await DB.getUserInfo(userId);
-    getUserInfo["subtopics_progress"] = subtopicsProgress;
+    getUserInfo["topics_numbers_learned_cards"] = topicsNumbersLearnedCards;
     await FirebaseFirestore.instance
         .collection("users")
         .doc(userId)

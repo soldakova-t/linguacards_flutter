@@ -96,7 +96,7 @@ class _CardsScreenState extends State<CardsScreen> {
             );
           fillListOfAllCards(documents);
 
-          learningState.numberOfCardsInSubtopic = listOfAllCards.length;
+          learningState.numberOfCardsInTopic = listOfAllCards.length;
 
           if (user != null) {
             return StreamBuilder<List<String>>(
@@ -115,6 +115,7 @@ class _CardsScreenState extends State<CardsScreen> {
                       ),
                     );
                   } else {
+                    listLearnedCardsIDs.clear();
                     listLearnedCardsIDs = snapshot.data;
                     fillLearnedAndNotLearnedCards();
 
@@ -136,21 +137,43 @@ class _CardsScreenState extends State<CardsScreen> {
                                 child: Column(
                                   children: [
                                     SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                              height: convertHeightFrom360(
-                                                  context, 360, 8)),
-                                          CardsList(
-                                              cards: notLearnedCardsLevel1),
-                                          CardsList(
-                                              cards: notLearnedCardsLevel2),
-                                          SizedBox(
-                                            height: convertHeightFrom360(
-                                                context, 360, 134),
-                                          ),
-                                        ],
-                                      ),
+                                      child: learningState
+                                                  .cardsForTraining.length ==
+                                              0
+                                          ? Column(
+                                              children: [
+                                                Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            24.0),
+                                                    child: Text(
+                                                      "Вы изучили все слова этой темы",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Column(
+                                              children: [
+                                                SizedBox(
+                                                    height:
+                                                        convertHeightFrom360(
+                                                            context, 360, 8)),
+                                                CardsList(
+                                                    cards:
+                                                        notLearnedCardsLevel1),
+                                                CardsList(
+                                                    cards:
+                                                        notLearnedCardsLevel2),
+                                                SizedBox(
+                                                  height: convertHeightFrom360(
+                                                      context, 360, 134),
+                                                ),
+                                              ],
+                                            ),
                                     ),
                                   ],
                                 ),

@@ -101,6 +101,11 @@ class CategoriesList extends StatelessWidget {
                         category.titleRus,
                         style: mySubtitleStyle,
                       ),
+                      SizedBox(height: convertHeightFrom360(context, 360, 16)),
+                      Text(
+                        category.subtopics.length.toString() + " " + Strings.getWordTopics(category.subtopics.length),
+                        style: mySubtitleStyle,
+                      ),
                     ],
                   ),
                 ),

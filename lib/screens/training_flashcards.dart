@@ -156,6 +156,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
     var trainingState = Provider.of<TrainingState>(context, listen: false);
 
     int bigPhotoWidth = 1640;
@@ -322,7 +323,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
             child: _showMeaningAndActions == true
                 ? Column(
                     children: [
-                      ButtonLearned(),
+                      user != null ? ButtonLearned() : Container(),
                       SizedBox(height: 16),
                       (widget.itemIndex < (learningState.cardsForTraining.length - 1))
                           ? _buildButtonNext()
