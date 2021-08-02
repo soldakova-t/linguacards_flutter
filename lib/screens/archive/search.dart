@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import '../shared/shared.dart';
 import '../services/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -102,4 +102,4 @@ class _SearchScreenState extends State<SearchScreen> {
       name = val.toLowerCase().trim();
     });
   }
-}
+}*/

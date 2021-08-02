@@ -10,26 +10,30 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true, // For making BottomNavigationBar transparent.
-      backgroundColor: MyColors.mainBgColor,
-      body: _buildBody(context),
-      appBar: AppBar(
-        elevation: 0, // Removes status bar's shadow.
+    return NetworkSensitive(
+      child: Scaffold(
+        extendBody: true, // For making BottomNavigationBar transparent.
         backgroundColor: MyColors.mainBgColor,
-        title: Text('Категории'),
-      ),
-      bottomNavigationBar: AppBottomNav(
-        selectedIndex: 1,
-        isHomePage: false,
+        body: _buildBody(context),
+        appBar: AppBar(
+          elevation: 0, // Removes status bar's shadow.
+          backgroundColor: MyColors.mainBgColor,
+          title: Text('Категории'),
+        ),
+        bottomNavigationBar: AppBottomNav(
+          selectedIndex: 1,
+          isHomePage: false,
+        ),
       ),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream:
-          FirebaseFirestore.instance.collection('topics').orderBy('number').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('topics')
+          .orderBy('number')
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LinearProgressIndicator();

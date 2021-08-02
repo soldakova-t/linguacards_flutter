@@ -22,15 +22,17 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     user = Provider.of<User>(context);
 
-    return Scaffold(
-      extendBody: true, // For making BottomNavigationBar transparent.
-      backgroundColor: MyColors.mainBgColor,
-      body: _buildBody(context),
-      appBar: AppBar(
-        elevation: 0, // Removes status bar's shadow.
-        toolbarHeight: 0,
+    return NetworkSensitive(
+      child: Scaffold(
+        extendBody: true, // For making BottomNavigationBar transparent.
+        backgroundColor: MyColors.mainBgColor,
+        body: _buildBody(context),
+        appBar: AppBar(
+          elevation: 0, // Removes status bar's shadow.
+          toolbarHeight: 0,
+        ),
+        bottomNavigationBar: AppBottomNav(selectedIndex: 0, isHomePage: true),
       ),
-      bottomNavigationBar: AppBottomNav(selectedIndex: 0, isHomePage: true),
     );
   }
 

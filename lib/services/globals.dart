@@ -2,8 +2,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:magicards/screens/screens.dart';
-import 'package:magicards/shared/styles.dart';
-
 import 'models.dart';
 
 /// Static global state. Immutable services that do not care about build context.
@@ -71,7 +69,7 @@ Route createRouteScreen(String ref,
       if (ref == "/cards") {
         return CardsScreen();
       }
-      return SearchScreen();
+      return CategoriesScreen();
     },
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1.0, 0.0);

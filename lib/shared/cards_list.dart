@@ -151,6 +151,14 @@ class _CardDetailsState extends State<CardDetails> {
 
     var learningState = Provider.of<LearningState>(context, listen: false);
     card = learningState.card;
+
+    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
+            card.subtopic.toString() +
+            "/" +
+            card.title +
+            ".mp3" ??
+        "");
+
   }
 
   @override

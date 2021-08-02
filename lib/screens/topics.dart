@@ -10,18 +10,20 @@ class TopicsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true, // For making BottomNavigationBar transparent.
-      backgroundColor: MyColors.mainBgColor,
-      body: _buildBody(context),
-      appBar: AppBar(
-        elevation: 0, // Removes status bar's shadow.
+    return NetworkSensitive(
+      child: Scaffold(
+        extendBody: true, // For making BottomNavigationBar transparent.
         backgroundColor: MyColors.mainBgColor,
-        title: Text(title),
-      ),
-      bottomNavigationBar: AppBottomNav(
-        selectedIndex: 1,
-        isHomePage: false,
+        body: _buildBody(context),
+        appBar: AppBar(
+          elevation: 0, // Removes status bar's shadow.
+          backgroundColor: MyColors.mainBgColor,
+          title: Text(title),
+        ),
+        bottomNavigationBar: AppBottomNav(
+          selectedIndex: 1,
+          isHomePage: false,
+        ),
       ),
     );
   }

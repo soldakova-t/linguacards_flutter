@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
-import 'package:magicards/screens/screens.dart';
+import '../screens/screens.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +18,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
   @override
   void initState() {
     super.initState();
+
     learningState = Provider.of<LearningState>(context, listen: false);
     Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
             learningState.cardsForTraining[0].subtopic.toString() +
@@ -29,72 +30,74 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: MyColors.mainBgColor,
-      body: Stack(
-        children: <Widget>[
-          Positioned(
-            left: 16.0,
-            top: 30 + MediaQuery.of(context).padding.top,
-            right: 10.0,
-            height: 49,
-            child: Stack(
-              children: <Widget>[
-                Positioned(
-                  left: 0,
-                  top: 24,
-                  child: Consumer<TrainingState>(
-                    builder: (context, trainingState, child) => Row(
-                      children: [
-                        Container(
-                          width: 84.0,
-                          child: AnimatedProgress(
-                            value: trainingState.trainingProgress,
-                            height: 5.0,
+    return NetworkSensitive(
+      child: Scaffold(
+        backgroundColor: MyColors.mainBgColor,
+        body: Stack(
+          children: <Widget>[
+            Positioned(
+              left: 16.0,
+              top: 30 + MediaQuery.of(context).padding.top,
+              right: 10.0,
+              height: 49,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 0,
+                    top: 24,
+                    child: Consumer<TrainingState>(
+                      builder: (context, trainingState, child) => Row(
+                        children: [
+                          Container(
+                            width: 84.0,
+                            child: AnimatedProgress(
+                              value: trainingState.trainingProgress,
+                              height: 5.0,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: convertWidthFrom360(context, 18)),
-                        Container(
-                          child: Text(
-                            trainingState.currentCardNumber.toString() +
-                                " из " +
-                                learningState.cardsForTraining.length
-                                    .toString(),
-                            style: myProgress,
+                          SizedBox(width: convertWidthFrom360(context, 18)),
+                          Container(
+                            child: Text(
+                              trainingState.currentCardNumber.toString() +
+                                  " из " +
+                                  learningState.cardsForTraining.length
+                                      .toString(),
+                              style: myProgress,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  right: 0,
-                  child: InkWell(
-                    onTap: () {
-                      var trainingState =
-                          Provider.of<TrainingState>(context, listen: false);
-                      trainingState.trainingProgress =
-                          (1 / learningState.cardsForTraining.length);
-                      trainingState.currentCardNumber = 1;
-                      Navigator.of(context).pop();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Icon(Icons.close),
+                  Positioned(
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        var trainingState =
+                            Provider.of<TrainingState>(context, listen: false);
+                        trainingState.trainingProgress =
+                            (1 / learningState.cardsForTraining.length);
+                        trainingState.currentCardNumber = 1;
+                        Navigator.of(context).pop();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Icon(Icons.close),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 103 + MediaQuery.of(context).padding.top,
-            child: _buildCarousel(context, trainingVariant),
-          ),
-        ],
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 103 + MediaQuery.of(context).padding.top,
+              child: _buildCarousel(context, trainingVariant),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -228,10 +231,12 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                   onTap: () {
                     Globals.playPronounciation(
                         "http://magicards.ru/cards_sounds/" +
-                                learningState.cardsForTraining[widget.itemIndex].subtopic
+                                learningState
+                                    .cardsForTraining[widget.itemIndex].subtopic
                                     .toString() +
                                 "/" +
-                                learningState.cardsForTraining[widget.itemIndex].title +
+                                learningState
+                                    .cardsForTraining[widget.itemIndex].title +
                                 ".mp3" ??
                             "");
                   },
@@ -239,7 +244,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                     children: <Widget>[
                       Text(
                         '[' +
-                            learningState.cardsForTraining[widget.itemIndex].transcriptionBr +
+                            learningState.cardsForTraining[widget.itemIndex]
+                                .transcriptionBr +
                             ']',
                         style: myTranscription,
                       ),
@@ -260,23 +266,31 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                 ),
                 SizedBox(height: 10),
                 if (_showMeaningAndActions == true &&
-                    (learningState.cardsForTraining[widget.itemIndex].syn1 != '' ||
-                        learningState.cardsForTraining[widget.itemIndex].syn2 != ''))
+                    (learningState.cardsForTraining[widget.itemIndex].syn1 !=
+                            '' ||
+                        learningState.cardsForTraining[widget.itemIndex].syn2 !=
+                            ''))
                   RichText(
                     text: TextSpan(
                       text: "also ",
                       style: myTranscription,
                       children: <TextSpan>[
                         TextSpan(
-                            text: learningState.cardsForTraining[widget.itemIndex].syn1,
+                            text: learningState
+                                .cardsForTraining[widget.itemIndex].syn1,
                             style: TextStyle(color: Colors.black)),
-                        if (learningState.cardsForTraining[widget.itemIndex].syn1 != '' &&
-                            learningState.cardsForTraining[widget.itemIndex].syn2 != '')
+                        if (learningState
+                                    .cardsForTraining[widget.itemIndex].syn1 !=
+                                '' &&
+                            learningState
+                                    .cardsForTraining[widget.itemIndex].syn2 !=
+                                '')
                           TextSpan(
                               text: ", ",
                               style: TextStyle(color: Colors.black)),
                         TextSpan(
-                            text: learningState.cardsForTraining[widget.itemIndex].syn2,
+                            text: learningState
+                                .cardsForTraining[widget.itemIndex].syn2,
                             style: TextStyle(color: Colors.black)),
                       ],
                     ),
@@ -306,7 +320,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            learningState.cardsForTraining[widget.itemIndex].titleRus,
+                            learningState
+                                .cardsForTraining[widget.itemIndex].titleRus,
                             style: myTitleRus,
                           ),
                         ],
@@ -325,7 +340,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                     children: [
                       user != null ? ButtonLearned() : Container(),
                       SizedBox(height: 16),
-                      (widget.itemIndex < (learningState.cardsForTraining.length - 1))
+                      (widget.itemIndex <
+                              (learningState.cardsForTraining.length - 1))
                           ? _buildButtonNext()
                           : _buildButtonFinish(),
                     ],
@@ -379,7 +395,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
           onPressed: () {
             var trainingState =
                 Provider.of<TrainingState>(context, listen: false);
-            trainingState.trainingProgress = (1 / learningState.cardsForTraining.length);
+            trainingState.trainingProgress =
+                (1 / learningState.cardsForTraining.length);
             Navigator.of(context).pop();
           }),
     );

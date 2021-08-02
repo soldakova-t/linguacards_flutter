@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/svg.dart';
+import '../screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
-import '../screens/screens.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   final AuthServiceFirebase auth = AuthServiceFirebase();
 
   @override
@@ -14,44 +19,46 @@ class SettingsScreen extends StatelessWidget {
     User user = Provider.of<User>(context);
 
     if (user != null) {
-      return Scaffold(
-        backgroundColor: MyColors.mainBgColor,
-        appBar: AppBar(
-        elevation: 0, // Removes status bar's shadow.
-        backgroundColor: MyColors.mainBgColor,
-          title: Text('Профиль'),
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0, right: 18.0),
-              child: GestureDetector(
-                onTap: () async {
-                  await auth.signOut();
-                  //Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Выйти',
-                    style: TextStyle(
-                      color: MyColors.mainBrightColor,
-                      fontSize: 15,
+      return NetworkSensitive(
+        child: Scaffold(
+          backgroundColor: MyColors.mainBgColor,
+          appBar: AppBar(
+            elevation: 0, // Removes status bar's shadow.
+            backgroundColor: MyColors.mainBgColor,
+            title: Text('Профиль'),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0, right: 18.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    await auth.signOut();
+                    //Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Выйти',
+                      style: TextStyle(
+                        color: MyColors.mainBrightColor,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              user.phoneNumber == '' || user.phoneNumber == null
+                  ? buildSocialNetworkUserHeader(user)
+                  : buildPhoneHeader(user),
+              // buildUserMenu(context),
+            ],
+          ),
+          bottomNavigationBar: AppBottomNav(selectedIndex: 2),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            user.phoneNumber == '' || user.phoneNumber == null
-                ? buildSocialNetworkUserHeader(user)
-                : buildPhoneHeader(user),
-            // buildUserMenu(context),
-          ],
-        ),
-        bottomNavigationBar: AppBottomNav(selectedIndex: 2),
       );
     } else {
       return LoginPage(prevPage: "cardDetails");
@@ -82,10 +89,10 @@ class SettingsScreen extends StatelessWidget {
                   Navigator.of(context)
                   .push(_createRouteChooseLevel());
                 }),*/
-                buildSettingsMenuItem(engVariantName, 'Вариант английского',
+                /*buildSettingsMenuItem(engVariantName, 'Вариант английского',
                     action: () {
                   Navigator.of(context).push(_createRouteChooseVariant());
-                }),
+                }),*/
                 buildSettingsMenuItem(access, 'Доступ к приложению'),
                 if (snapshot.data["premium"] == false)
                   Column(
@@ -214,44 +221,6 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Route _createRouteChooseLevel() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ChooseLevel(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
-
-  Route _createRouteChooseVariant() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ChooseVariant(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
     );
   }
 }

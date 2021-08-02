@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:magicards/screens/settings.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../shared/shared.dart';
 
 class LoginPage extends StatefulWidget {
   final String prevPage;
@@ -27,113 +27,116 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Builder(
-        builder: (context) => Form(
-            key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.all(0.0),
-              children: <Widget>[
-                SizedBox(height: 25 + MediaQuery.of(context).padding.top),
-                _buildCloseButton(context),
-                Padding(
-                  padding: const EdgeInsets.only(left: 25, right: 25),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      SizedBox(height: 17 + MediaQuery.of(context).padding.top),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        margin: const EdgeInsets.all(0.0),
-                        padding: const EdgeInsets.all(0.0),
-                        height: 58,
-                        child: SvgPicture.asset('assets/icons/logo_auth.svg'),
-                      ),
-                      SizedBox(height: 26),
-                      Text(
-                        'Добро пожаловать в Lingvicards!',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: MyColors.mainDarkColor,
+    return NetworkSensitive(
+      child: Scaffold(
+        body: Builder(
+          builder: (context) => Form(
+              key: _formKey,
+              child: ListView(
+                padding: EdgeInsets.all(0.0),
+                children: <Widget>[
+                  SizedBox(height: 25 + MediaQuery.of(context).padding.top),
+                  _buildCloseButton(context),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25, right: 25),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        SizedBox(
+                            height: 17 + MediaQuery.of(context).padding.top),
+                        Container(
+                          alignment: Alignment.topLeft,
+                          margin: const EdgeInsets.all(0.0),
+                          padding: const EdgeInsets.all(0.0),
+                          height: 58,
+                          child: SvgPicture.asset('assets/icons/logo_auth.svg'),
                         ),
-                      ),
-                      SizedBox(height: 32),
-                      codeSent ? Container() : _buildPhoneInput(),
-                      codeSent ? _buildCodeInput() : Container(),
-                      SizedBox(height: 8),
-                      codeSent
-                          ? Container(
-                              height: 15,
-                            )
-                          : Text(
-                              incorrectPhoneFireBase
-                                  ? 'Некорректный номер телефона'
-                                  : 'Мы отправим SMS, чтобы подтвердить номер телефона',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: incorrectPhoneFireBase
-                                    ? MyColors.mainBrightColor
-                                    : hexToColor('#6D6F9D'),
-                              ),
-                            ),
-                      SizedBox(height: 24),
-                      _buildPhoneAuthButton(),
-                      SizedBox(height: 28),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              'или',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: MyColors.subtitleColor,
-                              ),
-                            ),
+                        SizedBox(height: 26),
+                        Text(
+                          'Добро пожаловать в Lingvicards!',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: MyColors.mainDarkColor,
                           ),
-                          Expanded(child: Divider()),
-                        ],
-                      ),
-                      SizedBox(height: 22),
-                      _buildSocialAuthButton(
-                        'Google',
-                        auth.googleSignIn,
-                        "assets/icons/google_logo.svg",
-                        context,
-                      ),
-                      SizedBox(height: 4),
-                      _buildSocialAuthButton(
-                        'Facebook',
-                        auth.loginFacebook,
-                        "assets/icons/facebook_logo.svg",
-                        context,
-                      ),
-                      SizedBox(height: 4),
-                      FutureBuilder<Object>(
-                        future: auth.appleSignInAvailable,
-                        builder: (context, snapshot) {
-                          if (snapshot.data == true) {
-                            return _buildSocialAuthButton(
-                              'Apple',
-                              auth.appleSignIn,
-                              "assets/icons/apple_logo.svg",
-                              context,
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      ),
-                    ],
+                        ),
+                        SizedBox(height: 32),
+                        codeSent ? Container() : _buildPhoneInput(),
+                        codeSent ? _buildCodeInput() : Container(),
+                        SizedBox(height: 8),
+                        codeSent
+                            ? Container(
+                                height: 15,
+                              )
+                            : Text(
+                                incorrectPhoneFireBase
+                                    ? 'Некорректный номер телефона'
+                                    : 'Мы отправим SMS, чтобы подтвердить номер телефона',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: incorrectPhoneFireBase
+                                      ? MyColors.mainBrightColor
+                                      : hexToColor('#6D6F9D'),
+                                ),
+                              ),
+                        SizedBox(height: 24),
+                        _buildPhoneAuthButton(),
+                        SizedBox(height: 28),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'или',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: MyColors.subtitleColor,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
+                        SizedBox(height: 22),
+                        _buildSocialAuthButton(
+                          'Google',
+                          auth.googleSignIn,
+                          "assets/icons/google_logo.svg",
+                          context,
+                        ),
+                        SizedBox(height: 4),
+                        _buildSocialAuthButton(
+                          'Facebook',
+                          auth.loginFacebook,
+                          "assets/icons/facebook_logo.svg",
+                          context,
+                        ),
+                        SizedBox(height: 4),
+                        FutureBuilder<Object>(
+                          future: auth.appleSignInAvailable,
+                          builder: (context, snapshot) {
+                            if (snapshot.data == true) {
+                              return _buildSocialAuthButton(
+                                'Apple',
+                                auth.appleSignIn,
+                                "assets/icons/apple_logo.svg",
+                                context,
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              )),
+        ),
       ),
     );
   }
@@ -452,7 +455,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-Route _createProfileRoute() {
+/*Route _createProfileRoute() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => SettingsScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -468,4 +471,4 @@ Route _createProfileRoute() {
       );
     },
   );
-}
+}*/
