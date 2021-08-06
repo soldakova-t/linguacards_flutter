@@ -20,12 +20,7 @@ class NetworkSensitive extends StatelessWidget {
         connectionStatus == ConnectivityStatus.Cellular) {
       return child;
     } else {
-
-      var trainingState = Provider.of<TrainingState>(context, listen: false);
-      trainingState.currentCardNumber = 1;
-
       return NoConnectionScreen();
-      
     }
   }
 }

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import 'training_flashcards.dart';
@@ -93,8 +92,9 @@ class _CardsScreenState extends State<CardsScreen> {
           if (documents.length == 0)
             return Padding(
               padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: Text("В этой категории нет слов"),
+              child: Text(
+                "В этой категории нет слов",
+                textAlign: TextAlign.center,
               ),
             );
           fillListOfAllCards(documents);

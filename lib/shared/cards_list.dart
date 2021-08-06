@@ -57,13 +57,15 @@ class _CardsListState extends State<CardsList> {
         showDialog(
           context: context,
           builder: (context) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
+            return NetworkSensitive(
+              child: Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                elevation: 16,
+                insetPadding: EdgeInsets.all(0.0),
+                child: CardDetails(),
               ),
-              elevation: 16,
-              insetPadding: EdgeInsets.all(0.0),
-              child: CardDetails(),
             );
           },
         );
@@ -158,7 +160,6 @@ class _CardDetailsState extends State<CardDetails> {
             card.title +
             ".mp3" ??
         "");
-
   }
 
   @override
