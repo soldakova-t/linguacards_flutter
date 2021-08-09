@@ -402,7 +402,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Padding _buildCloseButton(BuildContext context) {
+  Widget _buildCloseButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 13.0),
       child: Container(

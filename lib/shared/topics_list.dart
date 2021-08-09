@@ -182,7 +182,7 @@ class _TopicsListItem extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       fit: BoxFit.fitHeight,
-                      image: NetworkImage("http://magicards.ru/topics_photos/" +
+                      image: NetworkImage("http://lingvicards.ru/topics_photos/" +
                           topic.categoryNumber +
                           "/" +
                           topic.number +

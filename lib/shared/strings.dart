@@ -8,5 +8,16 @@ class Strings {
     return wordTopics;
   }
 
+  static String getPartOfSpeech(String partOfSpeechDB) {
+    String wordPartOfSpeech = "";
+    if (partOfSpeechDB == "noun") wordPartOfSpeech = "существительное";
+    if (partOfSpeechDB == "verb") wordPartOfSpeech = "глагол";
+    if (partOfSpeechDB == "phrasal verb") wordPartOfSpeech = "фразовый глагол";
+    if (partOfSpeechDB == "adjective") wordPartOfSpeech = "прилагательное";
+    if (partOfSpeechDB == "idiom") wordPartOfSpeech = "идиома";
+    return wordPartOfSpeech;
+
+  }
+
 
 }

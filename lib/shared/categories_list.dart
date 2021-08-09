@@ -118,7 +118,7 @@ class CategoriesList extends StatelessWidget {
             child: Container(
               height: convertHeightFrom360(context, 76, category.photoHeight),
               alignment: Alignment.bottomRight,
-              child: Image.network("http://magicards.ru/categories_photo/" +
+              child: Image.network("http://lingvicards.ru/categories_photo/" +
                   category.number.toString() +
                   ".png"),
             ),

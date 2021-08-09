@@ -210,9 +210,16 @@ const myTranscription = TextStyle(
   fontFamily: 'Helvetica',
 );
 
+const myPartOfSpeech = TextStyle(
+  fontSize: 15,
+  color: MyColors.additionalTextGreyColor,
+  //color: Color(0xFF868686), // Darker grey
+  fontFamily: 'Helvetica',
+);
+
 const myTitleRus = TextStyle(
   fontSize: 15,
-  color: MyColors.subtitleColor,
+  color: Colors.black,
 );
 
 const myExampleCard = TextStyle(

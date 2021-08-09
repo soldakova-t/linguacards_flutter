@@ -49,6 +49,18 @@ class _CardsListState extends State<CardsList> {
       smallPhotoWidth = 352;
     }
 
+    String cardCategory = widget.cards[index].subtopic.split(" ")[0];
+    String cardSuptopicName = widget.cards[index].subtopic.split(" ")[1];
+    String cardPhotoPath = "http://lingvicards.ru/cards_photos/" +
+        cardCategory +
+        "/" +
+        cardSuptopicName +
+        "/" +
+        smallPhotoWidth.toString() +
+        "/" +
+        widget.cards[index].number +
+        ".jpg";
+
     return GestureDetector(
       onTap: () {
         var learningState = Provider.of<LearningState>(context, listen: false);
@@ -91,14 +103,7 @@ class _CardsListState extends State<CardsList> {
                       ),
                       image: DecorationImage(
                         fit: BoxFit.fitHeight,
-                        image: NetworkImage(
-                            "http://magicards.ru/cards_photos/" +
-                                widget.cards[index].subtopic.toString() +
-                                "/" +
-                                smallPhotoWidth.toString() +
-                                "/" +
-                                widget.cards[index].number.toString() +
-                                ".jpg"),
+                        image: NetworkImage(cardPhotoPath),
                       ),
                       color: Colors.white,
                     ),
@@ -117,12 +122,13 @@ class _CardsListState extends State<CardsList> {
                     ],
                   ),
                 ),
-                Container(
+                // Level
+                /*Container(
                   width: convertWidthFrom360(context, 100),
                   alignment: Alignment.centerRight,
                   child:
                       Text(widget.cards[index].level, style: mySubtitleStyle),
-                )
+                )*/
               ],
             ),
             Padding(
@@ -154,12 +160,17 @@ class _CardDetailsState extends State<CardDetails> {
     var learningState = Provider.of<LearningState>(context, listen: false);
     card = learningState.card;
 
-    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
-            card.subtopic.toString() +
-            "/" +
-            card.title +
-            ".mp3" ??
-        "");
+    String cardCategory = card.subtopic.split(" ")[0];
+    String cardSuptopicName = card.subtopic.split(" ")[1];
+    String cardSoundPath = "http://lingvicards.ru/cards_sounds/" +
+        cardCategory +
+        "/" +
+        cardSuptopicName +
+        "/" +
+        card.title +
+        ".mp3";
+
+    Globals.playPronounciation(cardSoundPath ?? "");
   }
 
   @override
@@ -180,13 +191,25 @@ class _CardDetailsState extends State<CardDetails> {
         bigPhotoWidth = 1640;
       }
 
-      String pathPhoto = "http://magicards.ru/cards_photos/" +
-          card.subtopic.toString() +
+      String cardCategory = card.subtopic.split(" ")[0];
+      String cardSuptopicName = card.subtopic.split(" ")[1];
+      String cardPhotoPath = "http://lingvicards.ru/cards_photos/" +
+          cardCategory +
+          "/" +
+          cardSuptopicName +
           "/" +
           bigPhotoWidth.toString() +
           "/" +
-          card.number.toString() +
+          card.number +
           ".jpg";
+
+      String cardSoundPath = "http://lingvicards.ru/cards_sounds/" +
+          cardCategory +
+          "/" +
+          cardSuptopicName +
+          "/" +
+          card.title +
+          ".mp3";
 
       return Container(
         width: convertWidthFrom360(context, 312),
@@ -199,25 +222,20 @@ class _CardDetailsState extends State<CardDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildCloseButton(context),
                   Text(
                     card.title,
                     style: myH1Card,
                   ),
                   SizedBox(height: 10),
                   Text(
-                    card.partOfSpeech,
-                    style: myTranscription,
+                    Strings.getPartOfSpeech(card.partOfSpeech),
+                    style: myPartOfSpeech,
                   ),
                   SizedBox(height: 8),
                   GestureDetector(
                     onTap: () {
-                      Globals.playPronounciation(
-                          "http://magicards.ru/cards_sounds/" +
-                                  card.subtopic.toString() +
-                                  "/" +
-                                  card.title +
-                                  ".mp3" ??
-                              "");
+                      Globals.playPronounciation(cardSoundPath ?? "");
                     },
                     child: Row(
                       children: <Widget>[
@@ -263,32 +281,62 @@ class _CardDetailsState extends State<CardDetails> {
                   SizedBox(height: 40),
                   Align(
                     alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: convertHeightFrom360(context, 360, 190),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(
-                                  convertHeightFrom360(context, 360, 16)),
-                            ),
-                            image: DecorationImage(
-                              fit: BoxFit.fitHeight,
-                              image: NetworkImage(pathPhoto),
-                            ),
-                            color: Colors.grey[200],
-                          ),
+                    child: Container(
+                      height: convertHeightFrom360(context, 360, 190),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                              convertHeightFrom360(context, 360, 16)),
                         ),
-                        SizedBox(height: 5),
-                        Text(
-                          card.titleRus,
+                        image: DecorationImage(
+                          fit: BoxFit.fitHeight,
+                          image: NetworkImage(cardPhotoPath),
+                        ),
+                        color: Colors.grey[200],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 18),
+                  Text("Перевод", style: myTranscription),
+                  SizedBox(height: 3),
+                  Text(capitalize(card.titleRus), style: myTitleRus),
+                  card.example1 != ''
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 18),
+                            Text("Пример", style: myTranscription),
+                            SizedBox(height: 3),
+                            Text(card.example1, style: myTitleRus),
+                          ],
+                        )
+                      : Container(),
+                  /*RichText(
+                    text: TextSpan(
+                      text: "Перевод ",
+                      style: myTranscription,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: card.titleRus,
                           style: myTitleRus,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 40),
+                  card.example1 != '' ? RichText(
+                    text: TextSpan(
+                      text: "Пример: ",
+                      style: myTitleRus,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: card.example1,
+                          style: myTitleRus,
+                        ),
+                      ],
+                    ),
+                  ) : Container(),*/
+                  SizedBox(height: 45),
                   ButtonLearned(),
                   SizedBox(height: 8),
                 ],
@@ -302,5 +350,20 @@ class _CardDetailsState extends State<CardDetails> {
         child: Text("Слово не найдено"),
       );
     }
+  }
+
+  Widget _buildCloseButton(BuildContext context) {
+    return Container(
+      alignment: Alignment.topRight,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pop();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Icon(Icons.close),
+        ),
+      ),
+    );
   }
 }

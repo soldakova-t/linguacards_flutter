@@ -12,8 +12,15 @@ class CardsScreen extends StatefulWidget {
 }
 
 class _CardsScreenState extends State<CardsScreen> {
-  List<String> listLearnedCardsIDs = [];
+  // All cards in topic
   List<Magicard> listOfAllCards = [];
+
+  // For unauthorized user
+  List<Magicard> allCardsLevel1 = [];
+  List<Magicard> allCardsLevel2 = [];
+
+  // For authorized user
+  List<String> listLearnedCardsIDs = [];
   List<Magicard> notLearnedCardsLevel1 = [];
   List<Magicard> notLearnedCardsLevel2 = [];
   List<Magicard> learnedCardsLevel1 = [];
@@ -81,7 +88,7 @@ class _CardsScreenState extends State<CardsScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('cards')
-          .where('subtopic', isEqualTo: learningState.topic.id)
+          .where('subtopic', isEqualTo: learningState.topic.categoryNumber + " " + learningState.topic.id)
           .where('version_br', isEqualTo: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -160,14 +167,29 @@ class _CardsScreenState extends State<CardsScreen> {
                                               ],
                                             )
                                           : Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                SizedBox(
-                                                    height:
-                                                        convertHeightFrom360(
-                                                            context, 360, 8)),
+                                                notLearnedCardsLevel1.length > 0
+                                                    ? _buildLabelLevel(
+                                                        "Уровень A1 - A2")
+                                                    : Container(),
                                                 CardsList(
                                                     cards:
                                                         notLearnedCardsLevel1),
+                                                notLearnedCardsLevel1.length > 0
+                                                    ? SizedBox(
+                                                        height:
+                                                            convertHeightFrom360(
+                                                                context,
+                                                                360,
+                                                                16),
+                                                      )
+                                                    : Container(),
+                                                notLearnedCardsLevel2.length > 0
+                                                    ? _buildLabelLevel(
+                                                        "Уровень Upper A2 - B1")
+                                                    : Container(),
                                                 CardsList(
                                                     cards:
                                                         notLearnedCardsLevel2),
@@ -212,13 +234,22 @@ class _CardsScreenState extends State<CardsScreen> {
                                       .length !=
                                   0
                               ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(
-                                        height: convertHeightFrom360(
-                                            context, 360, 8)),
-                                    CardsList(
-                                        cards:
-                                            learnedCardsLevel1), // Can remove?..
+                                    learnedCardsLevel1.length > 0
+                                        ? _buildLabelLevel("Уровень A1 - A2")
+                                        : Container(),
+                                    CardsList(cards: learnedCardsLevel1),
+                                    learnedCardsLevel1.length > 0
+                                        ? SizedBox(
+                                            height: convertHeightFrom360(
+                                                context, 360, 16),
+                                          )
+                                        : Container(),
+                                    learnedCardsLevel2.length > 0
+                                        ? _buildLabelLevel(
+                                            "Уровень Upper A2 - B1")
+                                        : Container(),
                                     CardsList(cards: learnedCardsLevel2),
                                     SizedBox(
                                         height: convertHeightFrom360(
@@ -245,6 +276,8 @@ class _CardsScreenState extends State<CardsScreen> {
             learningState.cardsForTraining = [];
             learningState.cardsForTraining = listOfAllCards;
 
+            fillAllCardsLevel1AndLevel2();
+
             return TabBarView(
               children: [
                 // TAB 1: All cards
@@ -257,11 +290,23 @@ class _CardsScreenState extends State<CardsScreen> {
                           children: [
                             SingleChildScrollView(
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                      height: convertHeightFrom360(
-                                          context, 360, 8)),
-                                  CardsList(cards: listOfAllCards),
+                                  allCardsLevel1.length > 0
+                                      ? _buildLabelLevel("Уровень A1 - A2")
+                                      : Container(),
+                                  CardsList(cards: allCardsLevel1),
+                                  allCardsLevel1.length > 0
+                                      ? SizedBox(
+                                          height: convertHeightFrom360(
+                                              context, 360, 16),
+                                        )
+                                      : Container(),
+                                  allCardsLevel2.length > 0
+                                      ? _buildLabelLevel(
+                                          "Уровень Upper A2 - B1")
+                                      : Container(),
+                                  CardsList(cards: allCardsLevel2),
                                   SizedBox(
                                     height:
                                         convertHeightFrom360(context, 360, 134),
@@ -317,6 +362,19 @@ class _CardsScreenState extends State<CardsScreen> {
     }
   }
 
+  // For unauthorized user
+  fillAllCardsLevel1AndLevel2() {
+    allCardsLevel1.clear();
+    allCardsLevel2.clear();
+
+    listOfAllCards.forEach((card) {
+      card.level == "A1 - A2"
+          ? allCardsLevel1.add(card)
+          : allCardsLevel2.add(card);
+    });
+  }
+
+  // For authorized user
   fillLearnedAndNotLearnedCards() {
     learnedCardsLevel1.clear();
     learnedCardsLevel2.clear();
@@ -334,6 +392,20 @@ class _CardsScreenState extends State<CardsScreen> {
             : notLearnedCardsLevel2.add(card);
       }
     });
+  }
+
+  Widget _buildLabelLevel(String label) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: convertHeightFrom360(context, 360, 16),
+        bottom: convertHeightFrom360(context, 360, 22),
+        left: convertWidthFrom360(context, 16),
+      ),
+      child: Text(
+        label,
+        style: mySubtitleStyle,
+      ),
+    );
   }
 
   Widget _buildTrainingButton() {
@@ -360,7 +432,7 @@ class _CardsScreenState extends State<CardsScreen> {
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => TrainingFlashcards(),
+                      builder: (BuildContext context) => TrainingFlashcards(learningState.cardsForTraining),
                     ),
                   );
                 },

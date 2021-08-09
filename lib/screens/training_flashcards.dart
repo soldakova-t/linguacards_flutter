@@ -7,6 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class TrainingFlashcards extends StatefulWidget {
+  final List<Magicard> cards;
+
+  const TrainingFlashcards(this.cards, {Key key}) : super(key: key);
+
   @override
   _TrainingFlashcardsState createState() => _TrainingFlashcardsState();
 }
@@ -20,12 +24,19 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
     super.initState();
 
     learningState = Provider.of<LearningState>(context, listen: false);
-    Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
-            learningState.cardsForTraining[0].subtopic.toString() +
-            "/" +
-            learningState.cardsForTraining[0].title +
-            ".mp3" ??
-        "");
+
+    Magicard card = widget.cards[0];
+    String cardCategory = card.subtopic.split(" ")[0];
+    String cardSuptopicName = card.subtopic.split(" ")[1];
+    String cardSoundPath = "http://lingvicards.ru/cards_sounds/" +
+        cardCategory +
+        "/" +
+        cardSuptopicName +
+        "/" +
+        card.title +
+        ".mp3";
+
+    Globals.playPronounciation(cardSoundPath ?? "");
   }
 
   @override
@@ -57,11 +68,11 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
                           ),
                           SizedBox(width: convertWidthFrom360(context, 18)),
                           Container(
-                            child: Text(
+                            child:
+                                Text(
                               trainingState.currentCardNumber.toString() +
                                   " из " +
-                                  learningState.cardsForTraining.length
-                                      .toString(),
+                                  widget.cards.length.toString(),
                               style: myProgress,
                             ),
                           ),
@@ -76,7 +87,7 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
                         var trainingState =
                             Provider.of<TrainingState>(context, listen: false);
                         trainingState.trainingProgress =
-                            (1 / learningState.cardsForTraining.length);
+                            (1 / widget.cards.length);
                         trainingState.currentCardNumber = 1;
                         Navigator.of(context).pop();
                       },
@@ -111,20 +122,29 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
       controller: trainingState
           .controller, // Here we can change left and right paddings.
       onPageChanged: (int idx) {
-        Globals.playPronounciation("http://magicards.ru/cards_sounds/" +
-                learningState.cardsForTraining[idx].subtopic.toString() +
-                "/" +
-                learningState.cardsForTraining[idx].title +
-                ".mp3" ??
-            "");
+        Magicard card = widget.cards[idx];
+        String cardCategory = card.subtopic.split(" ")[0];
+        String cardSuptopicName = card.subtopic.split(" ")[1];
+        String cardSoundPath = "http://lingvicards.ru/cards_sounds/" +
+            cardCategory +
+            "/" +
+            cardSuptopicName +
+            "/" +
+            card.title +
+            ".mp3";
+
+        Globals.playPronounciation(cardSoundPath ?? "");
       },
       itemBuilder: (BuildContext context, int itemIndex) {
         if (trainingVariant == 0) {
-          return CarouselItemWordOpened(itemIndex: itemIndex);
+          return CarouselItemWordOpened(
+            itemIndex: itemIndex,
+            cards: widget.cards,
+          );
         } else
           return Container();
       },
-      itemCount: learningState.cardsForTraining.length,
+      itemCount: widget.cards.length,
     );
   }
 }
@@ -133,9 +153,11 @@ class CarouselItemWordOpened extends StatefulWidget {
   const CarouselItemWordOpened({
     Key key,
     @required this.itemIndex,
+    this.cards,
   }) : super(key: key);
 
   final int itemIndex;
+  final List<Magicard> cards;
 
   @override
   _CarouselItemWordOpenedState createState() => _CarouselItemWordOpenedState();
@@ -154,11 +176,15 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
   void initState() {
     super.initState();
     learningState = Provider.of<LearningState>(context, listen: false);
-    learningState.card = learningState.cardsForTraining[widget.itemIndex];
+
+    // For button "Mark as learned"
+    learningState.card = widget.cards[widget.itemIndex];
   }
 
   @override
   Widget build(BuildContext context) {
+    Magicard card = widget.cards[widget.itemIndex];
+
     User user = Provider.of<User>(context);
     var trainingState = Provider.of<TrainingState>(context, listen: false);
 
@@ -177,28 +203,40 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
       bigPhotoWidth = 1640;
     }
 
-    String pathPhoto = "http://magicards.ru/cards_photos/" +
-        learningState.cardsForTraining[widget.itemIndex].subtopic.toString() +
+    String cardCategory = card.subtopic.split(" ")[0];
+    String cardSuptopicName = card.subtopic.split(" ")[1];
+    String cardPhotoPath = "http://lingvicards.ru/cards_photos/" +
+        cardCategory +
+        "/" +
+        cardSuptopicName +
         "/" +
         bigPhotoWidth.toString() +
         "/" +
-        learningState.cardsForTraining[widget.itemIndex].number.toString() +
+        card.number +
         ".jpg";
 
-    preload(context, pathPhoto);
+    String cardSoundPath = "http://lingvicards.ru/cards_sounds/" +
+        cardCategory +
+        "/" +
+        cardSuptopicName +
+        "/" +
+        card.title +
+        ".mp3";
+
+    preload(context, cardPhotoPath);
 
     return GestureDetector(
       onPanUpdate: (details) {
         if (details.delta.dx < 0 &&
-            (widget.itemIndex + 1) < learningState.cardsForTraining.length) {
+            (widget.itemIndex + 1) < widget.cards.length) {
           trainingState.trainingProgress =
-              (widget.itemIndex + 2) / learningState.cardsForTraining.length;
+              (widget.itemIndex + 2) / widget.cards.length;
           trainingState.currentCardNumber = widget.itemIndex + 2;
           trainingState.nextPage();
         }
         if (details.delta.dx > 0 && widget.itemIndex > 0) {
           trainingState.trainingProgress =
-              widget.itemIndex / learningState.cardsForTraining.length;
+              widget.itemIndex / widget.cards.length;
           trainingState.currentCardNumber = widget.itemIndex;
           trainingState.prevPage();
         }
@@ -218,35 +256,23 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                 Text("Вспомните, что означает это слово:"),
                 SizedBox(height: 30),
                 Text(
-                  learningState.cardsForTraining[widget.itemIndex].title,
+                  card.title,
                   style: myH1Card,
                 ),
                 SizedBox(height: 10),
                 Text(
-                  learningState.cardsForTraining[widget.itemIndex].partOfSpeech,
+                  Strings.getPartOfSpeech(card.partOfSpeech),
                   style: myTranscription,
                 ),
                 SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
-                    Globals.playPronounciation(
-                        "http://magicards.ru/cards_sounds/" +
-                                learningState
-                                    .cardsForTraining[widget.itemIndex].subtopic
-                                    .toString() +
-                                "/" +
-                                learningState
-                                    .cardsForTraining[widget.itemIndex].title +
-                                ".mp3" ??
-                            "");
+                    Globals.playPronounciation(cardSoundPath ?? "");
                   },
                   child: Row(
                     children: <Widget>[
                       Text(
-                        '[' +
-                            learningState.cardsForTraining[widget.itemIndex]
-                                .transcriptionBr +
-                            ']',
+                        '[' + card.transcriptionBr + ']',
                         style: myTranscription,
                       ),
                       SizedBox(width: 10),
@@ -266,31 +292,21 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                 ),
                 SizedBox(height: 10),
                 if (_showMeaningAndActions == true &&
-                    (learningState.cardsForTraining[widget.itemIndex].syn1 !=
-                            '' ||
-                        learningState.cardsForTraining[widget.itemIndex].syn2 !=
-                            ''))
+                    (card.syn1 != '' || card.syn2 != ''))
                   RichText(
                     text: TextSpan(
                       text: "also ",
                       style: myTranscription,
                       children: <TextSpan>[
                         TextSpan(
-                            text: learningState
-                                .cardsForTraining[widget.itemIndex].syn1,
+                            text: card.syn1,
                             style: TextStyle(color: Colors.black)),
-                        if (learningState
-                                    .cardsForTraining[widget.itemIndex].syn1 !=
-                                '' &&
-                            learningState
-                                    .cardsForTraining[widget.itemIndex].syn2 !=
-                                '')
+                        if (card.syn1 != '' && card.syn2 != '')
                           TextSpan(
                               text: ", ",
                               style: TextStyle(color: Colors.black)),
                         TextSpan(
-                            text: learningState
-                                .cardsForTraining[widget.itemIndex].syn2,
+                            text: card.syn2,
                             style: TextStyle(color: Colors.black)),
                       ],
                     ),
@@ -298,11 +314,12 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                 SizedBox(height: 40),
                 if (_showMeaningAndActions == true)
                   Expanded(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Container(
                             width: double.infinity,
                             height: convertHeightFrom360(context, 360, 215),
                             decoration: BoxDecoration(
@@ -313,19 +330,28 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                               ),
                               image: DecorationImage(
                                 fit: BoxFit.fitWidth,
-                                image: NetworkImage(pathPhoto),
+                                image: NetworkImage(cardPhotoPath),
                               ),
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 5),
-                          Text(
-                            learningState
-                                .cardsForTraining[widget.itemIndex].titleRus,
-                            style: myTitleRus,
-                          ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: 18),
+                        Text("Перевод", style: myTranscription),
+                        SizedBox(height: 3),
+                        Text(capitalize(card.titleRus), style: myTitleRus),
+                        card.example1 != ''
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 18),
+                                  Text("Пример", style: myTranscription),
+                                  SizedBox(height: 3),
+                                  Text(card.example1, style: myTitleRus),
+                                ],
+                              )
+                            : Container(),
+                      ],
                     ),
                   ),
               ],
@@ -377,9 +403,28 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
           onPressed: () {
             var trainingState =
                 Provider.of<TrainingState>(context, listen: false);
-            trainingState.trainingProgress =
-                (widget.itemIndex + 2) / learningState.cardsForTraining.length;
-            trainingState.currentCardNumber = widget.itemIndex + 2;
+
+            learningState = Provider.of<LearningState>(context, listen: false);
+
+            bool learned = false;
+            Magicard card = learningState.card;
+
+            User user = Provider.of<User>(context, listen: false);
+            if (user != null) {
+              if (learningState.listLearnedCardsIDs != null) {
+                if (learningState.listLearnedCardsIDs.contains(card.id)) {
+                  learned = true;
+                }
+              }
+            }
+
+            int incremento = 2;
+            if (learned == true) incremento = 1;
+
+            trainingState.currentCardNumber = widget.itemIndex + incremento;
+            trainingState.trainingProgress = (widget.itemIndex + incremento) /
+                learningState.cardsForTraining.length;
+
             trainingState.nextPage();
           }),
     );
