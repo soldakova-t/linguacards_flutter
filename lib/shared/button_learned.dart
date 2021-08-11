@@ -47,15 +47,19 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                 child: Text("Отметить изученным",
                     style: mySecondaryButtonTextStyle)),
             onPressed: () {
+
               List<String> newListLearnedCardsIDs =
                   learningState.listLearnedCardsIDs;
+              
+
+              print(learningState.listLearnedCardsIDs);
 
               newListLearnedCardsIDs.add(learningState.card.id);
 
-              Map<String, int> newtTopicsNumbersLearnedCards =
+              Map<String, int> newTopicsNumbersLearnedCards =
                   learningState.topicsNumbersLearnedCards;
 
-              newtTopicsNumbersLearnedCards[learningState.topic.id] =
+              newTopicsNumbersLearnedCards[learningState.topic.id] =
                   learningState.listLearnedCardsIDs.length;
 
               DB.updateArrayOfLearnedCards(
@@ -65,12 +69,14 @@ class _ButtonLearnedState extends State<ButtonLearned> {
 
               DB.updateTopicsNumbersLearnedCards(
                 user.uid,
-                newtTopicsNumbersLearnedCards,
+                newTopicsNumbersLearnedCards,
               );
 
+              learningState.listLearnedCardsIDs.clear(); 
               learningState.listLearnedCardsIDs = newListLearnedCardsIDs;
+
               learningState.topicsNumbersLearnedCards =
-                  newtTopicsNumbersLearnedCards;
+                  newTopicsNumbersLearnedCards;
 
               setState(() {
                 learned = true;

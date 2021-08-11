@@ -145,7 +145,6 @@ class LearningState {
   Map<String, int> topicsNumbersLearnedCards = {};
   Topic topic;
   int numberOfCardsInTopic = 1;
-  List<Magicard> cardsForTraining = [];
   List<String> listLearnedCardsIDs = [];
   Magicard card;
 }

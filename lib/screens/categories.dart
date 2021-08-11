@@ -36,7 +36,7 @@ class CategoriesScreen extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return LinearProgressIndicator();
+          return CircularProgress();
         } else {
           List<Category> categories = [];
 

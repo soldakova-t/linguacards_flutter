@@ -25,10 +25,13 @@ class _CardsScreenState extends State<CardsScreen> {
   List<Magicard> notLearnedCardsLevel2 = [];
   List<Magicard> learnedCardsLevel1 = [];
   List<Magicard> learnedCardsLevel2 = [];
+  List<Magicard> cardsForTraining = [];
+
+  var learningState;
 
   @override
   Widget build(BuildContext context) {
-    var learningState = Provider.of<LearningState>(context, listen: false);
+    learningState = Provider.of<LearningState>(context, listen: false);
 
     return NetworkSensitive(
       child: Scaffold(
@@ -88,7 +91,10 @@ class _CardsScreenState extends State<CardsScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('cards')
-          .where('subtopic', isEqualTo: learningState.topic.categoryNumber + " " + learningState.topic.id)
+          .where('subtopic',
+              isEqualTo: learningState.topic.categoryNumber +
+                  " " +
+                  learningState.topic.id)
           .where('version_br', isEqualTo: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -114,26 +120,16 @@ class _CardsScreenState extends State<CardsScreen> {
                     user.uid, learningState.topic.id),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    );
+                    return CircularProgress();
                   } else {
                     listLearnedCardsIDs.clear();
                     listLearnedCardsIDs = snapshot.data;
                     fillLearnedAndNotLearnedCards();
 
-                    learningState.listLearnedCardsIDs = [];
-                    learningState.cardsForTraining = [];
-
+                    learningState.listLearnedCardsIDs.clear();
                     learningState.listLearnedCardsIDs = listLearnedCardsIDs;
-                    learningState.cardsForTraining =
+
+                    cardsForTraining =
                         notLearnedCardsLevel1 + notLearnedCardsLevel2;
 
                     return TabBarView(
@@ -147,9 +143,7 @@ class _CardsScreenState extends State<CardsScreen> {
                                 child: Column(
                                   children: [
                                     SingleChildScrollView(
-                                      child: learningState
-                                                  .cardsForTraining.length ==
-                                              0
+                                      child: cardsForTraining.length == 0
                                           ? Column(
                                               children: [
                                                 Center(
@@ -273,8 +267,8 @@ class _CardsScreenState extends State<CardsScreen> {
                   }
                 });
           } else {
-            learningState.cardsForTraining = [];
-            learningState.cardsForTraining = listOfAllCards;
+            cardsForTraining = [];
+            cardsForTraining = listOfAllCards;
 
             fillAllCardsLevel1AndLevel2();
 
@@ -422,17 +416,18 @@ class _CardsScreenState extends State<CardsScreen> {
           style: myPrimaryButtonStyle,
           child: Center(
               child: Text("Тренироваться", style: myPrimaryButtonTextStyle)),
-          onPressed: learningState.cardsForTraining.length == 0
+          onPressed: cardsForTraining.length == 0
               ? null
               : () {
                   var trainingState =
                       Provider.of<TrainingState>(context, listen: false);
                   trainingState.trainingProgress =
-                      (1 / learningState.cardsForTraining.length);
+                      (1 / cardsForTraining.length);
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => TrainingFlashcards(learningState.cardsForTraining),
+                      builder: (BuildContext context) =>
+                          TrainingFlashcards(cardsForTraining),
                     ),
                   );
                 },

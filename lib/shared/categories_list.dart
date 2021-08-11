@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:magicards/enums/connectivity_status.dart';
 import 'package:magicards/services/models.dart';
 import 'package:magicards/shared/shared.dart';
+import 'package:provider/provider.dart';
 import '../services/globals.dart';
 
 class CategoriesList extends StatelessWidget {
@@ -103,7 +105,9 @@ class CategoriesList extends StatelessWidget {
                       ),
                       SizedBox(height: convertHeightFrom360(context, 360, 16)),
                       Text(
-                        category.subtopics.length.toString() + " " + Strings.getWordTopics(category.subtopics.length),
+                        category.subtopics.length.toString() +
+                            " " +
+                            Strings.getWordTopics(category.subtopics.length),
                         style: mySubtitleStyle,
                       ),
                     ],

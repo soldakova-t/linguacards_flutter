@@ -36,14 +36,14 @@ class AuthServiceFirebase {
         // handle errors from Apple
       }
 
-      final AuthCredential credential =
-          OAuthProvider('apple.com').credential(
+      final AuthCredential credential = OAuthProvider('apple.com').credential(
         accessToken:
             String.fromCharCodes(appleResult.credential.authorizationCode),
         idToken: String.fromCharCodes(appleResult.credential.identityToken),
       );
 
-      UserCredential firebaseResult = await _auth.signInWithCredential(credential);
+      UserCredential firebaseResult =
+          await _auth.signInWithCredential(credential);
       User user = firebaseResult.user;
 
       Fluttertoast.showToast(
@@ -76,6 +76,51 @@ class AuthServiceFirebase {
       );
 
       UserCredential result = await _auth.signInWithCredential(credential);
+
+      User user;
+      if (result != null) { // Not sure we need to check this
+        user = result.user;
+      }
+
+      if (user != null) {
+        if (await DB.userExists(user.uid) == false) {
+          DB.addNewUser(user.uid);
+        }
+        Fluttertoast.showToast(
+            msg: "Вы успешно авторизовались",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM);
+
+        return user;
+      }
+
+      return null;
+    } on FirebaseAuthException catch (e) {
+      Fluttertoast.showToast(
+          msg: "Авторизоваться не удалось",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM);
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+
+      return null;
+    }
+  }
+
+  /*Future<User> googleSignIn() async {
+    try {
+      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential result = await _auth.signInWithCredential(credential);
+
+
       User user = result.user;
 
       if (await DB.userExists(user.uid) == false) {
@@ -96,15 +141,13 @@ class AuthServiceFirebase {
 
       return null;
     }
-  }
+  }*/
 
   /// This mehtod makes the real auth
   Future<User> firebaseAuthWithFacebook(
       {@required FacebookAccessToken token}) async {
-    AuthCredential credential =
-        FacebookAuthProvider.credential(token.token);
-    User user =
-        (await _auth.signInWithCredential(credential)).user;
+    AuthCredential credential = FacebookAuthProvider.credential(token.token);
+    User user = (await _auth.signInWithCredential(credential)).user;
     return user;
   }
 
@@ -161,8 +204,8 @@ class AuthServiceFirebase {
 
   /// Sign in with OTP (phone auth)
   signInWithOTP(smsCode, verId, {String nextPage, BuildContext context}) {
-    AuthCredential authCreds = PhoneAuthProvider.credential(
-        verificationId: verId, smsCode: smsCode);
+    AuthCredential authCreds =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: smsCode);
     signInWithCredential(authCreds, nextPage: nextPage, context: context);
   }
 
@@ -213,5 +256,4 @@ class AuthServiceFirebase {
   Future<void> signOut() {
     return _auth.signOut();
   }
-
 }

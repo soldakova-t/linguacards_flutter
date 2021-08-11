@@ -44,24 +44,41 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
                         SizedBox(
-                            height: 17 + MediaQuery.of(context).padding.top),
-                        Container(
+                            height: 10 + MediaQuery.of(context).padding.top),
+                        /*Container(
                           alignment: Alignment.topLeft,
                           margin: const EdgeInsets.all(0.0),
                           padding: const EdgeInsets.all(0.0),
                           height: 58,
                           child: SvgPicture.asset('assets/icons/logo_auth.svg'),
                         ),
-                        SizedBox(height: 26),
-                        Text(
-                          'Добро пожаловать в Lingvicards!',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: MyColors.mainDarkColor,
+                        SizedBox(height: 26),*/
+                        Center(
+                          child: Column(
+                            children: [
+                              Text(
+                                'Вход в Lingvicards',
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: MyColors.mainDarkColor,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                'Вы сможете отмечать слова изученными',
+                                style: mySubtitleStyle,
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'и видеть свой прогресс',
+                                style: mySubtitleStyle,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 62),
                         codeSent ? Container() : _buildPhoneInput(),
                         codeSent ? _buildCodeInput() : Container(),
                         SizedBox(height: 8),
@@ -74,10 +91,10 @@ class _LoginPageState extends State<LoginPage> {
                                     ? 'Некорректный номер телефона'
                                     : 'Мы отправим SMS, чтобы подтвердить номер телефона',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   color: incorrectPhoneFireBase
                                       ? MyColors.mainBrightColor
-                                      : hexToColor('#6D6F9D'),
+                                      : MyColors.subtitleColor,
                                 ),
                               ),
                         SizedBox(height: 24),
@@ -108,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                           "assets/icons/google_logo.svg",
                           context,
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 8),
                         _buildSocialAuthButton(
                           'Facebook',
                           auth.loginFacebook,
@@ -171,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(
-            color: MyColors.mainBgColor,
+            color: Color(0xFFE5E5E5),
           ),
         ),
         child: Row(
@@ -254,8 +271,8 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               'Код из SMS',
               style: TextStyle(
-                color: hexToColor('#6D6F9D'),
-                fontSize: 12,
+                color: MyColors.subtitleColor,
+                fontSize: 13,
               ),
             ),
             Container(
@@ -331,24 +348,24 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               'Номер телефона',
               style: TextStyle(
-                color: hexToColor('#6D6F9D'),
-                fontSize: 12,
+                color: MyColors.subtitleColor,
+                fontSize: 13,
               ),
             ),
+            SizedBox(
+              height: 6,
+            ),
             Container(
-              height: 35,
+              height: 21,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5.5),
-                    child: Text(
-                      '+7',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
+                  Text(
+                    '+7',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
                     ),
                   ),
                   SizedBox(
@@ -356,7 +373,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(0.0),
+                      padding: const EdgeInsets.only(top: 0.5),
                       child: TextFormField(
                         style: TextStyle(
                           fontSize: 16,

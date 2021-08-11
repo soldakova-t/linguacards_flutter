@@ -26,43 +26,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
             elevation: 0, // Removes status bar's shadow.
             backgroundColor: MyColors.mainBgColor,
             title: Text('Профиль'),
-            actions: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, right: 18.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    await auth.signOut();
-                    //Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Выйти',
-                      style: TextStyle(
-                        color: MyColors.mainBrightColor,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              user.phoneNumber == '' || user.phoneNumber == null
-                  ? buildSocialNetworkUserHeader(user)
-                  : buildPhoneHeader(user),
-              // buildUserMenu(context),
-            ],
-          ),
+          body: _buildBody(user, context),
           bottomNavigationBar: AppBottomNav(selectedIndex: 2),
         ),
       );
     } else {
-      return LoginPage(prevPage: "cardDetails");
+      return LoginPage();
     }
+  }
+
+  Widget _buildBody(User user, BuildContext context) {
+    final double buttonSignOutWidth =
+        MediaQuery.of(context).size.width;
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16.0),
+              if (user.phoneNumber == '' || user.phoneNumber == null)
+                buildSocialNetworkUserHeader(user),
+              buildUserMenu(context),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 10,
+          child: Container(
+            width: buttonSignOutWidth,
+            child: AdditionalButton(
+              title: "Выйти",
+              action: () async {
+                await auth.signOut();
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildUserMenu(BuildContext context) {
@@ -79,8 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 : engVariantName = "Американский";
 
             snapshot.data["premium"] == false
-                ? access = "Базовый"
-                : access = "Премиум";
+                ? access = "Не оформлена"
+                : access = "Действует до 01.08.2022";
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,64 +97,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     action: () {
                   Navigator.of(context).push(_createRouteChooseVariant());
                 }),*/
-                buildSettingsMenuItem(access, 'Доступ к приложению'),
+
+                user.phoneNumber == '' || user.phoneNumber == null
+                    ? buildSettingsMenuItem('Электронная почта', user.email)
+                    : buildSettingsMenuItem('Номер телефона', user.phoneNumber),
+                buildSettingsMenuItem(
+                    'Подписка на полную версию приложения', access),
                 if (snapshot.data["premium"] == false)
                   Column(
                     children: <Widget>[
                       MainButton(
-                          title: 'Купить Премиум за 1490 ₽', action: () {}),
-                      Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          width: 210,
-                          child: Text(
-                            'Вы получите бессрочный доступ к каталогу из 2500+ карточек',
-                            style: mySubtitle14Style,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                        title: 'Выбрать подписку',
+                        action: () {},
                       ),
+                      /*Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Вы получите доступ к каталогу из 2500+ карточек',
+                          style: mySubtitle14Style,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),*/
                     ],
                   ),
               ],
             );
           } else {
-            return LinearProgressIndicator();
+            return CircularProgress();
           }
         });
   }
 
-  Widget buildSettingsMenuItem(String title, String subtitle,
-      {Function action}) {
+  Widget buildSettingsMenuItem(String label, String value, {Function action}) {
     return action != null
         ? InkWell(
             onTap: action,
-            child: buildSettingsMenuItemRow(title, subtitle, true),
+            child: buildSettingsMenuItemRow(label, value, true),
           )
-        : buildSettingsMenuItemRow(title, subtitle, false);
+        : buildSettingsMenuItemRow(label, value, false);
   }
 
   Row buildSettingsMenuItemRow(
-      String title, String subtitle, bool showArrowRight) {
+      String label, String value, bool showArrowRight) {
     return Row(
       children: <Widget>[
         Expanded(
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 10, left: 27.0, bottom: 15),
+                padding: const EdgeInsets.only(top: 10.0, left: 27.0, bottom: 15.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      title,
+                      label,
+                      style: mySubtitle14Style,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      value,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: mySubtitle14Style,
                     ),
                   ],
                 ),
@@ -186,10 +194,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget buildSocialNetworkUserHeader(User user) {
     return Padding(
-      padding:
-          const EdgeInsets.only(top: 34.0, right: 27, bottom: 44.0, left: 27.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      padding: const EdgeInsets.only(right: 27.0, bottom: 27.0, left: 27.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (user.photoURL != null)
             Container(
@@ -202,25 +209,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-          SizedBox(width: 25),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                user.displayName,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              Text(
-                user.email ?? '',
-                style: mySubtitle14Style,
-              ),
-            ],
+          SizedBox(height: 8),
+          Text(
+            user.displayName,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildButtonSignOut() {
+    return ElevatedButton(
+      style: mySecondaryButtonStyle,
+      child: Center(child: Text("Выйти", style: mySecondaryButtonTextStyle)),
+      onPressed: () async {
+        await auth.signOut();
+      },
     );
   }
 }

@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return LinearProgressIndicator();
+          return CircularProgress();
         } else {
           categories.clear();
           popularTopics.clear();
@@ -136,7 +136,7 @@ class _MainScreenState extends State<MainScreen> {
               child: Text.rich(
                 TextSpan(
                   children: [
-                    TextSpan(text: 'lingvi', style: myLogoStyle),
+                    TextSpan(text: 'Lingvi', style: myLogoStyle),
                     TextSpan(text: 'cards', style: myLogoStyle),
                   ],
                 ),

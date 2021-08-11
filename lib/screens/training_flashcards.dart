@@ -254,7 +254,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Text("Вспомните, что означает это слово:"),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 Text(
                   card.title,
                   style: myH1Card,
@@ -311,7 +311,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                       ],
                     ),
                   ),
-                SizedBox(height: 40),
+                SizedBox(height: 10),
                 if (_showMeaningAndActions == true)
                   Expanded(
                     child: Column(
@@ -367,7 +367,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                       user != null ? ButtonLearned() : Container(),
                       SizedBox(height: 16),
                       (widget.itemIndex <
-                              (learningState.cardsForTraining.length - 1))
+                              (widget.cards.length - 1))
                           ? _buildButtonNext()
                           : _buildButtonFinish(),
                     ],
@@ -423,7 +423,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
 
             trainingState.currentCardNumber = widget.itemIndex + incremento;
             trainingState.trainingProgress = (widget.itemIndex + incremento) /
-                learningState.cardsForTraining.length;
+                widget.cards.length;
 
             trainingState.nextPage();
           }),
@@ -441,7 +441,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
             var trainingState =
                 Provider.of<TrainingState>(context, listen: false);
             trainingState.trainingProgress =
-                (1 / learningState.cardsForTraining.length);
+                (1 / widget.cards.length);
             Navigator.of(context).pop();
           }),
     );
