@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "968997541736-3rn3pa1ar4okagslkritibm54lh7dk98.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.magicards.mc",
+            "certificate_hash": "a7903ad6e09302931cea7cf4199086dc2d8ff5c6"
+          }
+        },
+        {
           "client_id": "968997541736-jullkcgtvrqvd0ggfif6qrev2bm7i5vd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -38,6 +46,57 @@
             {
               "client_id": "968997541736-56g2fmofvoq2fi4lr7sf8fe03q4jn8os.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "968997541736-i2jr4pe6tfap4l8kr0u1aaan6c3ekk4i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.magicards.mc"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968997541736:android:aaeaea7dfa51873e25a8dd",
+        "android_client_info": {
+          "package_name": "ru.lingvicards.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "968997541736-mib8mlp70tbvr8jnk7th2jhljrmbh3gs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.lingvicards.app",
+            "certificate_hash": "1e30ef07cb7bf98eba69a00286dcbcc2a4639ad4"
+          }
+        },
+        {
+          "client_id": "968997541736-56g2fmofvoq2fi4lr7sf8fe03q4jn8os.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZKYfedjiNukbQZugdpaIg8EHBu3QKqJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "968997541736-56g2fmofvoq2fi4lr7sf8fe03q4jn8os.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "968997541736-i2jr4pe6tfap4l8kr0u1aaan6c3ekk4i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.magicards.mc"
+              }
             }
           ]
         }

@@ -122,27 +122,8 @@ class _MainScreenState extends State<MainScreen> {
 
     return Padding(
       padding: EdgeInsets.only(
-          left: convertWidthFrom360(context, 16), top: statusBarHeight),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SvgPicture.asset('assets/icons/logo.svg'),
-          Padding(
-              padding: const EdgeInsets.only(
-                left: 8.0,
-                top: 8.0,
-              ),
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: 'Lingvi', style: myLogoStyle),
-                    TextSpan(text: 'cards', style: myLogoStyle),
-                  ],
-                ),
-              )),
-        ],
-      ),
+          left: convertWidthFrom360(context, 16), top: statusBarHeight + 10),
+      child: SvgPicture.asset('assets/icons/logo.svg'),
     );
   }
 }

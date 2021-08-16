@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:magicards/api/purchase_api.dart';
 import '../screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
@@ -37,8 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildBody(User user, BuildContext context) {
-    final double buttonSignOutWidth =
-        MediaQuery.of(context).size.width;
+    final double buttonSignOutWidth = MediaQuery.of(context).size.width;
 
     return Stack(
       children: [
@@ -71,6 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget buildUserMenu(BuildContext context) {
     User user = Provider.of<User>(context);
+    bool isLoading = false; // Must be somewhere else
 
     return StreamBuilder(
         stream: DB.getUserInfoStream(user.uid),
@@ -108,7 +109,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: <Widget>[
                       MainButton(
                         title: 'Выбрать подписку',
-                        action: () {},
+                        action: () {
+                          isLoading ? null : fetchOffers();
+                        },
                       ),
                       /*Align(
                         alignment: Alignment.center,
@@ -128,6 +131,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
   }
 
+  Future fetchOffers() async {
+    final offerings = await PurchaseApi.fetchOffers();
+
+    if (offerings.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("No Plans Found"),
+        ),
+      );
+    } else {
+      final offer = offerings.first;
+      print('Offer: $offer');
+
+      showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 200,
+            color: Colors.amber,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text('Modal BottomSheet'),
+                  ElevatedButton(
+                    child: const Text('Close BottomSheet'),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   Widget buildSettingsMenuItem(String label, String value, {Function action}) {
     return action != null
         ? InkWell(
@@ -145,7 +186,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Stack(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 10.0, left: 27.0, bottom: 15.0),
+                padding:
+                    const EdgeInsets.only(top: 10.0, left: 27.0, bottom: 15.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[

@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>magicards</string>
+	<string>Lingvicards</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -73,7 +73,7 @@
 <key>FacebookDisplayName</key>
 
 <!-- Replace "YOUR_APP_NAME" with your Facebook App name. -->
-<string>Magicards</string>
+<string>Lingvicards</string>
 
 <key>LSApplicationQueriesSchemes</key>
 <array>

@@ -7,7 +7,7 @@ import 'models.dart';
 /// Static global state. Immutable services that do not care about build context.
 class Globals {
   // App Data
-  static final String title = 'Magicards';
+  static final String title = 'Lingvicards';
 
   // Services
   static final FirebaseAnalytics analytics = FirebaseAnalytics();
@@ -47,8 +47,7 @@ double convertHeightFrom360(
   return newBlockHeight;
 }
 
-Route createRouteScreen(String ref,
-    {List<Topic> topics, String title}) {
+Route createRouteScreen(String ref, {List<Topic> topics, String title}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) {
       if (ref == "/categories") {
@@ -85,4 +84,3 @@ Route createRouteScreen(String ref,
     },
   );
 }
-

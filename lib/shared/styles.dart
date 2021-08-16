@@ -17,6 +17,8 @@ class MyColors {
   static const Color hideAccessColor = Color(0xFFEDEDED);
   static const Color popularBgColor = Color(0xFFFEFFDA);
   static const Color additionalTextGreyColor = Color(0xFFB9B9B9);
+  static const Color logoDarkBlueColor = Color(0xFF4799F3);
+  static const Color logoPinkColor = Color(0xFFE95C78);
 }
 
 // My Text Styles
@@ -67,14 +69,12 @@ const myPercentStyle = TextStyle(
   fontFamily: "SF Compact Display",
 );
 
-
 const myHeaderStyle = TextStyle(
   fontSize: 23, // In Figma 21.
   color: Colors.black,
   fontFamily: "SF Compact Display",
   fontWeight: FontWeight.w900,
 );
-
 
 const myNotLearnedTabLabelStyle = TextStyle(
   fontSize: 16,
@@ -86,20 +86,25 @@ const myLearnedTabLabelStyle = TextStyle(
   fontWeight: FontWeight.w400,
 );
 
-const myLogoStyle = TextStyle(
-  fontSize: 17,
-  color: Colors.black,
-  fontFamily: "SF Compact Display",
+const myLogoLingvi = TextStyle(
+  color: MyColors.logoDarkBlueColor,
+  fontFamily: "Nunito",
+  fontSize: 19,
+  fontWeight: FontWeight.bold,
 );
 
-
+const myLogoCards = TextStyle(
+  color: MyColors.logoPinkColor,
+  fontFamily: "Nunito",
+  fontSize: 19,
+  fontWeight: FontWeight.bold,
+);
 
 final ButtonStyle myPrimaryButtonStyle = ButtonStyle(
   elevation: MaterialStateProperty.all(0.0),
   shape: MaterialStateProperty.all(
     RoundedRectangleBorder(
-      borderRadius:
-          BorderRadius.all(Radius.circular(12)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
   ),
   backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
@@ -109,7 +114,6 @@ final ButtonStyle myPrimaryButtonStyle = ButtonStyle(
     return MyColors.mainBrightColor; // Regular color
   }),
 );
-
 
 const myPrimaryButtonTextStyle = TextStyle(
   fontSize: 17,
@@ -122,8 +126,7 @@ final ButtonStyle mySecondaryButtonStyle = ButtonStyle(
   elevation: MaterialStateProperty.all(0.0),
   shape: MaterialStateProperty.all(
     RoundedRectangleBorder(
-      borderRadius:
-          BorderRadius.all(Radius.circular(12)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
   ),
   backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
@@ -133,7 +136,6 @@ final ButtonStyle mySecondaryButtonStyle = ButtonStyle(
     return hexToColor("#ECEBEB"); // Regular color
   }),
 );
-
 
 const mySecondaryButtonTextStyle = TextStyle(
   fontSize: 17,
