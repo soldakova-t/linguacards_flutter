@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:magicards/api/purchase_api.dart';
+import 'package:magicards/enums/entitlement.dart';
 import '../screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
@@ -71,21 +72,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget buildUserMenu(BuildContext context) {
     User user = Provider.of<User>(context);
+    final entitlement = Provider.of<RevenueCatProvider>(context).entitlement;
     bool isLoading = false; // Must be somewhere else
 
     return StreamBuilder(
         stream: DB.getUserInfoStream(user.uid),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
-            String engVariantName;
-            String access;
+            /*String engVariantName;
             snapshot.data["eng_version"] == "br"
                 ? engVariantName = "Британский"
-                : engVariantName = "Американский";
+                : engVariantName = "Американский";*/
 
-            snapshot.data["premium"] == false
-                ? access = "Не оформлена"
-                : access = "Действует до 01.08.2022";
+            String access;
+
+            switch (entitlement) {
+              case Entitlement.premium:
+                access = "Оформлена";
+                break;
+              case Entitlement.free:
+              default:
+                access = "Не оформлена";
+                break;
+            }
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,25 +111,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 user.phoneNumber == '' || user.phoneNumber == null
                     ? buildSettingsMenuItem('Электронная почта', user.email)
                     : buildSettingsMenuItem('Номер телефона', user.phoneNumber),
-                buildSettingsMenuItem(
-                    'Подписка на полную версию приложения', access),
-                if (snapshot.data["premium"] == false)
+                buildSettingsMenuItem('Премиум-подписка', access),
+                if (entitlement == Entitlement.free)
                   Column(
                     children: <Widget>[
                       MainButton(
-                        title: 'Выбрать подписку',
+                        title: 'Выбрать премиум-подписку',
                         action: () {
                           isLoading ? null : fetchOffers();
                         },
                       ),
-                      /*Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Вы получите доступ к каталогу из 2500+ карточек',
-                          style: mySubtitle14Style,
-                          textAlign: TextAlign.center,
+                      Container(
+                        width: 200,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Вы получите доступ ко всем 75 темам и обновлениям',
+                            style: mySubtitle14Style,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),*/
+                      ),
                     ],
                   ),
               ],
@@ -137,32 +148,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (offerings.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("No Plans Found"),
+          content: Text("Подписки не найдены"),
         ),
       );
     } else {
-      final offer = offerings.first;
-      print('Offer: $offer');
+      final packages = offerings
+          .map((offer) => offer.availablePackages)
+          .expand((pair) => pair)
+          .toList();
+      print("offerings.length = " + offerings.length.toString());
+      print("packages.lenght = " + packages.length.toString());
 
       showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
-          return Container(
-            height: 200,
-            color: Colors.amber,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Text('Modal BottomSheet'),
-                  ElevatedButton(
-                    child: const Text('Close BottomSheet'),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
+          return Paywall(
+            title: "Премиум",
+            description:
+                "Оформите подписку, чтобы получить доступ ко всем 75 темам и обновлениям",
+            packages: packages,
+            onCLickedPackage: (package) async {
+              await PurchaseApi.purchasePackage(context, package);
+              Navigator.pop(context);
+            },
           );
         },
       );

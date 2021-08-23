@@ -18,7 +18,7 @@ class CategoriesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (orientation == "horizontal") {
-      double categoryHeight = convertHeightFrom360(context, 140, 198);
+      double categoryHeight = convertHeightFrom360(context, 140, 208);
       return Container(
         height: categoryHeight,
         child: ListView.builder(
@@ -90,7 +90,11 @@ class CategoriesList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(convertWidthFrom360(context, 20)),
+                  padding: EdgeInsets.only(
+                    top: convertWidthFrom360(context, 30),
+                    left: convertWidthFrom360(context, 20),
+                    right: convertWidthFrom360(context, 20),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -116,6 +120,28 @@ class CategoriesList extends StatelessWidget {
               ],
             ),
           ),
+          category.premium
+              ? Positioned(
+                  top: 0,
+                  right: 16,
+                  child: Container(
+                    height: convertHeightFrom360(context, 360, 17),
+                    width: convertWidthFrom360(context, 51),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomRight:
+                            Radius.circular(convertWidthFrom360(context, 6)),
+                        bottomLeft:
+                            Radius.circular(convertWidthFrom360(context, 6)),
+                      ),
+                      color: Colors.black,
+                    ),
+                    child: Center(
+                      child: Text("Премиум", style: myPremiumLabelStyle),
+                    ),
+                  ),
+                )
+              : Container(),
           Positioned(
             right: convertWidthFrom360(context, category.photoRightPadding),
             bottom: convertWidthFrom360(context, category.photoBottomPadding),

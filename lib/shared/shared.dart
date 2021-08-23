@@ -14,4 +14,4 @@ export 'cards_list.dart';
 export 'button_learned.dart';
 export 'network_sensitive.dart';
 export 'circular_progress.dart';
-
+export 'paywall.dart';

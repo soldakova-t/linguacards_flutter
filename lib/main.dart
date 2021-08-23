@@ -7,6 +7,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:magicards/api/purchase_api.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ import 'enums/connectivity_status.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await PurchaseApi.init();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(MyApp());
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
                   ConnectivityService().connectionStatusController.stream),
           Provider<LearningState>(create: (_) => LearningState()),
           ChangeNotifierProvider<TrainingState>(create: (_) => TrainingState()),
+          ChangeNotifierProvider<RevenueCatProvider>(
+              create: (_) => RevenueCatProvider()),
         ],
         child: GestureDetector(
           onTap: () {

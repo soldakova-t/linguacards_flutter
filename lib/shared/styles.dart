@@ -55,6 +55,14 @@ const myPopularLabelStyle = TextStyle(
   fontWeight: FontWeight.w900,
 );
 
+const myPremiumLabelStyle = TextStyle(
+  fontSize: 10, // In Figma 15.
+  color: Colors.white,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w900,
+);
+
 const mySubtitleStyle = TextStyle(
   fontSize: 14, // In Figma 13.
   color: MyColors.subtitleColor,

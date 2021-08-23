@@ -38,7 +38,6 @@ class _TopicsListState extends State<TopicsList> {
 
             User user = Provider.of<User>(context);
             if (user != null) {
-              
               return StreamBuilder(
                 stream: DB.getUserInfoStream(user.uid),
                 builder:
@@ -48,7 +47,7 @@ class _TopicsListState extends State<TopicsList> {
 
                     // Updating learningState.mapTopicsProgress if userInfo != null
                     learningState.topicsNumbersLearnedCards = {};
-                    
+
                     if (userInfo != null) {
                       if (userInfo["topics_numbers_learned_cards"] != null) {
                         learningState.topicsNumbersLearnedCards =
@@ -59,14 +58,14 @@ class _TopicsListState extends State<TopicsList> {
 
                     // Updating progress for current topic if learningState.mapTopicsProgress != null
                     if (learningState.topicsNumbersLearnedCards != null) {
-                      if (learningState
-                              .topicsNumbersLearnedCards[widget.topics[index].id] !=
+                      if (learningState.topicsNumbersLearnedCards[
+                              widget.topics[index].id] !=
                           null) {
                         numberOfLearnedCards = learningState
                             .topicsNumbersLearnedCards[widget.topics[index].id];
                       }
                     }
-                    
+
                     return _TopicsListItem(
                         widget.topics[index], numberOfLearnedCards);
                   } else {
@@ -92,7 +91,6 @@ class _TopicsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(context, listen: false);
     double progress = numberOfLearnedCards / topic.numberOfCards;
 
     return GestureDetector(
@@ -119,22 +117,28 @@ class _TopicsListItem extends StatelessWidget {
                 ),
               ),
               // Label popular topic
-              /*Positioned(
-                top: 0,
-                right: 16,
-                child: Container(
-                  height: convertHeightFrom360(context, 360, 17),
-                  width: convertWidthFrom360(context, 71),
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(convertWidthFrom360(context, 6)),
-                    color: MyColors.popularBgColor,
-                  ),
-                  child: Center(
-                    child: Text("Популярная", style: myPopularLabelStyle),
-                  ),
-                ),
-              ),*/
+              topic.popular
+                  ? Positioned(
+                      top: 0,
+                      right: 16,
+                      child: Container(
+                        height: convertHeightFrom360(context, 360, 17),
+                        width: convertWidthFrom360(context, 71),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(
+                                convertWidthFrom360(context, 6)),
+                            bottomLeft: Radius.circular(
+                                convertWidthFrom360(context, 6)),
+                          ),
+                          color: MyColors.popularBgColor,
+                        ),
+                        child: Center(
+                          child: Text("Популярная", style: myPopularLabelStyle),
+                        ),
+                      ),
+                    )
+                  : Container(),
               Positioned(
                 left: convertWidthFrom360(context, 16),
                 top: convertHeightFrom360(context, 360, 18),
@@ -182,11 +186,12 @@ class _TopicsListItem extends StatelessWidget {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       fit: BoxFit.fitHeight,
-                      image: NetworkImage("http://lingvicards.ru/topics_photos/" +
-                          topic.categoryNumber +
-                          "/" +
-                          topic.number +
-                          ".jpg"),
+                      image: NetworkImage(
+                          "http://lingvicards.ru/topics_photos/" +
+                              topic.categoryNumber +
+                              "/" +
+                              topic.number +
+                              ".jpg"),
                     ),
                   ),
                 ),

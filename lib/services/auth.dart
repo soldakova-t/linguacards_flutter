@@ -7,6 +7,7 @@ import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import '../services/services.dart';
 import 'package:magicards/screens/screens.dart';
 
@@ -51,6 +52,8 @@ class AuthServiceFirebase {
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM);
 
+      await Purchases.logIn(user.uid);
+
       return user;
     } catch (error) {
       Fluttertoast.showToast(
@@ -78,7 +81,8 @@ class AuthServiceFirebase {
       UserCredential result = await _auth.signInWithCredential(credential);
 
       User user;
-      if (result != null) { // Not sure we need to check this
+      if (result != null) {
+        // Not sure we need to check this
         user = result.user;
       }
 
@@ -90,6 +94,8 @@ class AuthServiceFirebase {
             msg: "Вы успешно авторизовались",
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM);
+
+        await Purchases.logIn(user.uid);
 
         return user;
       }
@@ -171,6 +177,8 @@ class AuthServiceFirebase {
               toastLength: Toast.LENGTH_LONG,
               gravity: ToastGravity.BOTTOM);
 
+          await Purchases.logIn(user.uid);
+
           break;
         case FacebookLoginStatus.cancelledByUser:
           Fluttertoast.showToast(
@@ -226,6 +234,8 @@ class AuthServiceFirebase {
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM);
 
+        await Purchases.logIn(authResult.user.uid);
+
         switch (nextPage) {
           case "bottomNav":
             //Navigator.of(context).push(_createProfileRoute());
@@ -253,7 +263,8 @@ class AuthServiceFirebase {
   }
 
   // Sign out
-  Future<void> signOut() {
+  Future<void> signOut() async {
+    await Purchases.logOut();
     return _auth.signOut();
   }
 }

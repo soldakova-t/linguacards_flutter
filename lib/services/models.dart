@@ -8,7 +8,7 @@ class Topic {
   String id;
   String title;
   String titleRus;
-  bool premiumAccess;
+  bool premium;
   bool popular;
   int numberOfCards;
 
@@ -18,7 +18,7 @@ class Topic {
       this.id,
       this.title,
       this.titleRus,
-      this.premiumAccess,
+      this.premium,
       this.popular,
       this.numberOfCards});
 
@@ -29,7 +29,7 @@ class Topic {
       id: data['id'] ?? '',
       title: data['title'] ?? '',
       titleRus: data['titleRus'] ?? '',
-      premiumAccess: data['premiumAccess'] ?? false,
+      premium: data['premium'] ?? false,
       popular: data['popular'] ?? false,
       numberOfCards: data['numberOfCards'] ?? 1,
     );
@@ -44,16 +44,17 @@ class Category {
   final double photoBottomPadding;
   final double photoHeight;
   final String bgColor;
+  final bool premium;
   final List<Topic> subtopics;
   final DocumentReference reference;
 
   Category.fromMap(Map map, {this.reference})
       : assert(map['number'] != null),
         assert(map['title'] != null),
-        assert(map['titleRus'] != null),  
+        assert(map['titleRus'] != null),
         assert(map['bgColor'] != null),
         assert(map['photoRightPadding'] != null),
-        assert(map['photoBottomPadding'] != null),  
+        assert(map['photoBottomPadding'] != null),
         assert(map['photoHeight'] != null),
         number = map['number'],
         title = map['title'],
@@ -62,6 +63,7 @@ class Category {
         photoBottomPadding = double.parse(map['photoBottomPadding']) ?? 0,
         photoHeight = double.parse(map['photoHeight']) ?? 104,
         bgColor = map['bgColor'],
+        premium = map['premium'] ?? false,
         subtopics = (map['subtopics'] as List ?? [])
             .map((v) => Topic.fromMap(v))
             .toList();
@@ -185,6 +187,8 @@ class TrainingState with ChangeNotifier {
     );
   }
 }
+
+
 
 /*class User with ChangeNotifier {
   String userId;
