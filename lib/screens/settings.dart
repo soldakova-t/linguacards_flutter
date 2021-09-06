@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:magicards/api/purchase_api.dart';
 import 'package:magicards/enums/entitlement.dart';
@@ -27,14 +28,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           appBar: AppBar(
             elevation: 0, // Removes status bar's shadow.
             backgroundColor: MyColors.mainBgColor,
-            title: Text('Профиль'),
+            backwardsCompatibility: false,
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: MyColors.mainBgColor,
+              statusBarIconBrightness: Brightness.dark,
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.black,
+            ),
+            title: Text(
+              'Профиль',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
           body: _buildBody(user, context),
           bottomNavigationBar: AppBottomNav(selectedIndex: 2),
         ),
       );
     } else {
-      return LoginPage();
+      return LoginScreen();
+
+      /*Navigator.of(context).pop();
+      return Scaffold(
+        backgroundColor: MyColors.mainBgColor,
+        body: Container(),
+      );*/
     }
   }
 
@@ -75,6 +93,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final entitlement = Provider.of<RevenueCatProvider>(context).entitlement;
     bool isLoading = false; // Must be somewhere else
 
+    bool showPlusOffer = false;
+    StringsFB stringsFB = Provider.of<StringsFB>(context);
+    if (stringsFB != null) {
+      showPlusOffer = true;
+    }
+
     return StreamBuilder(
         stream: DB.getUserInfoStream(user.uid),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -111,27 +135,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 user.phoneNumber == '' || user.phoneNumber == null
                     ? buildSettingsMenuItem('Электронная почта', user.email)
                     : buildSettingsMenuItem('Номер телефона', user.phoneNumber),
-                buildSettingsMenuItem('Премиум-подписка', access),
+                buildSettingsMenuItem('Подписка на плюс', access),
                 if (entitlement == Entitlement.free)
                   Column(
                     children: <Widget>[
                       MainButton(
-                        title: 'Выбрать премиум-подписку',
+                        title: 'Оформить плюс',
                         action: () {
-                          isLoading ? null : fetchOffers();
+                          isLoading ? null : fetchOffers(context, user);
                         },
                       ),
-                      Container(
-                        width: 200,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Вы получите доступ ко всем 75 темам и обновлениям',
-                            style: mySubtitle14Style,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
+                      showPlusOffer
+                          ? Container(
+                              width: 200,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  stringsFB.plusOffer,
+                                  style: mySubtitle14Style,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
               ],
@@ -140,41 +166,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return CircularProgress();
           }
         });
-  }
-
-  Future fetchOffers() async {
-    final offerings = await PurchaseApi.fetchOffers();
-
-    if (offerings.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Подписки не найдены"),
-        ),
-      );
-    } else {
-      final packages = offerings
-          .map((offer) => offer.availablePackages)
-          .expand((pair) => pair)
-          .toList();
-      print("offerings.length = " + offerings.length.toString());
-      print("packages.lenght = " + packages.length.toString());
-
-      showModalBottomSheet<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return Paywall(
-            title: "Премиум",
-            description:
-                "Оформите подписку, чтобы получить доступ ко всем 75 темам и обновлениям",
-            packages: packages,
-            onCLickedPackage: (package) async {
-              await PurchaseApi.purchasePackage(context, package);
-              Navigator.pop(context);
-            },
-          );
-        },
-      );
-    }
   }
 
   Widget buildSettingsMenuItem(String label, String value, {Function action}) {

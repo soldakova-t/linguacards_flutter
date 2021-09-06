@@ -94,7 +94,7 @@ class _CardsListState extends State<CardsList> {
                   padding:
                       EdgeInsets.only(right: convertWidthFrom360(context, 16)),
                   child: Container(
-                    width: convertWidthFrom360(context, 70),
+                    width: convertWidthFrom360(context, 69),
                     height: convertHeightFrom360(context, 360, 46),
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,

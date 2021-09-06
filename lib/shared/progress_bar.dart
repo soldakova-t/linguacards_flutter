@@ -14,13 +14,11 @@ class AnimatedProgress extends StatelessWidget {
   }
 }
 
-
 class ProgressLayoutBuilder extends StatelessWidget {
   final double value;
   final double height;
 
-  const ProgressLayoutBuilder(
-      {Key key, @required this.value, this.height = 12})
+  const ProgressLayoutBuilder({Key key, @required this.value, this.height = 12})
       : super(key: key);
 
   @override
@@ -34,7 +32,9 @@ class ProgressLayoutBuilder extends StatelessWidget {
               Container(
                 height: height,
                 decoration: BoxDecoration(
-                  color: (value == 0) ? hexToColor("#F6F6F6") : hexToColor("#EEEEEE"),
+                  color: (value == 0)
+                      ? hexToColor("#F6F6F6")
+                      : hexToColor("#EEEEEE"),
                   borderRadius: BorderRadius.all(
                     Radius.circular(height),
                   ),
@@ -86,7 +86,6 @@ class _AnimatedProgressWithDelayState<T>
   _AnimatedProgressWithDelayState() {
     Future.delayed(const Duration(milliseconds: 400), () {
       setState(() {
-        print("setState" + widget.value.toString());
         _currentValue = widget.value;
       });
     });

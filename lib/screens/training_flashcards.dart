@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
 import '../screens/screens.dart';
@@ -41,75 +42,87 @@ class _TrainingFlashcardsState extends State<TrainingFlashcards> {
 
   @override
   Widget build(BuildContext context) {
-    return NetworkSensitive(
-      child: Scaffold(
-        backgroundColor: MyColors.mainBgColor,
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-              left: 16.0,
-              top: 30 + MediaQuery.of(context).padding.top,
-              right: 10.0,
-              height: 49,
-              child: Stack(
+    return FutureBuilder<bool>(
+      future: FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE),
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return NetworkSensitive(
+            child: Scaffold(
+              backgroundColor: MyColors.mainBgColor,
+              body: Stack(
                 children: <Widget>[
                   Positioned(
-                    left: 0,
-                    top: 24,
-                    child: Consumer<TrainingState>(
-                      builder: (context, trainingState, child) => Row(
-                        children: [
-                          Container(
-                            width: 84.0,
-                            child: AnimatedProgress(
-                              value: trainingState.trainingProgress,
-                              height: 5.0,
+                    left: 16.0,
+                    top: 30 + MediaQuery.of(context).padding.top,
+                    right: 10.0,
+                    height: 49,
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          left: 0,
+                          top: 24,
+                          child: Consumer<TrainingState>(
+                            builder: (context, trainingState, child) => Row(
+                              children: [
+                                Container(
+                                  width: 84.0,
+                                  child: AnimatedProgress(
+                                    value: trainingState.trainingProgress,
+                                    height: 5.0,
+                                  ),
+                                ),
+                                SizedBox(
+                                    width: convertWidthFrom360(context, 18)),
+                                Container(
+                                  child: Text(
+                                    trainingState.currentCardNumber.toString() +
+                                        " из " +
+                                        widget.cards.length.toString(),
+                                    style: myProgress,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(width: convertWidthFrom360(context, 18)),
-                          Container(
-                            child:
-                                Text(
-                              trainingState.currentCardNumber.toString() +
-                                  " из " +
-                                  widget.cards.length.toString(),
-                              style: myProgress,
+                        ),
+                        Positioned(
+                          right: 0,
+                          child: InkWell(
+                            onTap: () {
+                              var trainingState = Provider.of<TrainingState>(
+                                  context,
+                                  listen: false);
+                              trainingState.trainingProgress =
+                                  (1 / widget.cards.length);
+                              trainingState.currentCardNumber = 1;
+                              Navigator.of(context).pop();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Icon(Icons.close),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   Positioned(
+                    left: 0,
                     right: 0,
-                    child: InkWell(
-                      onTap: () {
-                        var trainingState =
-                            Provider.of<TrainingState>(context, listen: false);
-                        trainingState.trainingProgress =
-                            (1 / widget.cards.length);
-                        trainingState.currentCardNumber = 1;
-                        Navigator.of(context).pop();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Icon(Icons.close),
-                      ),
-                    ),
+                    bottom: 0,
+                    top: 103 + MediaQuery.of(context).padding.top,
+                    child: _buildCarousel(context, trainingVariant),
                   ),
                 ],
               ),
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 103 + MediaQuery.of(context).padding.top,
-              child: _buildCarousel(context, trainingVariant),
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 
@@ -366,8 +379,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
                     children: [
                       user != null ? ButtonLearned() : Container(),
                       SizedBox(height: 16),
-                      (widget.itemIndex <
-                              (widget.cards.length - 1))
+                      (widget.itemIndex < (widget.cards.length - 1))
                           ? _buildButtonNext()
                           : _buildButtonFinish(),
                     ],
@@ -422,8 +434,8 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
             if (learned == true) incremento = 1;
 
             trainingState.currentCardNumber = widget.itemIndex + incremento;
-            trainingState.trainingProgress = (widget.itemIndex + incremento) /
-                widget.cards.length;
+            trainingState.trainingProgress =
+                (widget.itemIndex + incremento) / widget.cards.length;
 
             trainingState.nextPage();
           }),
@@ -440,8 +452,7 @@ class _CarouselItemWordOpenedState extends State<CarouselItemWordOpened> {
           onPressed: () {
             var trainingState =
                 Provider.of<TrainingState>(context, listen: false);
-            trainingState.trainingProgress =
-                (1 / widget.cards.length);
+            trainingState.trainingProgress = (1 / widget.cards.length);
             Navigator.of(context).pop();
           }),
     );

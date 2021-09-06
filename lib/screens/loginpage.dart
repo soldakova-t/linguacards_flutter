@@ -6,16 +6,14 @@ import 'package:magicards/shared/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../shared/shared.dart';
 
-class LoginPage extends StatefulWidget {
-  final String prevPage;
-
-  const LoginPage({Key key, this.prevPage}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = new GlobalKey<FormState>();
 
   String phoneNo, verificationId, smsCode;
@@ -24,11 +22,26 @@ class _LoginPageState extends State<LoginPage> {
   bool codeSent = false;
   bool incorrectPhoneFireBase = false;
   AuthServiceFirebase auth = AuthServiceFirebase();
+  String prevScreen = "settings";
+  Map arguments = {};
 
   @override
   Widget build(BuildContext context) {
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    if (arguments != null) prevScreen = arguments["prevScreen"];
+
     return NetworkSensitive(
       child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          elevation: 0, // Removes status bar's shadow.
+          toolbarHeight: 0,
+          backwardsCompatibility: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.white,
+            statusBarIconBrightness: Brightness.dark,
+          ),
+        ),
         body: Builder(
           builder: (context) => Form(
               key: _formKey,
@@ -53,30 +66,30 @@ class _LoginPageState extends State<LoginPage> {
                           child: SvgPicture.asset('assets/icons/logo_auth.svg'),
                         ),
                         SizedBox(height: 26),*/
-                        Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                'Вход в Lingvicards',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: MyColors.mainDarkColor,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Вход',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.mainDarkColor,
                               ),
-                              SizedBox(height: 6),
-                              Text(
-                                'Вы сможете отмечать слова изученными',
-                                style: mySubtitleStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'и видеть свой прогресс',
-                                style: mySubtitleStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Войдите, чтобы отмечать слова изученными',
+                              //style: mySubtitleStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'и подписаться на "плюс"',
+                              //style: mySubtitleStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                         SizedBox(height: 62),
                         codeSent ? Container() : _buildPhoneInput(),
@@ -89,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                             : Text(
                                 incorrectPhoneFireBase
                                     ? 'Некорректный номер телефона'
-                                    : 'Мы отправим SMS, чтобы подтвердить номер телефона',
+                                    : 'Номер будет использоваться только для входа в приложение. Мы не будем вам звонить или писать',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: incorrectPhoneFireBase
@@ -133,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                           context,
                         ),
                         SizedBox(height: 4),
-                        FutureBuilder<Object>(
+                        /*FutureBuilder<Object>(
                           future: auth.appleSignInAvailable,
                           builder: (context, snapshot) {
                             if (snapshot.data == true) {
@@ -147,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                               return Container();
                             }
                           },
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
@@ -164,20 +177,21 @@ class _LoginPageState extends State<LoginPage> {
       onTap: () async {
         var user = await loginMethod();
         if (user != null) {
-          switch (widget.prevPage) {
+          switch (prevScreen) {
             case "bottomNav":
-              //Navigator.of(context).push(_createProfileRoute());
-              break;
-            case "training":
               Navigator.of(context).pop();
+              Navigator.pushNamed(context, '/settings');
+              break;
+            case "paywall":
+              Navigator.of(context).pop();
+              fetchOffers(context, user);
               break;
             case "cardDetails":
-              print("prevPage cardDetails");
               Navigator.of(context).pop();
               break;
+            case "settings":
+              break;
             default:
-              print("prevPage default");
-            //Navigator.of(context).push(_createProfileRoute());
           }
         }
       },
@@ -246,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                 codeSent
                     ? AuthServiceFirebase().signInWithOTP(
                         smsCode, verificationId,
-                        nextPage: widget.prevPage, context: context)
+                        prevScreen: arguments["prevScreen"], context: context)
                     : verifyPhone(phoneNo);
               },
       ),

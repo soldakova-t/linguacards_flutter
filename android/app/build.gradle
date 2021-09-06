@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "ru.lingvicards.app"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

@@ -48,7 +48,7 @@ const myCardTitleStyle = TextStyle(
 );
 
 const myPopularLabelStyle = TextStyle(
-  fontSize: 10, // In Figma 15.
+  fontSize: 11, // In Figma 15.
   color: Colors.black,
   decoration: TextDecoration.none,
   fontFamily: "SF Compact Display",
@@ -56,11 +56,71 @@ const myPopularLabelStyle = TextStyle(
 );
 
 const myPremiumLabelStyle = TextStyle(
-  fontSize: 10, // In Figma 15.
-  color: Colors.white,
+  fontSize: 11, // In Figma 15.
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w800,
+);
+
+const myAppBarPremiumLabelStyle = TextStyle(
+  fontSize: 13,
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w800,
+);
+
+const mySaleLabelStyle = TextStyle(
+  fontSize: 12,
+  color: MyColors.logoPinkColor,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w600,
+);
+
+const mySalePaywallLabelStyle = TextStyle(
+  fontSize: 14,
+  color: MyColors.logoPinkColor,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+  fontWeight: FontWeight.w600,
+);
+
+const myPlusOfferLabelStyle = TextStyle(
+  fontSize: 14,
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+);
+
+const myCurrentPricePaywall = TextStyle(
+  fontSize: 21,
+  color: Colors.black,
   decoration: TextDecoration.none,
   fontFamily: "SF Compact Display",
   fontWeight: FontWeight.w900,
+);
+
+const myOldPricePaywall = TextStyle(
+  fontSize: 14,
+  color: Colors.black,
+  decoration: TextDecoration.lineThrough,
+  fontFamily: "SF Compact Display",
+);
+
+const myPeriodPaywall = TextStyle(
+  fontSize: 14,
+  color: Colors.black,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
+);
+
+const myProfitablyLabelStyle = TextStyle(
+  fontSize: 13,
+  color: Colors.white,
+  decoration: TextDecoration.none,
+  fontFamily: "SF Compact Display",
 );
 
 const mySubtitleStyle = TextStyle(
@@ -117,7 +177,7 @@ final ButtonStyle myPrimaryButtonStyle = ButtonStyle(
   ),
   backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
     if (states.contains(MaterialState.disabled)) {
-      return hexToColor("#A3DEFF"); // Disabled color
+      return hexToColor("#73CDFF"); // Disabled color
     }
     return MyColors.mainBrightColor; // Regular color
   }),

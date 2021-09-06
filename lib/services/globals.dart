@@ -47,7 +47,8 @@ double convertHeightFrom360(
   return newBlockHeight;
 }
 
-Route createRouteScreen(String ref, {List<Topic> topics, String title}) {
+Route createRouteScreen(String ref,
+    {List<Topic> topics, String title, bool premium}) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) {
       if (ref == "/categories") {
@@ -55,8 +56,9 @@ Route createRouteScreen(String ref, {List<Topic> topics, String title}) {
       }
       if (ref == "/topics" && topics != null) {
         return TopicsScreen(
-          topics: topics,
-          title: title,
+          topics,
+          title,
+          premium,
         );
       }
       if (ref == "/popular_topics") {

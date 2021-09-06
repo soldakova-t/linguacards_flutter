@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:magicards/services/services.dart';
 import 'package:provider/provider.dart';
 
@@ -27,8 +28,16 @@ class _NoConnectionScreenState extends State<NoConnectionScreen> {
       appBar: AppBar(
         elevation: 0, // Removes status bar's shadow.
         toolbarHeight: 0,
+        backwardsCompatibility: false,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+        ),
       ),
-      body: Center(child: Text(message, style: TextStyle(fontSize: 18))),
+      body: Container(
+        color: Colors.white,
+        child: Center(child: Text(message, style: TextStyle(fontSize: 18))),
+      ),
     );
   }
 }

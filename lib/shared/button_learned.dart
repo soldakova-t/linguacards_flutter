@@ -47,12 +47,8 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                 child: Text("Отметить изученным",
                     style: mySecondaryButtonTextStyle)),
             onPressed: () {
-
               List<String> newListLearnedCardsIDs =
                   learningState.listLearnedCardsIDs;
-              
-
-              print(learningState.listLearnedCardsIDs);
 
               newListLearnedCardsIDs.add(learningState.card.id);
 
@@ -72,7 +68,7 @@ class _ButtonLearnedState extends State<ButtonLearned> {
                 newTopicsNumbersLearnedCards,
               );
 
-              learningState.listLearnedCardsIDs.clear(); 
+              learningState.listLearnedCardsIDs.clear();
               learningState.listLearnedCardsIDs = newListLearnedCardsIDs;
 
               learningState.topicsNumbersLearnedCards =
@@ -168,7 +164,11 @@ class _ButtonLearnedState extends State<ButtonLearned> {
       child: Center(
           child: Text("Отметить изученным", style: mySecondaryButtonTextStyle)),
       onPressed: () {
-        Navigator.pushNamed(context, '/settings');
+        Navigator.pushNamed(
+          context,
+          '/login',
+          arguments: {"prevScreen": "cardDetails"},
+        );
       },
     );
   }

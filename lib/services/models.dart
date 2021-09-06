@@ -72,36 +72,6 @@ class Category {
       : this.fromMap(snapshot.data(), reference: snapshot.reference);
 }
 
-/* class Magicard {
-  final String id;
-  final String title;
-  final String titleRus;
-  final String transcription;
-  final String photo;
-  final String whiteBg;
-  final String level;
-  final Map<String, dynamic> sound;
-  final DocumentReference reference;
-
-  Magicard.fromMap(String cardId, Map<String, dynamic> map, {this.reference})
-      : assert(map['title'] != null),
-        assert(map['photo'] != null),
-        id = cardId,
-        title = map['title'],
-        titleRus = map['titleRus'] ?? '',
-        transcription = map['transcription'] ?? '',
-        whiteBg = map['whiteBg'] ?? '1',
-        level = map['level'] ?? 'A1 - A2',
-        photo = map['photo'],
-        sound = map['sound'] ?? Map<String, String>();
-
-  Magicard.fromSnapshot(String cardId, DocumentSnapshot snapshot)
-      : this.fromMap(cardId, snapshot.data, reference: snapshot.reference);
-
-  @override
-  String toString() => "Magicard<$title>";
-}*/
-
 class Magicard {
   final String id;
   final String subtopic;
@@ -141,6 +111,44 @@ class Magicard {
 
   @override
   String toString() => "<$title> <$number>";
+}
+
+class Sale {
+  bool active;
+  String message;
+  String priceBeforeSale1m;
+  String priceBeforeSale1y;
+
+  Sale() {
+    active = false;
+    message = "";
+    priceBeforeSale1m = "";
+    priceBeforeSale1y = "";
+  }
+
+  Sale.fromMap(Map map)
+      : assert(map['active'] != null),
+        assert(map['message'] != null),
+        assert(map['priceBeforeSale1m'] != null),
+        assert(map['priceBeforeSale1y'] != null),
+        active = map['active'],
+        message = map['message'],
+        priceBeforeSale1m = map['priceBeforeSale1m'],
+        priceBeforeSale1y = map['priceBeforeSale1y'];
+
+  Sale.fromSnapshot(DocumentSnapshot snapshot) : this.fromMap(snapshot.data());
+}
+
+class StringsFB {
+  String plusOffer;
+  StringsFB() {
+    plusOffer = "";
+  }
+
+  StringsFB.fromMap(Map map) : plusOffer = map['plusOffer'] ?? '';
+
+  StringsFB.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data());
 }
 
 class LearningState {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:magicards/enums/connectivity_status.dart';
+import 'package:magicards/enums/entitlement.dart';
 import 'package:magicards/services/models.dart';
+import 'package:magicards/services/revenuecat.dart';
 import 'package:magicards/shared/shared.dart';
 import 'package:provider/provider.dart';
 import '../services/globals.dart';
@@ -71,10 +73,14 @@ class CategoriesList extends StatelessWidget {
 
   Widget _buildCategoriesListItem(
       BuildContext context, Category category, int index) {
+    final entitlement = Provider.of<RevenueCatProvider>(context).entitlement;
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(createRouteScreen("/topics",
-            topics: category.subtopics, title: category.title));
+            topics: category.subtopics,
+            title: category.title,
+            premium: category.premium));
       },
       child: Stack(
         children: [
@@ -120,7 +126,7 @@ class CategoriesList extends StatelessWidget {
               ],
             ),
           ),
-          category.premium
+          category.premium && (entitlement == Entitlement.free)
               ? Positioned(
                   top: 0,
                   right: 16,
@@ -128,16 +134,14 @@ class CategoriesList extends StatelessWidget {
                     height: convertHeightFrom360(context, 360, 17),
                     width: convertWidthFrom360(context, 51),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomRight:
-                            Radius.circular(convertWidthFrom360(context, 6)),
-                        bottomLeft:
-                            Radius.circular(convertWidthFrom360(context, 6)),
+                      border: Border.all(color: Color(0xFF656565)),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(convertWidthFrom360(context, 6)),
                       ),
-                      color: Colors.black,
+                      color: Colors.transparent,
                     ),
                     child: Center(
-                      child: Text("Премиум", style: myPremiumLabelStyle),
+                      child: Text("плюс", style: myPremiumLabelStyle),
                     ),
                   ),
                 )

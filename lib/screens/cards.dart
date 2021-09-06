@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:provider/provider.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
@@ -31,57 +33,79 @@ class _CardsScreenState extends State<CardsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
     learningState = Provider.of<LearningState>(context, listen: false);
 
-    return NetworkSensitive(
-      child: Scaffold(
-        extendBody: true, // For making BottomNavigationBar transparent.
-        backgroundColor: MyColors.mainBgColor,
-        body: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: convertHeightFrom360(context, 360, 10)),
-              Container(
-                height: convertHeightFrom360(context, 360, 32),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: convertWidthFrom360(context, 16)),
-                  child: Material(
-                    color: hexToColor("#E4E4E5"),
-                    borderRadius: BorderRadius.circular(10),
-                    child: TabBar(
-                      indicatorPadding: const EdgeInsets.all(2.0),
-                      indicator: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+    return FutureBuilder<bool>(
+        future: FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return NetworkSensitive(
+              child: Scaffold(
+                extendBody: true, // For making BottomNavigationBar transparent.
+                backgroundColor: MyColors.mainBgColor,
+                body: DefaultTabController(
+                  length: 2,
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(height: convertHeightFrom360(context, 360, 10)),
+                      Container(
+                        height: convertHeightFrom360(context, 360, 32),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: convertWidthFrom360(context, 16)),
+                          child: Material(
+                            color: hexToColor("#E4E4E5"),
+                            borderRadius: BorderRadius.circular(10),
+                            child: TabBar(
+                              indicatorPadding: const EdgeInsets.all(2.0),
+                              indicator: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              tabs: [
+                                Tab(text: "На изучении"),
+                                Tab(text: "Изучено"),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                      tabs: [
-                        Tab(text: "На изучении"),
-                        Tab(text: "Изучено"),
-                      ],
-                    ),
+                      SizedBox(height: convertHeightFrom360(context, 360, 8)),
+                      Expanded(
+                        child: _buildBody(context),
+                      ),
+                    ],
                   ),
                 ),
+                appBar: AppBar(
+                  elevation: 0, // Removes status bar's shadow.
+                  backgroundColor: MyColors.mainBgColor,
+                  backwardsCompatibility: false,
+                  systemOverlayStyle: SystemUiOverlayStyle(
+                    statusBarColor: MyColors.mainBgColor,
+                    statusBarIconBrightness: Brightness.dark,
+                  ),
+                  iconTheme: IconThemeData(
+                    color: Colors.black,
+                  ),
+                  title: Text(
+                    learningState.topic.title,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                bottomNavigationBar: AppBottomNav(
+                  selectedIndex: 1,
+                  isHomePage: false,
+                ),
               ),
-              SizedBox(height: convertHeightFrom360(context, 360, 8)),
-              Expanded(
-                child: _buildBody(context),
-              ),
-            ],
-          ),
-        ),
-        appBar: AppBar(
-          elevation: 0, // Removes status bar's shadow.
-          backgroundColor: MyColors.mainBgColor,
-          title: Text(learningState.topic.title),
-        ),
-        bottomNavigationBar: AppBottomNav(
-          selectedIndex: 1,
-          isHomePage: false,
-        ),
-      ),
-    );
+            );
+          }
+        });
   }
 
   Widget _buildBody(BuildContext context) {

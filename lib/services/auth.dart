@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:apple_sign_in/apple_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:magicards/shared/shared.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../services/services.dart';
 import 'package:magicards/screens/screens.dart';
@@ -23,10 +23,10 @@ class AuthServiceFirebase {
   Stream<User> get user => _auth.authStateChanges();
 
   // Determine if Apple Signin is available on device
-  Future<bool> get appleSignInAvailable => AppleSignIn.isAvailable();
+  //Future<bool> get appleSignInAvailable => AppleSignIn.isAvailable();
 
   /// Sign in with Apple
-  Future<User> appleSignIn() async {
+  /*Future<User> appleSignIn() async {
     try {
       final AuthorizationResult appleResult =
           await AppleSignIn.performRequests([
@@ -64,7 +64,7 @@ class AuthServiceFirebase {
       print(error);
       return null;
     }
-  }
+  }*/
 
   /// Sign in with Google
   Future<User> googleSignIn() async {
@@ -211,14 +211,14 @@ class AuthServiceFirebase {
   }
 
   /// Sign in with OTP (phone auth)
-  signInWithOTP(smsCode, verId, {String nextPage, BuildContext context}) {
+  signInWithOTP(smsCode, verId, {String prevScreen, BuildContext context}) {
     AuthCredential authCreds =
         PhoneAuthProvider.credential(verificationId: verId, smsCode: smsCode);
-    signInWithCredential(authCreds, nextPage: nextPage, context: context);
+    signInWithCredential(authCreds, prevScreen: prevScreen, context: context);
   }
 
   signInWithCredential(AuthCredential authCreds,
-      {String nextPage, BuildContext context}) async {
+      {String prevScreen, BuildContext context}) async {
     try {
       UserCredential authResult =
           await FirebaseAuth.instance.signInWithCredential(authCreds);
@@ -236,20 +236,21 @@ class AuthServiceFirebase {
 
         await Purchases.logIn(authResult.user.uid);
 
-        switch (nextPage) {
+        switch (prevScreen) {
           case "bottomNav":
-            //Navigator.of(context).push(_createProfileRoute());
-            break;
-          case "training":
             Navigator.of(context).pop();
+            Navigator.pushNamed(context, '/settings');
+            break;
+          case "paywall":
+            Navigator.of(context).pop();
+            fetchOffers(context, authResult.user);
             break;
           case "cardDetails":
             Navigator.of(context).pop();
             break;
-          default:
-            print("widget.nextPage default");
-            //Navigator.of(context).push(_createProfileRoute());
+          case "settings":
             break;
+          default:
         }
       }
     } catch (e) {

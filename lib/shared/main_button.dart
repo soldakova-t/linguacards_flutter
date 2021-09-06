@@ -6,10 +6,12 @@ class MainButton extends StatelessWidget {
     Key key,
     @required this.title,
     @required this.action,
+    this.color,
   }) : super(key: key);
 
   final String title;
   final Function action;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class MainButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          color: MyColors.mainBrightColor,
+          color: color == null ? MyColors.mainBrightColor : color,
           child: Text(
             title,
             style: TextStyle(

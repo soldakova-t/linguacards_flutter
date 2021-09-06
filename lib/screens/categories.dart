@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 
@@ -18,7 +19,18 @@ class CategoriesScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0, // Removes status bar's shadow.
           backgroundColor: MyColors.mainBgColor,
-          title: Text('Категории'),
+          backwardsCompatibility: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: MyColors.mainBgColor,
+            statusBarIconBrightness: Brightness.dark,
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          title: Text(
+            'Категории',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         bottomNavigationBar: AppBottomNav(
           selectedIndex: 1,

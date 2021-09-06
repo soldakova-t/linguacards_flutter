@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 
@@ -24,7 +25,18 @@ class _PopularTopicsScreenState extends State<PopularTopicsScreen> {
         appBar: AppBar(
           elevation: 0, // Removes status bar's shadow.
           backgroundColor: MyColors.mainBgColor,
-          title: Text(widget.title),
+          backwardsCompatibility: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: MyColors.mainBgColor,
+            statusBarIconBrightness: Brightness.dark,
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          title: Text(
+            widget.title,
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         bottomNavigationBar: AppBottomNav(
           selectedIndex: 0,
@@ -39,7 +51,11 @@ class _PopularTopicsScreenState extends State<PopularTopicsScreen> {
       child: Column(
         children: [
           SizedBox(height: convertHeightFrom360(context, 360, 16)),
-          TopicsList(topics: widget.topics),
+          TopicsList(
+            topics: widget.topics,
+            showOffering: false,
+            showPopulars: false,
+          ),
           SizedBox(height: convertHeightFrom360(context, 360, 80)),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:magicards/api/purchase_api.dart';
 import 'package:magicards/services/models.dart';
 import 'package:magicards/services/services.dart';
 import 'package:magicards/shared/shared.dart';
@@ -13,11 +14,15 @@ class TopicsList extends StatefulWidget {
     @required this.topics,
     this.orientation,
     this.withButtonContinue,
+    @required this.showOffering,
+    this.showPopulars = true,
   }) : super(key: key);
 
   final List<Topic> topics;
   final String orientation;
   final bool withButtonContinue;
+  final bool showOffering;
+  final bool showPopulars;
 
   @override
   _TopicsListState createState() => _TopicsListState();
@@ -67,7 +72,10 @@ class _TopicsListState extends State<TopicsList> {
                     }
 
                     return _TopicsListItem(
-                        widget.topics[index], numberOfLearnedCards);
+                        widget.topics[index],
+                        numberOfLearnedCards,
+                        widget.showOffering,
+                        widget.showPopulars);
                   } else {
                     return Container();
                   }
@@ -75,7 +83,8 @@ class _TopicsListState extends State<TopicsList> {
               );
             } else {
               learningState.topicsNumbersLearnedCards = null;
-              return _TopicsListItem(widget.topics[index], 0);
+              return _TopicsListItem(widget.topics[index], 0,
+                  widget.showOffering, widget.showPopulars);
             }
           }),
     );
@@ -83,21 +92,31 @@ class _TopicsListState extends State<TopicsList> {
 }
 
 class _TopicsListItem extends StatelessWidget {
-  const _TopicsListItem(this.topic, this.numberOfLearnedCards, {Key key})
-      : super(key: key);
+  const _TopicsListItem(
+    this.topic,
+    this.numberOfLearnedCards,
+    this.showOffering,
+    this.showPopulars, {
+    Key key,
+  }) : super(key: key);
 
   final Topic topic;
   final int numberOfLearnedCards;
+  final bool showOffering;
+  final bool showPopulars;
 
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
     double progress = numberOfLearnedCards / topic.numberOfCards;
 
     return GestureDetector(
       onTap: () {
         var learningState = Provider.of<LearningState>(context, listen: false);
         learningState.topic = topic;
-        return Navigator.of(context).push(createRouteScreen("/cards"));
+        showOffering
+            ? fetchOffers(context, user)
+            : Navigator.of(context).push(createRouteScreen("/cards"));
       },
       child: Padding(
         padding:
@@ -117,24 +136,21 @@ class _TopicsListItem extends StatelessWidget {
                 ),
               ),
               // Label popular topic
-              topic.popular
+              (topic.popular && showPopulars)
                   ? Positioned(
                       top: 0,
                       right: 16,
                       child: Container(
                         height: convertHeightFrom360(context, 360, 17),
-                        width: convertWidthFrom360(context, 71),
+                        width: convertWidthFrom360(context, 81),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(
-                                convertWidthFrom360(context, 6)),
-                            bottomLeft: Radius.circular(
-                                convertWidthFrom360(context, 6)),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(convertWidthFrom360(context, 6)),
                           ),
                           color: MyColors.popularBgColor,
                         ),
                         child: Center(
-                          child: Text("Популярная", style: myPopularLabelStyle),
+                          child: Text("популярная", style: myPopularLabelStyle),
                         ),
                       ),
                     )
@@ -160,10 +176,12 @@ class _TopicsListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        "изучено " +
+                        topic.numberOfCards.toString() +
+                            " " +
+                            Strings.getWordWords(topic.numberOfCards) +
+                            ", " +
                             numberOfLearnedCards.toString() +
-                            " слов из " +
-                            topic.numberOfCards.toString(),
+                            " изучено ",
                         style: myPercentStyle),
                     SizedBox(height: convertWidthFrom360(context, 5)),
                     Container(

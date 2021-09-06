@@ -32,6 +32,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           StreamProvider<User>.value(value: AuthServiceFirebase().user),
+          StreamProvider<Sale>.value(value: DB.getSaleStream()),
+          StreamProvider<StringsFB>.value(value: DB.getStringsFBStream()),
           StreamProvider<ConnectivityStatus>(
               create: (_) =>
                   ConnectivityService().connectionStatusController.stream),
@@ -56,6 +58,7 @@ class MyApp extends StatelessWidget {
               '/main': (context) => MainScreen(),
               '/words': (context) => CategoriesScreen(),
               '/settings': (context) => SettingsScreen(),
+              '/login': (context) => LoginScreen(),
             },
 
             // Theme
@@ -63,6 +66,7 @@ class MyApp extends StatelessWidget {
               fontFamily: "SF Compact Display",
               primaryColor: MyColors.mainBrightColor,
               backgroundColor: MyColors.mainBgColor,
+              canvasColor: Colors.transparent,
               brightness: Brightness.light,
               textTheme: TextTheme(
                 bodyText2:

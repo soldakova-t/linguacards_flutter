@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:magicards/api/purchase_api.dart';
+import 'package:magicards/enums/entitlement.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,6 +33,11 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           elevation: 0, // Removes status bar's shadow.
           toolbarHeight: 0,
+          backwardsCompatibility: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: MyColors.mainBgColor,
+            statusBarIconBrightness: Brightness.dark,
+          ),
         ),
         bottomNavigationBar: AppBottomNav(selectedIndex: 0, isHomePage: true),
       ),
@@ -92,7 +100,11 @@ class _MainScreenState extends State<MainScreen> {
                     passedTopics: popularTopics,
                     passedTitle: "Популярные темы"),
                 SizedBox(height: convertHeightFrom360(context, 360, 16)),
-                TopicsList(topics: threePopularTopics),
+                TopicsList(
+                  topics: threePopularTopics,
+                  showOffering: false,
+                  showPopulars: false,
+                ),
                 SizedBox(height: convertHeightFrom360(context, 360, 80)),
               ],
             ),
@@ -119,11 +131,71 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildCustomTopBar(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
+    final entitlement = Provider.of<RevenueCatProvider>(context).entitlement;
+    double appBarHeight;
+    (entitlement == Entitlement.premium)
+        ? appBarHeight = 45
+        : appBarHeight = 55;
 
-    return Padding(
-      padding: EdgeInsets.only(
-          left: convertWidthFrom360(context, 16), top: statusBarHeight + 10),
-      child: SvgPicture.asset('assets/icons/logo.svg'),
+    bool showSaleMessage = false;
+    Sale sale = Provider.of<Sale>(context);
+    if (sale != null) {
+      showSaleMessage = sale.active;
+    }
+
+    return Container(
+      width: double.infinity,
+      height: convertHeightFrom360(context, 360, appBarHeight),
+      child: Stack(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(
+                left: convertWidthFrom360(context, 16),
+                top: statusBarHeight + 10),
+            child: SvgPicture.asset('assets/icons/logo.svg'),
+          ),
+          (entitlement != Entitlement.premium)
+              ? Positioned(
+                  right: 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        right: convertWidthFrom360(context, 16),
+                        top: statusBarHeight + 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            fetchOffers(context, user);
+                          },
+                          child: Container(
+                            height: convertHeightFrom360(context, 360, 22),
+                            width: convertWidthFrom360(context, 74),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xFF656565)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                    convertWidthFrom360(context, 6)),
+                              ),
+                              color: Colors.transparent,
+                            ),
+                            child: Center(
+                              child: Text("плюс",
+                                  style: myAppBarPremiumLabelStyle),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: convertHeightFrom360(context, 360, 7)),
+                        showSaleMessage
+                            ? Text(sale.message, style: mySaleLabelStyle)
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
+      ),
     );
   }
 }

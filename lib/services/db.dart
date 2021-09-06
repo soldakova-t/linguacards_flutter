@@ -1,7 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:magicards/services/services.dart';
 
 class DB {
+  static Future<Sale> getSale() async {
+    try {
+      var collectionRef = FirebaseFirestore.instance.collection('settings');
+      var doc = await collectionRef.doc('sale').get();
+      Sale sale;
+      if (doc.exists) return sale = Sale.fromSnapshot(doc);
+      return sale;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Stream<Sale> getSaleStream() async* {
+    while (true) {
+      yield await getSale();
+    }
+  }
+
+  static Future<StringsFB> getStringsFB() async {
+    try {
+      var collectionRef = FirebaseFirestore.instance.collection('settings');
+      var doc = await collectionRef.doc('strings').get();
+      StringsFB stringsFB;
+      if (doc.exists) return stringsFB = StringsFB.fromSnapshot(doc);
+      return stringsFB;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Stream<StringsFB> getStringsFBStream() async* {
+    while (true) {
+      yield await getStringsFB();
+    }
+  }
+
   static Future<bool> userExists(String userId) async {
     try {
       var collectionRef = FirebaseFirestore.instance.collection('users');
@@ -39,7 +76,8 @@ class DB {
     }
   }*/
 
-  static Future<List<String>> getEarlyLearnedCardsIDs(String userId, String subtopicId) async {
+  static Future<List<String>> getEarlyLearnedCardsIDs(
+      String userId, String subtopicId) async {
     try {
       List<String> learnedCards = [];
       await FirebaseFirestore.instance

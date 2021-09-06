@@ -13,7 +13,6 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     User user = Provider.of<User>(context);
 
     return SizedBox(
@@ -66,7 +65,7 @@ class AppBottomNav extends StatelessWidget {
                         label: user == null ? "Войти" : "Профиль"),
                   ].toList(),
                   currentIndex: selectedIndex,
-                  selectedItemColor: MyColors.mainBrightColor,
+                  selectedItemColor: MyColors.logoPinkColor,
                   unselectedItemColor: MyColors.mainDarkColor,
                   selectedFontSize: 12,
                   iconSize: 24,
@@ -85,7 +84,13 @@ class AppBottomNav extends StatelessWidget {
                         break;
                       case 2:
                         if (selectedIndex != 2) {
-                          Navigator.pushNamed(context, '/settings');
+                          user == null
+                              ? Navigator.pushNamed(
+                                  context,
+                                  '/login',
+                                  arguments: {"prevScreen": "bottomNav"},
+                                )
+                              : Navigator.pushNamed(context, '/settings');
                         }
                         break;
                     }
