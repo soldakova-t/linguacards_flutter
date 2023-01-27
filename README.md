@@ -1,16 +1,12 @@
-# magicards
+# Linguacards
 
-A new Flutter project.
+Flutter-приложение со словарными карточками английского языка.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<h2>Главная и вход</h2>
+<p><img src="./images/designs_1.jpg" /></p>
+<br/>
+<h2>Категории и слова</h2>
+<p><img src="./images/designs_2.jpg" /></p>
+<br/>
+<h2>Тренировка</h2>
+<p><img src="./images/designs_3.jpg" /></p>
